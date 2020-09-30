@@ -1,4 +1,0 @@
-apiVersion: project.jenkins-x.io/v1alpha1
-kind: Metadata
-metadata:
-  name: metadata

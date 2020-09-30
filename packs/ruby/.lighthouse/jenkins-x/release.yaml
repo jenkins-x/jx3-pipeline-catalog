@@ -8,7 +8,7 @@ metadata:
     jenkins.io/pipelineType: build
     owner: jenkins-x-quickstarts
     repository: node-http
-  name: jenkins-x-quickstarts-node-http-5b2h4-1
+  name: jenkins-x-quickstarts-node-http-cmdwv-1
 spec:
   pipelineSpec:
     params:
