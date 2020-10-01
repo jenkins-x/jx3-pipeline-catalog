@@ -8,7 +8,7 @@ metadata:
     jenkins.io/pipelineType: build
     owner: jenkins-x-quickstarts
     repository: node-http
-  name: jenkins-x-quickstarts-node-http-d2wrx-1
+  name: jenkins-x-quickstarts-node-http-c452n-1
 spec:
   pipelineSpec:
     params:
@@ -197,14 +197,6 @@ spec:
           resources: {}
           workingDir: /workspace
         - args:
-          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-          command:
-          - /bin/sh
-          - -c
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: setup-builder-home
-          resources: {}
-        - args:
           - step
           - git
           - merge
@@ -219,6 +211,46 @@ spec:
           - jx
           image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: git-merge
+          resources: {}
+        - args:
+          - -c
+          - jx step next-version --filename package.json
+          command:
+          - /bin/sh
+          image: gcr.io/jenkinsxio/builder-go
+          name: next-version
+          resources: {}
+        - args:
+          - -c
+          - jx step tag --version $(cat VERSION) --no-apply
+          command:
+          - /bin/sh
+          image: gcr.io/jenkinsxio/builder-go
+          name: update-version
+          resources: {}
+        - args:
+          - -c
+          - 'echo disabled: jx gitops helm template --optional'
+          command:
+          - /bin/sh
+          image: gcr.io/jenkinsxio/jx-cli
+          name: helm-template
+          resources: {}
+        - args:
+          - -c
+          - jx step tag --version $(cat VERSION)
+          command:
+          - /bin/sh
+          image: gcr.io/jenkinsxio/builder-go
+          name: tag-version
+          resources: {}
+        - args:
+          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
+          command:
+          - /bin/sh
+          - -c
+          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+          name: setup-builder-home
           resources: {}
         - args:
           - gitops

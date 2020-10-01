@@ -8,7 +8,7 @@ metadata:
     jenkins.io/pipelineType: build
     owner: jenkins-x-quickstarts
     repository: node-http
-  name: jenkins-x-quickstarts-node-http-46sq2-1
+  name: jenkins-x-quickstarts-node-http-rm8j2-1
 spec:
   pipelineSpec:
     params:
@@ -196,21 +196,6 @@ spec:
           resources: {}
           workingDir: /workspace
         - args:
-          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-          command:
-          - /bin/sh
-          - -c
-          env:
-          - name: JX_SECRETS_YAML
-            value: /secrets/jx-boot/secrets.yaml
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: setup-builder-home
-          resources: {}
-        - args:
           - step
           - git
           - merge
@@ -232,6 +217,26 @@ spec:
                 fieldPath: metadata.namespace
           image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: git-merge
+          resources: {}
+        - command:
+          - jx step next-version --use-git-tag-only --tag
+          image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
+          name: next-version
+          resources: {}
+        - args:
+          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
+          command:
+          - /bin/sh
+          - -c
+          env:
+          - name: JX_SECRETS_YAML
+            value: /secrets/jx-boot/secrets.yaml
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+          name: setup-builder-home
           resources: {}
         - args:
           - gitops

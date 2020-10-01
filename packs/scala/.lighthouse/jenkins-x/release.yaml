@@ -8,7 +8,7 @@ metadata:
     jenkins.io/pipelineType: build
     owner: jenkins-x-quickstarts
     repository: node-http
-  name: jenkins-x-quickstarts-node-http-gpstm-1
+  name: jenkins-x-quickstarts-node-http-4s4d9-1
 spec:
   pipelineSpec:
     params:

@@ -8,7 +8,7 @@ metadata:
     jenkins.io/pipelineType: build
     owner: jenkins-x-quickstarts
     repository: node-http
-  name: jenkins-x-quickstarts-node-http-lnkfc-1
+  name: jenkins-x-quickstarts-node-http-k2rlg-1
 spec:
   pipelineSpec:
     params:
@@ -194,14 +194,6 @@ spec:
           resources: {}
           workingDir: /workspace
         - args:
-          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-          command:
-          - /bin/sh
-          - -c
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: setup-builder-home
-          resources: {}
-        - args:
           - step
           - git
           - merge
@@ -216,6 +208,19 @@ spec:
           - jx
           image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: git-merge
+          resources: {}
+        - command:
+          - jx step next-version --use-git-tag-only --tag
+          image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
+          name: next-version
+          resources: {}
+        - args:
+          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
+          command:
+          - /bin/sh
+          - -c
+          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+          name: setup-builder-home
           resources: {}
         - args:
           - gitops
