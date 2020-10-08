@@ -204,7 +204,7 @@ spec:
           - --baseSHA
           - $(params.PULL_BASE_SHA)
           - --sha
-          - $(params.PULL_PULL_SHA)
+          - $(params.PULL_BASE_REF)
           - --baseBranch
           - $(params.PULL_BASE_REF)
           command:
