@@ -242,11 +242,11 @@ spec:
           name: build-make
           resources: {}
         - args:
-          - source .jx/variables.sh && /kaniko/executor $KANIKO_FLAGS --cache=true --cache-dir=/workspace --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --cache-repo=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/cache
+          - source .jx/variables.sh && cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json && /kaniko/executor $KANIKO_FLAGS --cache=true --cache-dir=/workspace --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --cache-repo=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/cache
           command:
           - /busybox/sh
           - -c
-          image: gcr.io/kaniko-project/executor:debug-v0.24.0
+          image: gcr.io/jenkinsxio/kaniko:0.0.5
           name: build-container-build
           resources: {}
         - args:
