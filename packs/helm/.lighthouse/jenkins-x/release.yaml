@@ -213,11 +213,6 @@ spec:
           command:
           - /bin/sh
           - -c
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: setup-builder-home
           resources: {}
@@ -234,11 +229,6 @@ spec:
           - $(params.PULL_BASE_REF)
           command:
           - jx
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: git-merge
           resources: {}
@@ -255,11 +245,6 @@ spec:
           command:
           - /bin/sh
           - -c
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/builder-maven:2.1.150-769
           name: build-helm-build
           resources: {}
@@ -268,11 +253,6 @@ spec:
           command:
           - /bin/bash
           - -c
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: promote-changelog
           resources: {}
@@ -281,11 +261,6 @@ spec:
           command:
           - /bin/sh
           - -c
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/jx-cli:latest
           name: promote-helm-release
           resources: {}
@@ -294,11 +269,6 @@ spec:
           command:
           - /bin/bash
           - -c
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/jx-cli:latest
           name: promote-jx-promote
           resources: {}
