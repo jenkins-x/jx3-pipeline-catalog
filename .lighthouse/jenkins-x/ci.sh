@@ -5,6 +5,8 @@ declare -a repos=(
   "nodedemo"
 )
 
+# TODO to test locally could be: $CURDIR/../../packs
+PACKDIR=/workspace/source/packs
 CURDIR=$(pwd)
 export PROJECT_DIR=test-projects
 rm -rf $PROJECT_DIR
@@ -23,7 +25,7 @@ do
   echo "recreating the pipeline... in dir $(pwd)"
 
   # lets regenerate the build pack...
-  jx project import --no-dev-pr --dry-run --batch-mode --dir $(pwd)  --pipeline-catalog-dir $CURDIR/../../packs
+  jx project import --no-dev-pr --dry-run --batch-mode --dir $(pwd)  --pipeline-catalog-dir $PACKDIR
 
   git add * || true
   git commit -a -m "chore: upgrade pipeline library" || true
