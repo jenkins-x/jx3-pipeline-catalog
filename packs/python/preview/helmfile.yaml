@@ -7,6 +7,7 @@ releases:
   values:
   - values.yaml.gotmpl
   - jx-values.yaml
+  - imagePullSecrets.yaml
   hooks:
   - events: ["presync"]
     showlogs: true
