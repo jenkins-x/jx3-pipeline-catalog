@@ -228,14 +228,7 @@ spec:
           image: gcr.io/jenkinsxio/builder-go
           name: update-version
           resources: {}
-        - args:
-          - -c
-          - 'echo disabled: jx gitops helm template --optional'
-          command:
-          - /bin/sh
-          image: gcr.io/jenkinsxio/jx-cli
-          name: helm-template
-          resources: {}
+
         - args:
           - -c
           - jx step tag --version $(cat VERSION)
