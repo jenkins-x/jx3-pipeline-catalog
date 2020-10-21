@@ -226,14 +226,6 @@ spec:
           resources: {}
         - args:
           - -c
-          - echo disabled
-          command:
-          - /bin/sh
-          image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
-          name: helm-template
-          resources: {}
-        - args:
-          - -c
           - jx step tag --version $(cat VERSION)
           command:
           - /bin/sh
