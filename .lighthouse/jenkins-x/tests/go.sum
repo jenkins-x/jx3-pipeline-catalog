@@ -838,6 +838,8 @@ github.com/jenkins-x/go-scm v1.5.188/go.mod h1:pTp8HHrCEVGs24H/8Cy+X/CDXFlKv9VC6
 github.com/jenkins-x/jx-api/v3 v3.0.0/go.mod h1:T/Q15bSgPAq9+4k5gMZIuVVmj6rfCDqF4XYLJXkM3Q8=
 github.com/jenkins-x/jx-api/v3 v3.0.1 h1:kB3f6r/xUzwdMjeh/R+nE72bLHLaQHCB8Cxs96l5KCc=
 github.com/jenkins-x/jx-api/v3 v3.0.1/go.mod h1:T/Q15bSgPAq9+4k5gMZIuVVmj6rfCDqF4XYLJXkM3Q8=
+github.com/jenkins-x/jx-application v0.0.17 h1:pu/OdVZRyC1S3o3ITT0x6y15t0aiIw9MB9mzziYFFOY=
+github.com/jenkins-x/jx-application v0.0.17/go.mod h1:k3hZYlVB5yTpfXmD0qzvcluqTLV/SSfwyVsTZPKaeyU=
 github.com/jenkins-x/jx-gitops v0.0.394/go.mod h1:GgmrJQ2JFluPLouWcbMgoqtVc5xgdwnFxoA5ohz8/4E=
 github.com/jenkins-x/jx-helpers/v3 v3.0.5/go.mod h1:gwTYDwvCi4qduS2qRSbn6P/isyObDDxmOeM5CTMfn+s=
 github.com/jenkins-x/jx-helpers/v3 v3.0.6/go.mod h1:r3QYErQdwy+5ceg9/ipwPJLLsdwipjL8tRFwZR7SZSY=
@@ -951,6 +953,7 @@ github.com/mattn/go-colorable v0.0.9/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaO
 github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=
 github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
+github.com/mattn/go-colorable v0.1.6/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-colorable v0.1.8 h1:c1ghPdyEDarC70ftn0y+A/Ee++9zz8ljHG1b13eJ0s8=
 github.com/mattn/go-colorable v0.1.8/go.mod h1:u6P/XSegPjTcexA+o6vUJrdnUu04hMope9wVRipJSqc=
 github.com/mattn/go-ieproxy v0.0.0-20190610004146-91bb50d98149/go.mod h1:31jz6HNzdxOmlERGGEc4v/dMssOfmp2p5bT/okiKFFc=

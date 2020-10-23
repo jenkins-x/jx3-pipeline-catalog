@@ -15,6 +15,7 @@ import (
 	"github.com/jenkins-x/go-scm/scm"
 	v1 "github.com/jenkins-x/jx-api/v3/pkg/apis/jenkins.io/v1"
 	"github.com/jenkins-x/jx-api/v3/pkg/client/clientset/versioned"
+	"github.com/jenkins-x/jx-application/pkg/applications"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/cmdrunner"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
@@ -352,12 +353,17 @@ func (o *Options) verifyPreviewEnvironment(pr *scm.PullRequest) {
 
 	o.Infof("found preview URL: %s", info(previewURL))
 
+	statusCode := o.GetAppHttpStatusCode()
+	o.AssertURLReturns(previewURL, statusCode, o.PullRequestPollTimeout, o.PullRequestPollPeriod)
+}
+
+func (o *Options) GetAppHttpStatusCode() int {
 	statusCode := 200
 	// spring quickstarts return 404 for the home page
 	if strings.HasPrefix(o.Repository, "spring") {
 		statusCode = 404
 	}
-	o.AssertURLReturns(previewURL, statusCode, o.PullRequestPollTimeout, o.PullRequestPollPeriod)
+	return statusCode
 }
 
 // ExpectUrlReturns expects that the given URL returns the given status code within the given time period
@@ -371,30 +377,40 @@ func (o *Options) AssertURLReturns(url string, expectedStatusCode int, pollTimeo
 	}
 
 	fn := func(elapsed time.Duration) (bool, error) {
-		transport := &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: o.InsecureURLSkipVerify,
-			},
-		}
-		var httpClient = &http.Client{
-			Timeout:   time.Second * 30,
-			Transport: transport,
-		}
-		response, err := httpClient.Get(url)
+		actualStatusCode, err := o.GetURLStatusCode(url, logMessage)
 		if err != nil {
-			errorMessage := err.Error()
-			if response != nil {
-				errorMessage += " status: " + response.Status
-			}
-			logMessage(fmt.Sprintf("failed to invoke URL %s got: %s", info(url), errorMessage))
-			return false, err
+			return false, nil
 		}
-		actualStatusCode := response.StatusCode
-		logMessage(fmt.Sprintf("invoked URL %s and got return code: %s", info(url), info(strconv.Itoa(actualStatusCode))))
 		return actualStatusCode == expectedStatusCode, nil
 	}
 	message := fmt.Sprintf("expecting status %d on URL %s", expectedStatusCode, url)
 	return o.PollLoop(pollTimeout, pollPeriod, message, fn)
+}
+
+// GetURLStatusCode gets the URL status code
+func (o *Options) GetURLStatusCode(url string, logMessage func(message string)) (int, error) {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: o.InsecureURLSkipVerify,
+		},
+	}
+	var httpClient = &http.Client{
+		Timeout:   time.Second * 30,
+		Transport: transport,
+	}
+	response, err := httpClient.Get(url)
+	if err != nil {
+		errorMessage := err.Error()
+		if response != nil {
+			errorMessage += " status: " + response.Status
+		}
+		message := fmt.Sprintf("failed to invoke URL %s got: %s", info(url), errorMessage)
+		logMessage(message)
+		return 0, errors.Wrap(err, message)
+	}
+	actualStatusCode := response.StatusCode
+	logMessage(fmt.Sprintf("invoked URL %s and got return code: %s", info(url), info(strconv.Itoa(actualStatusCode))))
+	return actualStatusCode, nil
 }
 
 func (o *Options) waitForPullRequestToMerge(pullRequest *scm.PullRequest) *scm.PullRequest {
@@ -544,5 +560,72 @@ func (o *Options) waitForSuccessfulBootJob(sha string) {
 }
 
 func (o *Options) waitForVersionInStaging(version string) {
-	o.Infof("TODO waiting for version %s to be in staging", version)
+	t := o.T
+	message := fmt.Sprintf("waiting for version %s to be in Staging", info(version))
+	ns := o.Namespace
+
+	expectedStatusCode := o.GetAppHttpStatusCode()
+	lastStatus := ""
+	fn := func(elapsed time.Duration) (bool, error) {
+		list, err := applications.GetApplications(o.JXClient, o.KubeClient, ns)
+		if err != nil {
+			return false, errors.Wrap(err, "fetching applications")
+		}
+		answer := false
+		status := ""
+		if len(list.Items) == 0 {
+			status = "No applications found"
+		}
+		for i := range list.Items {
+			app := &list.Items[i]
+			name := app.Name()
+			if !strings.HasPrefix(name, o.Repository) {
+				continue
+			}
+			envs := app.Environments
+			if envs != nil {
+				env := envs["staging"]
+				depName := ""
+				foundVersion := ""
+				for j := range env.Deployments {
+					dep := &env.Deployments[j]
+					depVersion := dep.Version()
+
+					if version == depVersion {
+						appURL := dep.URL(o.KubeClient, app)
+						status = fmt.Sprintf("has version %s running in staging at: %s", version, appURL)
+
+						if appURL != "" {
+							logMessage := func(message string) {
+								status += " " + message
+							}
+							actualStatusCode, err := o.GetURLStatusCode(appURL, logMessage)
+							if err != nil {
+								o.Warnf("failed to get URL %s")
+							} else {
+								status += fmt.Sprintf(" got status code %d", actualStatusCode)
+								if actualStatusCode == expectedStatusCode {
+									answer = true
+								}
+							}
+						}
+						break
+					} else {
+						foundVersion = depVersion
+						depName = dep.Name
+					}
+				}
+				if !answer {
+					o.Infof("app %s has deployment %s with version %s", name, depName, foundVersion)
+				}
+			}
+		}
+		if status != lastStatus {
+			lastStatus = status
+			o.Infof(status)
+		}
+		return answer, nil
+	}
+	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	require.NoError(t, err, "failed to wait for version %s to be in Staging", ns, version)
 }

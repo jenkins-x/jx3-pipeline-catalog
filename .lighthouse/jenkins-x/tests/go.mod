@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/jenkins-x/go-scm v1.5.188
 	github.com/jenkins-x/jx-api/v3 v3.0.1
+	github.com/jenkins-x/jx-application v0.0.17
 	github.com/jenkins-x/jx-helpers/v3 v3.0.10
 	github.com/jenkins-x/jx-promote v0.0.135
 	github.com/mattn/go-colorable v0.1.8 // indirect
