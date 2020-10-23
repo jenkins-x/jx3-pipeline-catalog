@@ -19,17 +19,19 @@ import (
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/cli"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/gitclient/giturl"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jobs"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/jxclient"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/kube/naming"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/scmhelpers"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/stringhelpers"
 	"github.com/jenkins-x/jx-helpers/v3/pkg/termcolor"
-	"github.com/jenkins-x/jx-logging/v3/pkg/log"
 	"github.com/jenkins-x/jx-promote/pkg/environments"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 var (
@@ -38,7 +40,7 @@ var (
 	removePaths = []string{".lighthouse", "jenkins-x.yml", "charts", "preview", "Dockerfile"}
 )
 
-func TestInitialPipelineActivity(t *testing.T) {
+func TestPipelineCatalogWorksOnTestRepository(t *testing.T) {
 	repoName := os.Getenv("JOB_NAME")
 	require.NotEmpty(t, repoName, "no $JOB_NAME defined")
 
@@ -66,17 +68,24 @@ type Options struct {
 	Namespace              string
 	MainBranch             string
 	ReleaseBuildNumber     string
+	MergeSHA               string
+	GitOperatorNamespace   string
 	InsecureURLSkipVerify  bool
+	Verbose                bool
 	GitClient              gitclient.Interface
 	CommandRunner          cmdrunner.CommandRunner
 	ScmFactory             scmhelpers.Factory
 	PullRequestPollTimeout time.Duration
 	PullRequestPollPeriod  time.Duration
+	KubeClient             kubernetes.Interface
 	JXClient               versioned.Interface
 }
 
 // Validate verifies we can lazily create the various clients
 func (o *Options) Validate() {
+	if o.GitOperatorNamespace == "" {
+		o.GitOperatorNamespace = "jx-git-operator"
+	}
 	if o.MainBranch == "" {
 		o.MainBranch = "master"
 	}
@@ -105,6 +114,8 @@ func (o *Options) Validate() {
 
 	o.JXClient, o.Namespace, err = jxclient.LazyCreateJXClientAndNamespace(o.JXClient, o.Namespace)
 	require.NoError(o.T, err, "failed to create the jx client")
+	o.KubeClient, err = kube.LazyCreateKubeClient(o.KubeClient)
+	require.NoError(o.T, err, "failed to create the kube client")
 }
 
 // Run runs the test suite
@@ -119,7 +130,8 @@ func (o *Options) Run() {
 
 	o.verifyPreviewEnvironment(pr)
 
-	o.waitForReleasePipelineToComplete(buildNumber)
+	releasePA := o.waitForReleasePipelineToComplete(buildNumber)
+	o.waitForPromotePullRequestToMerge(releasePA)
 }
 
 // CreatePullRequest creates the pull request with the new build pack
@@ -145,7 +157,7 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 	pro.Function = func() error {
 		dir := pro.OutDir
 
-		t.Logf("cloned to git dir %s", dir)
+		o.Infof("cloned to git dir %s", dir)
 
 		for _, p := range removePaths {
 			path := filepath.Join(dir, p)
@@ -153,7 +165,7 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 			if err != nil {
 				return errors.Wrapf(err, "failed to remove %s", path)
 			}
-			t.Logf("removed %s\n", path)
+			o.Debugf("removed %s\n", path)
 		}
 
 		c := &cmdrunner.Command{
@@ -181,63 +193,13 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 	return pr
 }
 
-func (o *Options) waitForPullRequestToMerge(pullRequestInfo *scm.PullRequest) *scm.PullRequest {
-	logNoMergeCommitSha := false
-	logHasMergeSha := false
-
-	t := o.T
-	message := fmt.Sprintf("pull request %s to merge", info(pullRequestInfo.Link))
-
-	ctx := context.Background()
-	fullName := pullRequestInfo.Repository().FullName
-	prNumber := pullRequestInfo.Number
-
-	var err error
-	var pr *scm.PullRequest
-	fn := func(elapsed time.Duration) (bool, error) {
-		pr, _, err = o.ScmFactory.ScmClient.PullRequests.Find(ctx, fullName, prNumber)
-		if err != nil {
-			o.Warnf("Failed to query the Pull Request status for %s %s", pullRequestInfo.Link, err)
-		} else {
-			elaspedString := elapsed.String()
-			if pr.Merged {
-				if pr.MergeSha == "" {
-					if !logNoMergeCommitSha {
-						logNoMergeCommitSha = true
-						o.Infof("Pull Request %s is merged but we don't yet have a merge SHA after waiting %s", termcolor.ColorInfo(pr.Link), elaspedString)
-						return true, nil
-					}
-				} else {
-					mergeSha := pr.MergeSha
-					if !logHasMergeSha {
-						logHasMergeSha = true
-						o.Infof("Pull Request %s is merged at sha %s after waiting %s", termcolor.ColorInfo(pr.Link), termcolor.ColorInfo(mergeSha), elaspedString)
-						return true, nil
-					}
-				}
-			} else {
-				if pr.Closed {
-					o.Warnf("Pull Request %s is closed after waiting %s", termcolor.ColorInfo(pr.Link), elaspedString)
-					return true, nil
-				}
-			}
-		}
-		return false, nil
-	}
-
-	err = PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
-	require.NoError(t, err, "failed to %s", message)
-
-	return pr
-}
-
 // PollLoop polls the given callback until the poll period expires or the function returns true
-func PollLoop(pollTimeout, pollPeriod time.Duration, message string, fn func(elapsed time.Duration) (bool, error)) error {
+func (o *Options) PollLoop(pollTimeout, pollPeriod time.Duration, message string, fn func(elapsed time.Duration) (bool, error)) error {
 	start := time.Now()
 	end := start.Add(pollTimeout)
 	durationString := pollTimeout.String()
 
-	log.Logger().Infof("Waiting up to %s for %s...", durationString, message)
+	o.Infof("Waiting up to %s for %s...", durationString, message)
 
 	for {
 		elapsed := time.Now().Sub(start)
@@ -253,6 +215,12 @@ func PollLoop(pollTimeout, pollPeriod time.Duration, message string, fn func(ela
 			return fmt.Errorf("Timed out waiting for %s. Waited %s", message, durationString)
 		}
 		time.Sleep(pollPeriod)
+	}
+}
+
+func (o *Options) Debugf(message string, args ...interface{}) {
+	if o.Verbose {
+		o.Infof("DEBUG: "+message, args...)
 	}
 }
 
@@ -321,7 +289,7 @@ func (o *Options) waitForReleasePipelineToComplete(buildNumber string) *v1.Pipel
 	}
 
 	message := fmt.Sprintf("release complete for PipelineActivity build %s with selector %s", info(o.ReleaseBuildNumber), info(selector))
-	err := PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
 	require.NoError(t, err, "failed to %s", message)
 
 	require.NotNil(t, answer, "no PipelineActivity found for %s", message)
@@ -426,5 +394,155 @@ func (o *Options) AssertURLReturns(url string, expectedStatusCode int, pollTimeo
 		return actualStatusCode == expectedStatusCode, nil
 	}
 	message := fmt.Sprintf("expecting status %d on URL %s", expectedStatusCode, url)
-	return PollLoop(pollTimeout, pollPeriod, message, fn)
+	return o.PollLoop(pollTimeout, pollPeriod, message, fn)
+}
+
+func (o *Options) waitForPullRequestToMerge(pullRequest *scm.PullRequest) *scm.PullRequest {
+	t := o.T
+	logNoMergeCommitSha := false
+	logHasMergeSha := false
+	message := fmt.Sprintf("pull request %s to merge", info(pullRequest.Link))
+
+	ctx := context.Background()
+	fullName := pullRequest.Repository().FullName
+	prNumber := pullRequest.Number
+
+	o.MergeSHA = ""
+	var err error
+	var pr *scm.PullRequest
+	fn := func(elapsed time.Duration) (bool, error) {
+		pr, _, err = o.ScmFactory.ScmClient.PullRequests.Find(ctx, fullName, prNumber)
+		if err != nil {
+			o.Warnf("Failed to query the Pull Request status for %s %s", pullRequest.Link, err)
+		} else {
+			if pr.MergeSha != "" {
+				o.MergeSHA = pr.MergeSha
+			}
+			elaspedString := elapsed.String()
+			if pr.Merged {
+				if pr.MergeSha == "" && o.MergeSHA == "" {
+					if !logNoMergeCommitSha {
+						logNoMergeCommitSha = true
+						o.Infof("Pull Request %s is merged but we don't yet have a merge SHA after waiting %s", info(pr.Link), elaspedString)
+						return false, nil
+					}
+				} else {
+					if !logHasMergeSha {
+						logHasMergeSha = true
+						o.Infof("Pull Request %s is merged at sha %s after waiting %s", info(pr.Link), info(o.MergeSHA), elaspedString)
+						return true, nil
+					}
+				}
+			} else {
+				if pr.Closed {
+					o.Warnf("Pull Request %s is closed after waiting %s", info(pr.Link), elaspedString)
+					return true, nil
+				}
+			}
+		}
+		return false, nil
+	}
+
+	err = o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	require.NoError(t, err, "failed to %s", message)
+
+	return pr
+}
+
+func (o *Options) waitForPromotePullRequestToMerge(pa *v1.PipelineActivity) {
+	t := o.T
+
+	version := pa.Spec.Version
+	prURL := ""
+	for i := range pa.Spec.Steps {
+		s := &pa.Spec.Steps[i]
+		promote := s.Promote
+		if promote != nil && promote.PullRequest != nil {
+			prURL = promote.PullRequest.PullRequestURL
+			if prURL != "" {
+				break
+			}
+		}
+	}
+	require.NotEmpty(t, version, "could not find the version for PipelineActivity %s", pa.Name)
+	require.NotEmpty(t, prURL, "could not find the Promote PullRequest URL for PipelineActivity %s", pa.Name)
+
+	o.Infof("found Promote Pull Request: %s", info(prURL))
+
+	pr, err := scmhelpers.ParsePullRequestURL(prURL)
+	require.NoError(t, err, "failed to parse Pull Request: %s", prURL)
+
+	o.waitForPullRequestToMerge(pr)
+
+	require.NotEmpty(t, o.MergeSHA, "no merge SHA for the promote Pull Request %s", prURL)
+
+	o.waitForSuccessfulBootJob(o.MergeSHA)
+
+	o.waitForVersionInStaging(version)
+}
+
+func (o *Options) waitForSuccessfulBootJob(sha string) {
+	t := o.T
+	selector := "app=jx-boot,git-operator.jenkins.io/commit-sha=" + sha
+
+	message := fmt.Sprintf("successful Job in namespace %s with selector %s", info(o.GitOperatorNamespace), info(selector))
+	ctx := context.Background()
+	ns := o.GitOperatorNamespace
+	kubeClient := o.KubeClient
+
+	lastStatus := ""
+	fn := func(elapsed time.Duration) (bool, error) {
+		resources, err := kubeClient.BatchV1().Jobs(ns).List(ctx, metav1.ListOptions{LabelSelector: selector})
+		if err != nil && apierrors.IsNotFound(err) {
+			err = nil
+		}
+		if err != nil {
+			return false, errors.Wrapf(err, "failed to list Jobs in namespace %s with selector %s", ns, selector)
+		}
+
+		jobName := ""
+		answer := false
+		status := "Pending"
+		count := len(resources.Items)
+		if count == 0 {
+			status = fmt.Sprintf("no jobs found matching selector %s", selector)
+		} else {
+			if count > 1 {
+				o.Warnf("found %s Jobs in namespace %s with selector %s", count, ns, selector)
+			}
+
+			// lets use the last one
+			job := &resources.Items[count-1]
+			jobName = job.Name
+			if jobs.IsJobFinished(job) {
+				if jobs.IsJobSucceeded(job) {
+					status = "Succeeded"
+					answer = true
+				} else {
+					status = "Failed"
+					err = errors.Errorf("job %s has failed", job.Name)
+				}
+			} else {
+				if job.Status.Active > 0 {
+					status = "Running"
+				}
+			}
+		}
+		if status != lastStatus {
+			lastStatus = status
+			if jobName != "" {
+				o.Infof("boot Job %s has status: %s", info(jobName), info(status))
+			} else {
+				o.Infof("status: %s", info(status))
+			}
+		}
+		return answer, err
+	}
+
+	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	require.NoError(t, err, "failed to poll for completed Job in namespace %s for selector %s", ns, selector)
+}
+
+func (o *Options) waitForVersionInStaging(version string) {
+	o.Infof("TODO waiting for version %s to be in staging", version)
 }
