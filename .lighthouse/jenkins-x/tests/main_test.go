@@ -2,10 +2,13 @@ package tests
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -49,6 +52,7 @@ func TestInitialPipelineActivity(t *testing.T) {
 		PackDir:                packDir,
 		PullRequestPollTimeout: 20 * time.Minute,
 		PullRequestPollPeriod:  10 * time.Second,
+		InsecureURLSkipVerify:  true,
 	}
 	o.Run()
 }
@@ -60,8 +64,9 @@ type Options struct {
 	GitURL                 string
 	PackDir                string
 	Namespace              string
-	Selector               string
+	MainBranch             string
 	ReleaseBuildNumber     string
+	InsecureURLSkipVerify  bool
 	GitClient              gitclient.Interface
 	CommandRunner          cmdrunner.CommandRunner
 	ScmFactory             scmhelpers.Factory
@@ -72,6 +77,9 @@ type Options struct {
 
 // Validate verifies we can lazily create the various clients
 func (o *Options) Validate() {
+	if o.MainBranch == "" {
+		o.MainBranch = "master"
+	}
 	if o.Owner == "" {
 		o.Owner = "jenkins-x-labs-bdd-tests"
 	}
@@ -84,7 +92,7 @@ func (o *Options) Validate() {
 
 	var err error
 	if o.CommandRunner == nil {
-		o.CommandRunner = cmdrunner.DefaultCommandRunner
+		o.CommandRunner = cmdrunner.QuietCommandRunner
 	}
 	if o.GitClient == nil {
 		o.GitClient = cli.NewCLIClient("", o.CommandRunner)
@@ -108,6 +116,8 @@ func (o *Options) Run() {
 	buildNumber := o.findNextBuildNumber()
 
 	o.waitForPullRequestToMerge(pr)
+
+	o.verifyPreviewEnvironment(pr)
 
 	o.waitForReleasePipelineToComplete(buildNumber)
 }
@@ -167,7 +177,7 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 
 	prURL := pr.Link
 
-	t.Logf("created Pull Request %s", prURL)
+	t.Logf("created Pull Request: %s", info(prURL))
 	return pr
 }
 
@@ -254,37 +264,19 @@ func (o *Options) Warnf(message string, args ...interface{}) {
 	o.Infof("WARN: "+message, args...)
 }
 
+// ActivitySelector returns the activity selector for the repo and branch
+func (o *Options) ActivitySelector(branch string) string {
+	return "owner=" + naming.ToValidName(o.Owner) + ",repository=" + naming.ToValidName(o.Repository) + ",branch=" + naming.ToValidValue(branch)
+}
+
 func (o *Options) findNextBuildNumber() string {
 	t := o.T
-	jxClient := o.JXClient
-	ns := o.Namespace
-	ctx := context.Background()
-	if o.Selector == "" {
-		o.Selector = "owner=" + naming.ToValidName(o.Owner) + ",repository=" + naming.ToValidName(o.Repository) + ",branch=master"
-	}
-	resources, err := jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: o.Selector})
-	if err != nil && apierrors.IsNotFound(err) {
-		err = nil
-	}
-	require.NoError(t, err, "failed to list PipelineActivity resources in namespace %s with selector %s", ns, o.Selector)
+	_, buildNumber, _, err := o.getLatestPipelineActivity(o.MainBranch)
+	require.NoError(t, err, "failed to find latest PipelineActivity for branch %s", o.MainBranch)
 
-	maxBuildNumber := 0
-	for _, r := range resources.Items {
-		buildName := r.Spec.Build
-		if buildName != "" {
-			b, err := strconv.Atoi(buildName)
-			if err != nil {
-				o.Warnf("failed to convert build number %s to number for PipelineActivity %s: %s", buildName, r.Name, err.Error())
-				continue
-			}
-			if b > maxBuildNumber {
-				maxBuildNumber = b
-			}
-		}
-	}
-	maxBuildNumber++
-	o.ReleaseBuildNumber = strconv.Itoa(maxBuildNumber)
-	o.Infof("next PipelineActivity release build number is: #s", o.ReleaseBuildNumber)
+	buildNumber++
+	o.ReleaseBuildNumber = strconv.Itoa(buildNumber)
+	o.Infof("next PipelineActivity release build number is: #%s", o.ReleaseBuildNumber)
 	return o.ReleaseBuildNumber
 }
 
@@ -293,18 +285,19 @@ func (o *Options) waitForReleasePipelineToComplete(buildNumber string) *v1.Pipel
 	jxClient := o.JXClient
 	ns := o.Namespace
 	ctx := context.Background()
+	selector := o.ActivitySelector(o.MainBranch)
 
+	lastStatusString := ""
 	var answer *v1.PipelineActivity
 	fn := func(elapsed time.Duration) (bool, error) {
-		resources, err := jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: o.Selector})
+		resources, err := jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: selector})
 		if err != nil && apierrors.IsNotFound(err) {
 			err = nil
 		}
 		if err != nil {
-			return false, errors.Wrapf(err, "failed to list PipelineActivity resources in namespace %s with selector %s", ns, o.Selector)
+			return false, errors.Wrapf(err, "failed to list PipelineActivity resources in namespace %s with selector %s", ns, selector)
 		}
 
-		lastStatusString := ""
 		for i := range resources.Items {
 			r := &resources.Items[i]
 			buildName := r.Spec.Build
@@ -327,11 +320,111 @@ func (o *Options) waitForReleasePipelineToComplete(buildNumber string) *v1.Pipel
 		return false, nil
 	}
 
-	message := fmt.Sprintf("release complete for PipelineActivity build %s with selector %s", info(o.ReleaseBuildNumber), info(o.Selector))
+	message := fmt.Sprintf("release complete for PipelineActivity build %s with selector %s", info(o.ReleaseBuildNumber), info(selector))
 	err := PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
 	require.NoError(t, err, "failed to %s", message)
 
 	require.NotNil(t, answer, "no PipelineActivity found for %s", message)
 	require.Equal(t, v1.ActivityStatusTypeSucceeded, answer.Spec.Status, "status for %s", message)
 	return answer
+}
+
+func (o *Options) getLatestPipelineActivity(branch string) (pa *v1.PipelineActivity, buildNumber int, selector string, err error) {
+	jxClient := o.JXClient
+	ns := o.Namespace
+	ctx := context.Background()
+
+	selector = o.ActivitySelector(branch)
+	var resources *v1.PipelineActivityList
+	resources, err = jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: selector})
+	if err != nil && apierrors.IsNotFound(err) {
+		err = nil
+	}
+	if err != nil {
+		return
+	}
+
+	for i := range resources.Items {
+		r := &resources.Items[i]
+		buildName := r.Spec.Build
+		if buildName != "" {
+			b, err := strconv.Atoi(buildName)
+			if err != nil {
+				o.Warnf("failed to convert build number %s to number for PipelineActivity %s: %s", buildName, r.Name, err.Error())
+				continue
+			}
+			if b > buildNumber {
+				buildNumber = b
+				pa = r
+			}
+		}
+	}
+	return
+}
+
+func (o *Options) verifyPreviewEnvironment(pr *scm.PullRequest) {
+	t := o.T
+	branch := fmt.Sprintf("PR-%d", pr.Number)
+	pa, _, selector, err := o.getLatestPipelineActivity(branch)
+	require.NoError(t, err, "failed to find latest PipelineActivity for branch %s", branch)
+	require.NotNil(t, pa, "could not find a PipelineActivity for selector %s", selector)
+
+	previewURL := ""
+	for i := range pa.Spec.Steps {
+		s := &pa.Spec.Steps[i]
+		preview := s.Preview
+		if preview != nil {
+			previewURL = preview.ApplicationURL
+			if previewURL != "" {
+				break
+			}
+		}
+	}
+	require.NotEmpty(t, previewURL, "could not find a Preview URL for PipelineActivity %s", pa.Name)
+
+	o.Infof("found preview URL: %s", info(previewURL))
+
+	statusCode := 200
+	// spring quickstarts return 404 for the home page
+	if strings.HasPrefix(o.Repository, "spring") {
+		statusCode = 404
+	}
+	o.AssertURLReturns(previewURL, statusCode, o.PullRequestPollTimeout, o.PullRequestPollPeriod)
+}
+
+// ExpectUrlReturns expects that the given URL returns the given status code within the given time period
+func (o *Options) AssertURLReturns(url string, expectedStatusCode int, pollTimeout, pollPeriod time.Duration) error {
+	lastLogMessage := ""
+	logMessage := func(message string) {
+		if message != lastLogMessage {
+			lastLogMessage = message
+			o.Infof(message)
+		}
+	}
+
+	fn := func(elapsed time.Duration) (bool, error) {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: o.InsecureURLSkipVerify,
+			},
+		}
+		var httpClient = &http.Client{
+			Timeout:   time.Second * 30,
+			Transport: transport,
+		}
+		response, err := httpClient.Get(url)
+		if err != nil {
+			errorMessage := err.Error()
+			if response != nil {
+				errorMessage += " status: " + response.Status
+			}
+			logMessage(fmt.Sprintf("failed to invoke URL %s got: %s", info(url), errorMessage))
+			return false, err
+		}
+		actualStatusCode := response.StatusCode
+		logMessage(fmt.Sprintf("invoked URL %s and got return code: %s", info(url), info(strconv.Itoa(actualStatusCode))))
+		return actualStatusCode == expectedStatusCode, nil
+	}
+	message := fmt.Sprintf("expecting status %d on URL %s", expectedStatusCode, url)
+	return PollLoop(pollTimeout, pollPeriod, message, fn)
 }
