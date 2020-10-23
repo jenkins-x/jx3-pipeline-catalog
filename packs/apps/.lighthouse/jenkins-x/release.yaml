@@ -242,28 +242,12 @@ spec:
           name: build-build
           resources: {}
         - args:
-          - cd /workspace/source/charts/node-http && make tag
+          - 'if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh && cd /workspace/source/charts/$REPO_NAME && make release; else echo no charts; fi'
           command:
-          - /bin/sh
+          - /bin/bash
           - -c
-          image: gcr.io/jenkinsxio/builder-go:2.1.150-769
-          name: build-tag
-          resources: {}
-        - args:
-          - cd /workspace/source/charts/node-http && jx step helm build
-          command:
-          - /bin/sh
-          - -c
-          image: gcr.io/jenkinsxio/builder-go:2.1.150-769
-          name: build-helm-build
-          resources: {}
-        - args:
-          - cd /workspace/source/charts/node-http && jx step helm version
-          command:
-          - /bin/sh
-          - -c
-          image: gcr.io/jenkinsxio/builder-go:2.1.150-769
-          name: build-helm-version
+          image: gcr.io/jenkinsxio/jx-cli:latest
+          name: release-chart
           resources: {}
         - args:
           - make release
