@@ -241,12 +241,12 @@ spec:
           name: jx-variables
           resources: {}
         - args:
-          - cd /workspace/source/charts/node-http && jx step helm build --verbose
+          - 'if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh && cd /workspace/source/charts/$REPO_NAME && make release; else echo no charts; fi'
           command:
-          - /bin/sh
+          - /bin/bash
           - -c
-          image: gcr.io/jenkinsxio/builder-maven:2.1.150-769
-          name: build-helm-build
+          image: gcr.io/jenkinsxio/jx-cli:latest
+          name: release-chart
           resources: {}
         - args:
           - source /workspace/source/.jx/variables.sh && jx step changelog --version v${VERSION}

@@ -243,7 +243,7 @@ spec:
           name: jx-variables
           resources: {}
         - args:
-          - mvn versions:set -DnewVersion=$PREVIEW_VERSION
+          - source .jx/variables.sh && mvn versions:set -DnewVersion=$VERSION
           command:
           - /bin/sh
           - -c
