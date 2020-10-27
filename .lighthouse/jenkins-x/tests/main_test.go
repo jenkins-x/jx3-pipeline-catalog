@@ -243,6 +243,11 @@ func (o *Options) ActivitySelector(branch string) string {
 	return "owner=" + naming.ToValidName(o.Owner) + ",repository=" + naming.ToValidName(o.Repository) + ",branch=" + naming.ToValidValue(branch)
 }
 
+// ActivitySelector returns the activity selector for the repo and branch
+func (o *Options) PromoteSelector(repository *scm.Repository, branch string) string {
+	return "lighthouse.jenkins-x.io/refs.org=" + naming.ToValidName(repository.Namespace) + ",lighthouse.jenkins-x.io/refs.repo=" + naming.ToValidName(repository.Name) + ",lighthouse.jenkins-x.io/branch=" + naming.ToValidValue(branch)
+}
+
 func (o *Options) findNextBuildNumber() string {
 	t := o.T
 	_, buildNumber, _, err := o.getLatestPipelineActivity(o.MainBranch)
@@ -420,18 +425,67 @@ func (o *Options) GetURLStatusCode(url string, logMessage func(message string)) 
 
 func (o *Options) waitForPullRequestToMerge(pullRequest *scm.PullRequest) *scm.PullRequest {
 	t := o.T
+	jxClient := o.JXClient
+	ns := o.Namespace
 	logNoMergeCommitSha := false
 	logHasMergeSha := false
 	message := fmt.Sprintf("pull request %s to merge", info(pullRequest.Link))
 
 	ctx := context.Background()
-	fullName := pullRequest.Repository().FullName
+	repository := pullRequest.Repository()
+	fullName := repository.FullName
 	prNumber := pullRequest.Number
 
 	o.MergeSHA = ""
 	var err error
 	var pr *scm.PullRequest
+
+	selector := o.PromoteSelector(&repository, "PR-"+strconv.Itoa(prNumber))
+
+	lastStatus := ""
+
 	fn := func(elapsed time.Duration) (bool, error) {
+		// lets wait for there to be at least one PipelineActivity for this branch and for them all to have completed
+		resources, err := jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: selector})
+		if err != nil && apierrors.IsNotFound(err) {
+			err = nil
+		}
+		if err != nil {
+			return false, errors.Wrapf(err, "failed to list PipelineActivity resources in namespace %s with selector %s", ns, selector)
+		}
+
+		status := ""
+		prPipelineComplete := false
+		if len(resources.Items) == 0 {
+			status = fmt.Sprintf("no PipelineActivity resources found in namespace %s with selector %s", ns, selector)
+		} else {
+			for i := range resources.Items {
+				r := &resources.Items[i]
+				status = fmt.Sprintf("PipelineActivity %s has status %s", r.Name, string(r.Spec.Status))
+				if r.Spec.Status.IsTerminated() {
+					if r.Spec.Status == v1.ActivityStatusTypeSucceeded {
+						prPipelineComplete = true
+						status += "\nnow polling for PullRequest being merged..."
+					} else {
+						err = errors.Errorf("PipelineActivity %s has status %s", r.Name, string(r.Spec.Status))
+					}
+				}
+			}
+		}
+		if status != lastStatus {
+			o.Infof(status)
+			lastStatus = status
+		}
+		return prPipelineComplete, err
+	}
+
+	err = o.PollLoop(o.ReleasePollTimeout, o.ReleasePollPeriod, message, fn)
+	require.NoError(t, err, "failed to %s", message)
+
+	// lets sleep a little bit to give keeper a chance to auto merge to minimise github API calls...
+	time.Sleep(30 * time.Second)
+
+	fn = func(elapsed time.Duration) (bool, error) {
 		pr, _, err = o.ScmFactory.ScmClient.PullRequests.Find(ctx, fullName, prNumber)
 		if err != nil {
 			o.Warnf("Failed to query the Pull Request status for %s %s", pullRequest.Link, err)
@@ -463,9 +517,6 @@ func (o *Options) waitForPullRequestToMerge(pullRequest *scm.PullRequest) *scm.P
 		}
 		return false, nil
 	}
-
-	// lets sleep for a bit to reduce the number of polls
-	time.Sleep(3 * time.Minute)
 
 	err = o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
 	require.NoError(t, err, "failed to %s", message)
