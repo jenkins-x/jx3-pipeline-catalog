@@ -4,23 +4,23 @@ spec:
   presubmits:
   - name: godemo
     context: "godemo"
-    always_run: true
+    always_run: false
     optional: false
-    trigger: (?m)^/test( all| go),?(s+|$)
+    trigger: (?m)^/test( all| go.*),?(s+|$)
     rerun_command: /test go
     source: "pullrequest.yaml"
   - name: nodedemo
     context: "nodedemo"
-    always_run: true
+    always_run: false
     optional: false
-    trigger: (?m)^/test( all| node),?(s+|$)
+    trigger: (?m)^/test( all| node.*),?(s+|$)
     rerun_command: /test node
     source: "pullrequest.yaml"
   - name: springdemo
     context: "springdemo"
-    always_run: true
+    always_run: false
     optional: false
-    trigger: (?m)^/test( all| spring),?(s+|$)
+    trigger: (?m)^/test( all| spring.*),?(s+|$)
     rerun_command: /test spring
     source: "pullrequest.yaml"
   postsubmits:

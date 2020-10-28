@@ -179,7 +179,7 @@ spec:
             to dir: /workspace/$(params.subdirectory); ls -al'
           command:
           - /bin/sh
-          image: gcr.io/jenkinsxio/builder-jx:2.1.32-662
+          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
           name: git-clone
           resources: {}
           workingDir: /workspace

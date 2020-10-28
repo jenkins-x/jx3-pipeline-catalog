@@ -54,7 +54,9 @@ func TestPipelineCatalogWorksOnTestRepository(t *testing.T) {
 		Repository:             repoName,
 		PackDir:                packDir,
 		PullRequestPollTimeout: 20 * time.Minute,
-		PullRequestPollPeriod:  10 * time.Second,
+		PullRequestPollPeriod:  time.Minute,
+		ReleasePollTimeout:     20 * time.Minute,
+		ReleasePollPeriod:      10 * time.Second,
 		InsecureURLSkipVerify:  true,
 	}
 	o.Run()
@@ -78,6 +80,8 @@ type Options struct {
 	ScmFactory             scmhelpers.Factory
 	PullRequestPollTimeout time.Duration
 	PullRequestPollPeriod  time.Duration
+	ReleasePollTimeout     time.Duration
+	ReleasePollPeriod      time.Duration
 	KubeClient             kubernetes.Interface
 	JXClient               versioned.Interface
 }
@@ -174,7 +178,8 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 			Name: "jx",
 			Args: []string{"project", "import", "--dry-run", "--batch-mode", "--pipeline-catalog-dir", o.PackDir},
 		}
-		_, err := o.CommandRunner(c)
+		out, err := o.CommandRunner(c)
+		o.Infof(out)
 		if err != nil {
 			return errors.Wrapf(err, "failed to run %s", c.CLI())
 		}
@@ -200,7 +205,7 @@ func (o *Options) PollLoop(pollTimeout, pollPeriod time.Duration, message string
 	end := start.Add(pollTimeout)
 	durationString := pollTimeout.String()
 
-	o.Infof("Waiting up to %s for %s...", durationString, message)
+	o.Infof("Waiting up to %s with poll period %s for %s...", durationString, pollPeriod.String(), message)
 
 	for {
 		elapsed := time.Now().Sub(start)
@@ -236,6 +241,11 @@ func (o *Options) Warnf(message string, args ...interface{}) {
 // ActivitySelector returns the activity selector for the repo and branch
 func (o *Options) ActivitySelector(branch string) string {
 	return "owner=" + naming.ToValidName(o.Owner) + ",repository=" + naming.ToValidName(o.Repository) + ",branch=" + naming.ToValidValue(branch)
+}
+
+// ActivitySelector returns the activity selector for the repo and branch
+func (o *Options) PromoteSelector(repository *scm.Repository, branch string) string {
+	return "lighthouse.jenkins-x.io/refs.org=" + naming.ToValidName(repository.Namespace) + ",lighthouse.jenkins-x.io/refs.repo=" + naming.ToValidName(repository.Name) + ",lighthouse.jenkins-x.io/branch=" + naming.ToValidValue(branch)
 }
 
 func (o *Options) findNextBuildNumber() string {
@@ -290,7 +300,7 @@ func (o *Options) waitForReleasePipelineToComplete(buildNumber string) *v1.Pipel
 	}
 
 	message := fmt.Sprintf("release complete for PipelineActivity build %s with selector %s", info(o.ReleaseBuildNumber), info(selector))
-	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	err := o.PollLoop(o.PullRequestPollTimeout, o.ReleasePollPeriod, message, fn)
 	require.NoError(t, err, "failed to %s", message)
 
 	require.NotNil(t, answer, "no PipelineActivity found for %s", message)
@@ -354,7 +364,7 @@ func (o *Options) verifyPreviewEnvironment(pr *scm.PullRequest) {
 	o.Infof("found preview URL: %s", info(previewURL))
 
 	statusCode := o.GetAppHttpStatusCode()
-	o.AssertURLReturns(previewURL, statusCode, o.PullRequestPollTimeout, o.PullRequestPollPeriod)
+	o.AssertURLReturns(previewURL, statusCode, o.PullRequestPollTimeout, o.ReleasePollPeriod)
 }
 
 func (o *Options) GetAppHttpStatusCode() int {
@@ -415,18 +425,67 @@ func (o *Options) GetURLStatusCode(url string, logMessage func(message string)) 
 
 func (o *Options) waitForPullRequestToMerge(pullRequest *scm.PullRequest) *scm.PullRequest {
 	t := o.T
+	jxClient := o.JXClient
+	ns := o.Namespace
 	logNoMergeCommitSha := false
 	logHasMergeSha := false
 	message := fmt.Sprintf("pull request %s to merge", info(pullRequest.Link))
 
 	ctx := context.Background()
-	fullName := pullRequest.Repository().FullName
+	repository := pullRequest.Repository()
+	fullName := repository.FullName
 	prNumber := pullRequest.Number
 
 	o.MergeSHA = ""
 	var err error
 	var pr *scm.PullRequest
+
+	selector := o.PromoteSelector(&repository, "PR-"+strconv.Itoa(prNumber))
+
+	lastStatus := ""
+
 	fn := func(elapsed time.Duration) (bool, error) {
+		// lets wait for there to be at least one PipelineActivity for this branch and for them all to have completed
+		resources, err := jxClient.JenkinsV1().PipelineActivities(ns).List(ctx, metav1.ListOptions{LabelSelector: selector})
+		if err != nil && apierrors.IsNotFound(err) {
+			err = nil
+		}
+		if err != nil {
+			return false, errors.Wrapf(err, "failed to list PipelineActivity resources in namespace %s with selector %s", ns, selector)
+		}
+
+		status := ""
+		prPipelineComplete := false
+		if len(resources.Items) == 0 {
+			status = fmt.Sprintf("no PipelineActivity resources found in namespace %s with selector %s", ns, selector)
+		} else {
+			for i := range resources.Items {
+				r := &resources.Items[i]
+				status = fmt.Sprintf("PipelineActivity %s has status %s", r.Name, string(r.Spec.Status))
+				if r.Spec.Status.IsTerminated() {
+					if r.Spec.Status == v1.ActivityStatusTypeSucceeded {
+						prPipelineComplete = true
+						status += "\nnow polling for PullRequest being merged..."
+					} else {
+						err = errors.Errorf("PipelineActivity %s has status %s", r.Name, string(r.Spec.Status))
+					}
+				}
+			}
+		}
+		if status != lastStatus {
+			o.Infof(status)
+			lastStatus = status
+		}
+		return prPipelineComplete, err
+	}
+
+	err = o.PollLoop(o.ReleasePollTimeout, o.ReleasePollPeriod, message, fn)
+	require.NoError(t, err, "failed to %s", message)
+
+	// lets sleep a little bit to give keeper a chance to auto merge to minimise github API calls...
+	time.Sleep(30 * time.Second)
+
+	fn = func(elapsed time.Duration) (bool, error) {
 		pr, _, err = o.ScmFactory.ScmClient.PullRequests.Find(ctx, fullName, prNumber)
 		if err != nil {
 			o.Warnf("Failed to query the Pull Request status for %s %s", pullRequest.Link, err)
@@ -555,7 +614,7 @@ func (o *Options) waitForSuccessfulBootJob(sha string) {
 		return answer, err
 	}
 
-	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	err := o.PollLoop(o.ReleasePollTimeout, o.ReleasePollPeriod, message, fn)
 	require.NoError(t, err, "failed to poll for completed Job in namespace %s for selector %s", ns, selector)
 }
 
@@ -626,6 +685,6 @@ func (o *Options) waitForVersionInStaging(version string) {
 		}
 		return answer, nil
 	}
-	err := o.PollLoop(o.PullRequestPollTimeout, o.PullRequestPollPeriod, message, fn)
+	err := o.PollLoop(o.ReleasePollTimeout, o.ReleasePollPeriod, message, fn)
 	require.NoError(t, err, "failed to wait for version %s to be in Staging", ns, version)
 }
