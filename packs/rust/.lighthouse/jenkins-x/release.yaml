@@ -197,22 +197,6 @@ spec:
           resources: {}
           workingDir: /workspace
         - args:
-          - step
-          - git
-          - merge
-          - --verbose
-          - --baseSHA
-          - $(params.PULL_BASE_SHA)
-          - --sha
-          - $(params.PULL_PULL_SHA)
-          - --baseBranch
-          - $(params.PULL_BASE_REF)
-          command:
-          - jx
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: git-merge
-          resources: {}
-        - args:
           - -c
           - jx step next-version --use-git-tag-only
           command:
