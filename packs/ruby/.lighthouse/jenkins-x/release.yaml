@@ -213,22 +213,6 @@ spec:
           name: setup-builder-home
           resources: {}
         - args:
-          - step
-          - git
-          - merge
-          - --verbose
-          - --baseSHA
-          - $(params.PULL_BASE_SHA)
-          - --sha
-          - $(params.PULL_PULL_SHA)
-          - --baseBranch
-          - $(params.PULL_BASE_REF)
-          command:
-          - jx
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: git-merge
-          resources: {}
-        - args:
           - gitops
           - variables
           command:
