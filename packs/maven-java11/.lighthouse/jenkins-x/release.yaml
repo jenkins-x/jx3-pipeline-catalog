@@ -201,27 +201,6 @@ spec:
           resources: {}
           workingDir: /workspace
         - args:
-          - step
-          - git
-          - merge
-          - --verbose
-          - --baseSHA
-          - $(params.PULL_BASE_SHA)
-          - --sha
-          - $(params.PULL_PULL_SHA)
-          - --baseBranch
-          - $(params.PULL_BASE_REF)
-          command:
-          - jx
-          env:
-          - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: git-merge
-          resources: {}
-        - args:
           - -c
           - jx step next-version --filename pom.xml
           command:
