@@ -234,6 +234,8 @@ spec:
           name: build-dummy-build
           resources: {}
         volumes:
+        - emptyDir: {}
+          name: workspace-volume
         - downwardAPI:
             items:
             - fieldRef:
