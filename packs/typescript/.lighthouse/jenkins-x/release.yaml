@@ -266,7 +266,7 @@ spec:
           command:
           - /busybox/sh
           - -c
-          image: gcr.io/jenkinsxio/kaniko:0.0.5
+          image: gcr.io/kaniko-project/executor:debug-1d1298564878f2a57d8f77b4269c66c6e2d9bb6b
           name: build-container-build
           resources: {}
         - args:
