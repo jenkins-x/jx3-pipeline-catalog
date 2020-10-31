@@ -24,6 +24,14 @@ spec:
     resources: { }
     workingDir: /workspace
   - args:
+    - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
+    command:
+    - /bin/sh
+    - -c
+    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    name: setup-builder-home
+    resources: {}
+  - args:
     - step
     - git
     - merge
