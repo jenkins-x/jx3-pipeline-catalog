@@ -1,167 +1,18 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
+  annotations:
+    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/4a22dee8a67f66e5012729808de081d2f4d0e715/tasks/git-clone/git-clone-pr.yaml
   creationTimestamp: null
-  labels:
-    branch: master
-    build: "1"
-    jenkins.io/pipelineType: build
-    owner: jenkins-x-quickstarts
-    repository: node-http
-  name: jenkins-x-quickstarts-node-http-rm8j2-1
+  name: release
 spec:
   pipelineSpec:
-    params:
-    - description: the unique build number
-      name: BUILD_ID
-      type: string
-    - description: the name of the job which is the trigger context name
-      name: JOB_NAME
-      type: string
-    - description: the specification of the job
-      name: JOB_SPEC
-      type: string
-    - description: 'the kind of job: postsubmit or presubmit'
-      name: JOB_TYPE
-      type: string
-    - default: master
-      description: the base git reference of the pull request
-      name: PULL_BASE_REF
-      type: string
-    - description: the git sha of the base of the pull request
-      name: PULL_BASE_SHA
-      type: string
-    - default: ""
-      description: git pull request number
-      name: PULL_NUMBER
-      type: string
-    - default: ""
-      description: git pull request ref in the form 'refs/pull/$PULL_NUMBER/head'
-      name: PULL_PULL_REF
-      type: string
-    - default: master
-      description: git revision to checkout (branch, tag, sha, ref…)
-      name: PULL_PULL_SHA
-      type: string
-    - description: git pull reference strings of base and latest in the form 'master:$PULL_BASE_SHA,$PULL_NUMBER:$PULL_PULL_SHA:refs/pull/$PULL_NUMBER/head'
-      name: PULL_REFS
-      type: string
-    - description: git repository name
-      name: REPO_NAME
-      type: string
-    - description: git repository owner (user or organisation)
-      name: REPO_OWNER
-      type: string
-    - description: git url to clone
-      name: REPO_URL
-      type: string
     tasks:
     - name: release
-      params:
-      - name: BUILD_ID
-        value: $(params.BUILD_ID)
-      - name: JOB_NAME
-        value: $(params.JOB_NAME)
-      - name: JOB_SPEC
-        value: $(params.JOB_SPEC)
-      - name: JOB_TYPE
-        value: $(params.JOB_TYPE)
-      - name: PULL_BASE_REF
-        value: $(params.PULL_BASE_REF)
-      - name: PULL_BASE_SHA
-        value: $(params.PULL_BASE_SHA)
-      - name: PULL_NUMBER
-        value: $(params.PULL_NUMBER)
-      - name: PULL_PULL_REF
-        value: $(params.PULL_PULL_REF)
-      - name: PULL_PULL_SHA
-        value: $(params.PULL_PULL_SHA)
-      - name: PULL_REFS
-        value: $(params.PULL_REFS)
-      - name: REPO_NAME
-        value: $(params.REPO_NAME)
-      - name: REPO_OWNER
-        value: $(params.REPO_OWNER)
-      - name: REPO_URL
-        value: $(params.REPO_URL)
       resources: {}
       taskSpec:
-        params:
-        - description: git url to clone
-          name: REPO_URL
-          type: string
-        - default: master
-          description: git revision to checkout (branch, tag, sha, ref…)
-          name: PULL_PULL_SHA
-          type: string
-        - default: source
-          description: subdirectory inside of /workspace to clone the git repo
-          name: subdirectory
-          type: string
-        - description: the unique build number
-          name: BUILD_ID
-          type: string
-        - description: the name of the job which is the trigger context name
-          name: JOB_NAME
-          type: string
-        - description: the specification of the job
-          name: JOB_SPEC
-          type: string
-        - description: 'the kind of job: postsubmit or presubmit'
-          name: JOB_TYPE
-          type: string
-        - default: master
-          description: the base git reference of the pull request
-          name: PULL_BASE_REF
-          type: string
-        - description: the git sha of the base of the pull request
-          name: PULL_BASE_SHA
-          type: string
-        - default: ""
-          description: git pull request number
-          name: PULL_NUMBER
-          type: string
-        - default: ""
-          description: git pull request ref in the form 'refs/pull/$PULL_NUMBER/head'
-          name: PULL_PULL_REF
-          type: string
-        - description: git pull reference strings of base and latest in the form 'master:$PULL_BASE_SHA,$PULL_NUMBER:$PULL_PULL_SHA:refs/pull/$PULL_NUMBER/head'
-          name: PULL_REFS
-          type: string
-        - description: git repository name
-          name: REPO_NAME
-          type: string
-        - description: git repository owner (user or organisation)
-          name: REPO_OWNER
-          type: string
+        metadata: {}
         stepTemplate:
-          env:
-          - name: BUILD_ID
-            value: $(params.BUILD_ID)
-          - name: JOB_NAME
-            value: $(params.JOB_NAME)
-          - name: JOB_SPEC
-            value: $(params.JOB_SPEC)
-          - name: JOB_TYPE
-            value: $(params.JOB_TYPE)
-          - name: PULL_BASE_REF
-            value: $(params.PULL_BASE_REF)
-          - name: PULL_BASE_SHA
-            value: $(params.PULL_BASE_SHA)
-          - name: PULL_NUMBER
-            value: $(params.PULL_NUMBER)
-          - name: PULL_PULL_REF
-            value: $(params.PULL_PULL_REF)
-          - name: PULL_PULL_SHA
-            value: $(params.PULL_PULL_SHA)
-          - name: PULL_REFS
-            value: $(params.PULL_REFS)
-          - name: REPO_NAME
-            value: $(params.REPO_NAME)
-          - name: REPO_OWNER
-            value: $(params.REPO_OWNER)
-          - name: REPO_URL
-            value: $(params.REPO_URL)
           name: ""
           resources: {}
           volumeMounts:
@@ -174,61 +25,18 @@ spec:
             readOnly: true
           workingDir: /workspace/source
         steps:
-        - args:
-          - -c
-          - 'mkdir -p $HOME; git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}; git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}; git config --global credential.helper store; git clone $(params.REPO_URL) $(params.subdirectory); echo cloned url: $(params.REPO_URL) to dir: $(params.subdirectory); cd $(params.subdirectory); git checkout $(params.PULL_PULL_SHA); echo checked out revision: $(params.PULL_PULL_SHA) to dir: $(params.subdirectory)'
-          command:
-          - /bin/sh
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: git-clone
-          resources: {}
-          workingDir: /workspace
-        - args:
-          - gitops
-          - git
-          - setup
-          - --namespace
-          - jx-git-operator
-          command:
-          - jx
-          image: gcr.io/jenkinsxio/jx-cli:latest
-          name: git-setup
-          resources: {}
-          workingDir: /workspace
         - command:
           - jx step next-version --use-git-tag-only --tag
           image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
           name: next-version
           resources: {}
-        - args:
-          - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-          command:
-          - /bin/sh
-          - -c
-          env:
-          - name: JX_SECRETS_YAML
-            value: /secrets/jx-boot/secrets.yaml
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-          name: setup-builder-home
-          resources: {}
-        - args:
-          - gitops
-          - variables
-          command:
-          - jx
-          image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:latest
           name: jx-variables
           resources: {}
-        - args:
-          - jxl boot secrets export --dir=.
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx gitops variables
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -238,12 +46,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-secrets
           resources: {}
-        - args:
-          - jx step git validate
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            jxl boot secrets export --dir=.
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -253,12 +59,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: validate-git
           resources: {}
-        - args:
-          - jx step verify preinstall --disable-verify-packages
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step git validate
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -268,12 +72,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-preinstall
           resources: {}
-        - args:
-          - jxl boot helmfile
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step verify preinstall --disable-verify-packages
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -283,12 +85,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: generate-helmfile
           resources: {}
-        - args:
-          - cd /workspace/source/system && helmfile diff
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            jxl boot helmfile
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -298,12 +98,11 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helmfile-system-diff
           resources: {}
-        - args:
-          - cd /workspace/source/system && helmfile sync
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            cd /workspace/source/system
+            helmfile diff
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -313,12 +112,11 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helmfile-system
           resources: {}
-        - args:
-          - jx step verify ingress
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            cd /workspace/source/system
+            helmfile sync
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -328,12 +126,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-ingress
           resources: {}
-        - args:
-          - jxl boot step label repo
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step verify ingress
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -343,12 +139,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helm-label-repositories
           resources: {}
-        - args:
-          - cd /workspace/source/apps && helmfile diff
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            jxl boot step label repo
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -358,12 +152,11 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helmfile-apps-diff
           resources: {}
-        - args:
-          - cd /workspace/source/apps && helmfile sync
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            cd /workspace/source/apps
+            helmfile diff
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -373,12 +166,11 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helmfile-apps
           resources: {}
-        - args:
-          - jx step git credentials -o /builder/home/git/credentials
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            cd /workspace/source/apps
+            helmfile sync
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -388,12 +180,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: git-creds
           resources: {}
-        - args:
-          - jx step verify env
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step git credentials -o /builder/home/git/credentials
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -403,12 +193,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-jenkins-x-environment
           resources: {}
-        - args:
-          - jx step scheduler config apply --direct=true
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step verify env
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -418,12 +206,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: install-pipelines
           resources: {}
-        - args:
-          - jxl boot step annotate helm
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step scheduler config apply --direct=true
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -433,12 +219,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: helm-annotate
           resources: {}
-        - args:
-          - jx step verify dns --timeout 10m
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/bin/sh
+            jxl boot step annotate helm
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -448,12 +232,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-dns
           resources: {}
-        - args:
-          - jx update webhooks --verbose --warn-on-fail
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx step verify dns --timeout 10m
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -463,12 +245,10 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: update-webhooks
           resources: {}
-        - args:
-          - jx step verify install --pod-wait-time 30m
-          command:
-          - /bin/sh
-          - -c
-          env:
+          script: |
+            #!/usr/bin/env bash
+            jx update webhooks --verbose --warn-on-fail
+        - env:
           - name: JX_SECRETS_YAML
             value: /secrets/jx-boot/secrets.yaml
           - name: NAMESPACE
@@ -478,6 +258,9 @@ spec:
           image: gcr.io/jenkinsxio/builder-go:2.1.142-761
           name: verify-installation
           resources: {}
+          script: |
+            #!/usr/bin/env bash
+            jx step verify install --pod-wait-time 30m
         volumes:
         - emptyDir: {}
           name: jx-boot-secrets
@@ -487,10 +270,7 @@ spec:
                 fieldPath: metadata.labels
               path: labels
           name: podinfo
-  podTemplate:
-    ImagePullSecrets: null
-    hostNetwork: false
-    schedulerName: ""
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
 status: {}
