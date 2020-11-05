@@ -18,46 +18,21 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /root/.m2/
-            name: volume-0
-          - mountPath: /home/jenkins/.gnupg
-            name: volume-1
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.684
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env bash
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-maven:2.1.150-769
+        - image:  gcr.io/jenkinsxio/jx-cli:3.0.684
           name: build-helm-build
           resources: {}
           script: |
             #!/bin/sh
-            cd /workspace/source/charts/node-http
             jx step helm build
-        volumes:
-        - name: volume-0
-          secret:
-            secretName: jenkins-maven-settings
-        - name: volume-1
-          secret:
-            secretName: jenkins-release-gpg
-        - emptyDir: {}
-          name: workspace-volume
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
