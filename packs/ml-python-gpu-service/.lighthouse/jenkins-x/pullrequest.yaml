@@ -54,7 +54,7 @@ spec:
             #!/bin/sh
             source /root/.bashrc
             pytest
-        - image: gcr.io/kaniko-project/executor:debug-1d1298564878f2a57d8f77b4269c66c6e2d9bb6b
+        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}
           script: |
