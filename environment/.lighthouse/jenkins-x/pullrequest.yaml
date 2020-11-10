@@ -3,7 +3,6 @@ kind: PipelineRun
 metadata:
   annotations:
     lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/005e78cf69b643862344397a635736a51dd1bd89/tasks/git-clone/git-clone-pr.yaml
-  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
@@ -23,30 +22,15 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - args:
           - pr
           command:
           - make
-          image: gcr.io/jenkinsxio/jx-cli:latest
+          image: gcr.io/jenkinsxio/jx-cli:3.0.705
           name: make-pr
           resources: {}
-        volumes:
-        - emptyDir: {}
-          name: workspace-volume
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

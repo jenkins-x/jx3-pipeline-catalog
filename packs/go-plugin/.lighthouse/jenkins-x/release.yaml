@@ -3,7 +3,6 @@ kind: PipelineRun
 metadata:
   annotations:
     lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/005e78cf69b643862344397a635736a51dd1bd89/tasks/git-clone/git-clone.yaml
-  creationTimestamp: null
   name: release
 spec:
   pipelineSpec:
@@ -15,10 +14,6 @@ spec:
         stepTemplate:
           name: ""
           resources: {}
-          volumeMounts:
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/builder-go
@@ -39,7 +34,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx step tag --version $(cat VERSION)
-        - image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
           name: jx-variables
           resources: {}
           script: |
@@ -59,15 +54,15 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor --cache=true --cache-dir=/workspace --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=gcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION --cache-repo=gcr.io/jx-labs-infra/cache
-        - image: jnorwood/helm-docs:latest
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=gcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION
+        - image: jnorwood/helm-docs:v1.4.0
           name: chart-docs
           resources: {}
           script: |
             #!/bin/ash
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
           name: release-chart
           resources: {}
           script: |
@@ -96,13 +91,7 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             ./promote.sh
-        volumes:
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
