@@ -3,7 +3,6 @@ kind: PipelineRun
 metadata:
   annotations:
     lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/005e78cf69b643862344397a635736a51dd1bd89/tasks/git-clone/git-clone-pr.yaml
-  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
