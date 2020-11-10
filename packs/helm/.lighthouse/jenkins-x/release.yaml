@@ -32,14 +32,6 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.684
-          name: release-chart
-          resources: {}
-          script: |
-            #!/bin/bash
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
-            cd /workspace/source/charts/$REPO_NAME
-            make release; else echo no charts; fi
         - image: gcr.io/jenkinsxio/jx:2.1.150
           name: promote-changelog
           resources: {}
