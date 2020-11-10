@@ -25,7 +25,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx step next-version --use-git-tag-only --tag
-        - image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
           name: jx-variables
           resources: {}
           script: |

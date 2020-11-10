@@ -21,7 +21,7 @@ spec:
           image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
           name: next-version
           resources: {}
-        - image: gcr.io/jenkinsxio/jx-cli:latest
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
           name: jx-variables
           resources: {}
           script: |
