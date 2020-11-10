@@ -15,10 +15,6 @@ spec:
         stepTemplate:
           name: ""
           resources: {}
-          volumeMounts:
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/builder-go
@@ -96,13 +92,7 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             ./promote.sh
-        volumes:
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

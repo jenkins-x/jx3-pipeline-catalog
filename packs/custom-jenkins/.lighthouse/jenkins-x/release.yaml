@@ -18,12 +18,6 @@ spec:
             requests:
               cpu: 400m
               memory: 600Mi
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - command:
@@ -43,15 +37,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx step custom pipeline
-        volumes:
-        - emptyDir: {}
-          name: workspace-volume
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

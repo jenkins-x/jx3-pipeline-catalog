@@ -15,12 +15,6 @@ spec:
         stepTemplate:
           name: ""
           resources: {}
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - command:
@@ -41,13 +35,7 @@ spec:
             #!/bin/sh
             cd /workspace/source/env
             jx step helm apply
-        volumes:
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

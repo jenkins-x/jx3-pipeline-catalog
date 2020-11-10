@@ -15,14 +15,6 @@ spec:
         stepTemplate:
           name: ""
           resources: {}
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /secrets/jx-boot
-            name: jx-boot-secrets
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - command:
@@ -261,15 +253,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx step verify install --pod-wait-time 30m
-        volumes:
-        - emptyDir: {}
-          name: jx-boot-secrets
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
+
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

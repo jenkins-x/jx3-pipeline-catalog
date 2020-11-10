@@ -15,10 +15,6 @@ spec:
         stepTemplate:
           name: ""
           resources: {}
-          volumeMounts:
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/jx-cli:latest
@@ -39,13 +35,6 @@ spec:
           script: |
             #!/bin/sh
             ./.lighthouse/jenkins-x/promote.sh
-        volumes:
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

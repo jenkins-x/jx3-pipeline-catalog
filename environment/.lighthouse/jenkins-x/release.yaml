@@ -38,12 +38,6 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
-          volumeMounts:
-          - mountPath: /home/jenkins
-            name: workspace-volume
-          - mountPath: /etc/podinfo
-            name: podinfo
-            readOnly: true
           workingDir: /workspace/source
         steps:
         - args:
@@ -53,15 +47,6 @@ spec:
           image: gcr.io/jenkinsxio/jx-cli:latest
           name: make-pr
           resources: {}
-        volumes:
-        - emptyDir: {}
-          name: workspace-volume
-        - downwardAPI:
-            items:
-            - fieldRef:
-                fieldPath: metadata.labels
-              path: labels
-          name: podinfo
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
