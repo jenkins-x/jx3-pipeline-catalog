@@ -36,8 +36,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            cd /workspace/source/charts/node-http
-            jx step helm build
+            jx gitops helm build
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
