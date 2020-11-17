@@ -20,7 +20,7 @@ spec:
           name: jx-variables
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops variables
         - image: cpp
           name: build-cmake
