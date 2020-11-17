@@ -80,7 +80,7 @@ spec:
           name: promote-step7
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx promote -b --all-auto --timeout 1h --no-poll
 

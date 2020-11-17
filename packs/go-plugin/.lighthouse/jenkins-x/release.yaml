@@ -44,7 +44,7 @@ spec:
           name: release-binary
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             source .jx/variables.sh
             make release
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
@@ -66,7 +66,7 @@ spec:
           name: release-chart
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
             cd /workspace/source/charts/$REPO_NAME
             make release; else echo no charts; fi
