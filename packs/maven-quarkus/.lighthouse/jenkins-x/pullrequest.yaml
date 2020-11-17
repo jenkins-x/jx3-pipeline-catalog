@@ -19,7 +19,7 @@ spec:
               memory: 2Gi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.737
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: jx-variables
           resources: {}
           script: |
