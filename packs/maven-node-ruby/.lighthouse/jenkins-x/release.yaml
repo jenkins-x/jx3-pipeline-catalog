@@ -17,6 +17,11 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          - mountPath: /root/.gnupg
+            name: release-gpg
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
@@ -96,7 +101,13 @@ spec:
             #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx promote -b --all-auto --timeout 1h --no-poll
-
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+        - name: release-gpg
+          secret:
+            secretName: jenkins-release-gpg
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
