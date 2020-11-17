@@ -19,11 +19,11 @@ spec:
               memory: 4Gi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: jx-variables
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops variables
         - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
           name: build-flake8
