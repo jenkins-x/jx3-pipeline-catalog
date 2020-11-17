@@ -20,7 +20,7 @@ spec:
           name: jx-variables
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops variables
         - image: gcr.io/jenkinsxio/builder-jx:0.1.792
           name: changelog
