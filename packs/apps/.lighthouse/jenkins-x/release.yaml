@@ -36,11 +36,11 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: release-chart
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
             cd /workspace/source/charts/$REPO_NAME
             make release; else echo no charts; fi
@@ -50,17 +50,17 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: promote-helm-release
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-promote:0.0.144
           name: promote-jx-promote
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx promote -b --all-auto --timeout 1h --no-poll
   podTemplate: {}
