@@ -55,7 +55,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+        - image: gcr.io/kaniko-project/executor:multi-arch-v1.3.0
           name: build-container-build
           resources: {}
           script: |
