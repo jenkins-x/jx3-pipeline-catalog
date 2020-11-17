@@ -36,7 +36,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: release-chart
           resources: {}
           script: |
@@ -50,13 +50,13 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env bash
             jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-cli:3.0.705
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: promote-jx-promote
           resources: {}
           script: |
