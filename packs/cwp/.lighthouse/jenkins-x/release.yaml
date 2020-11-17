@@ -82,7 +82,7 @@ spec:
           name: promote-step6
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops helm release
         - env:
           - name: MAVEN_OPTS

@@ -66,7 +66,7 @@ spec:
           name: promote-helm-release
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx gitops helm release
         - env:
           - name: MAVEN_OPTS
@@ -77,7 +77,7 @@ spec:
           name: promote-jx-promote
           resources: {}
           script: |
-            #!/bin/bash
+            #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx promote -b --all-auto --timeout 1h --no-poll
 
