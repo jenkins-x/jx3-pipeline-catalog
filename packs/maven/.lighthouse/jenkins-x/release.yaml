@@ -18,9 +18,9 @@ spec:
               cpu: 400m
               memory: 512Mi
           volumeMounts:
-          - mountPath: /tekton/home/.m2/
+          - mountPath: /root/.m2/
             name: maven-settings
-          - mountPath: /tekton/home/.gnupg
+          - mountPath: /root/.gnupg
             name: release-gpg
           workingDir: /workspace/source
         steps:
