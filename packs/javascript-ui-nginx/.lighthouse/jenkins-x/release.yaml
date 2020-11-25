@@ -17,6 +17,10 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
+          volumeMounts:
+          - name: npmrc
+            mountPath: /builder/home/.npmrc
+            key: file
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/jx-release-version:1.0.42
@@ -94,7 +98,14 @@ spec:
             #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx promote -b --all-auto --timeout 1h --no-poll
-
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+        - name: release-gpg
+          secret:
+            secretName: jenkins-release-gpg
+            optional: true
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
