@@ -73,7 +73,6 @@ spec:
             #!/usr/bin/env sh
             source /workspace/source/.jx/variables.sh
             jx preview create
-
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
