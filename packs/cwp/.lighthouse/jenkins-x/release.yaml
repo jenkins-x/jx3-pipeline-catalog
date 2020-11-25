@@ -35,7 +35,7 @@ spec:
             git commit -a -m "release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push origin v$VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.738
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
           name: jx-variables
           resources: {}
           script: |
@@ -74,7 +74,7 @@ spec:
         - env:
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          image: gcr.io/jenkinsxio/jx-boot:3.0.738
+          image: gcr.io/jenkinsxio/jx-boot:3.0.755
           name: promote-step6
           resources: {}
           script: |
@@ -83,7 +83,7 @@ spec:
         - env:
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          image: gcr.io/jenkinsxio/jx-boot:3.0.738
+          image: gcr.io/jenkinsxio/jx-boot:3.0.755
           name: promote-jx
           resources: {}
           script: |
