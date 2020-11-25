@@ -30,7 +30,8 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            ls -al  /builder/home/.npmrc
+            echo $HOME
+            ls -al $HOME
         - image: node:9-slim
           name: build-npm-install
           resources: {}

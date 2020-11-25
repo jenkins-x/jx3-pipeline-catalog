@@ -51,7 +51,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo $HOME
-            ls -al  $HOME
+            ls -al $HOME
         - image: node:9-slim
           name: build-npm-install
           resources: {}
