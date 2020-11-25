@@ -36,7 +36,7 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn versions:set -DnewVersion=$VERSION
+            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
         - env:
           - name: MAVEN_OPTS
             value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn

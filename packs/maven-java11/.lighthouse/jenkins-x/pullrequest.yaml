@@ -36,7 +36,7 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn versions:set -DnewVersion=$VERSION
+            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
         - image: maven:3.6-openjdk-11
           name: build-mvn-install
           resources: {}
