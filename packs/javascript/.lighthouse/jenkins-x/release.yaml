@@ -46,13 +46,6 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
         - image: node:9-slim
-          name: build-npmrc
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            echo $HOME
-            ls -al $HOME
-        - image: node:9-slim
           name: build-npm-install
           resources: {}
           script: |
