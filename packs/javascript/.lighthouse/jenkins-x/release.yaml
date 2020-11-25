@@ -46,7 +46,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            jx step credential -s npm-token -k file -f /builder/home/.npmrc --optional=true
+            ls -al  /builder/home/.npmrc
         - image: node:9-slim
           name: build-npm-install
           resources: {}
