@@ -25,24 +25,22 @@ spec:
           name: ""
           resources: {}
           workingDir: /home/jenkins/go/src/REPLACE_ME_GIT_PROVIDER/REPLACE_ME_ORG/REPLACE_ME_APP_NAME
-        - image: gcr.io/jenkinsxio/builder-go
+        - image: gcr.io/jenkinsxio/jx-release-version:1.0.42
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env bash
-            jx step next-version --use-git-tag-only
-        - image: gcr.io/jenkinsxio/builder-go
-          name: update-version
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            jx step tag --version $(cat VERSION) --no-apply
-        - image: gcr.io/jenkinsxio/builder-go
-          name: tag-version
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            jx step tag --version $(cat VERSION)
+            VERSION=$(jx-release-version)
+            echo $VERSION > VERSION
+
+            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
+            sed -i -e "s/version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
+            sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
+            else echo no charts; fi
+
+            git commit -a -m "release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Release version $VERSION"
+            git push origin v$VERSION
         - image: gcr.io/jenkinsxio/jx-boot:3.0.738
           name: jx-variables
           resources: {}
