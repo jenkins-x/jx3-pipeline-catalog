@@ -14,7 +14,7 @@ spec:
         stepTemplate:
           env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx1800m
           name: ""
@@ -36,13 +36,13 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
+            mvn versions:set -DnewVersion=$VERSION
         - image: gcr.io/jenkinsxio/builder-maven-graalvm:2.1.150-769
           name: build-mvn-install
           resources: {}
           script: |
             #!/bin/sh
-            mvn --no-transfer-progress install
+            mvn install
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}

@@ -14,7 +14,7 @@ spec:
         stepTemplate:
           env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           name: ""
@@ -56,7 +56,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            mvn --no-transfer-progress clean deploy
+            mvn clean deploy
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}

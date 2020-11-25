@@ -27,7 +27,7 @@ spec:
             jx gitops variables
         - env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: maven:3.6-openjdk-8
@@ -36,10 +36,10 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
+            mvn versions:set -DnewVersion=$VERSION
         - env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: maven:3.6-openjdk-8
@@ -47,10 +47,10 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            mvn --no-transfer-progress install
+            mvn install
         - env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/kaniko-project/executor:debug-v1.3.0
@@ -63,7 +63,7 @@ spec:
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
         - env:
           - name: MAVEN_OPTS
-            value: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+            value: --no-transfer-progress
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           image: gcr.io/jenkinsxio/jx-preview:0.0.122
