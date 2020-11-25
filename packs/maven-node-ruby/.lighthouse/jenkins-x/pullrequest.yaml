@@ -41,7 +41,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            mvn install
+            mvn --no-transfer-progress install
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}
