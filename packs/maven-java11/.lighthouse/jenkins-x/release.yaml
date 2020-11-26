@@ -63,9 +63,8 @@ spec:
             source /workspace/source/.jx/variables.sh
 
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
-            export IMAGE="$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME"
             sed -i -e "s/version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
-            sed -i -e "s/repository:.*/repository: $IMAGE/" ./charts/$REPO_NAME/values.yaml;
+            sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
             sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
 
