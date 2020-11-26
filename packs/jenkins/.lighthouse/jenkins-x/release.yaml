@@ -60,6 +60,18 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
+
+            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
+            export IMAGE="$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME"
+            sed -i -e "s/version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
+            sed -i -e "s/repository:.*/repository: $IMAGE/" ./charts/$REPO_NAME/values.yaml;
+            sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
+            else echo no charts; fi
+
+            git commit -a -m "release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Release version $VERSION"
+            git push origin v$VERSION
+
             jx step changelog --version v${VERSION}
 
   podTemplate: {}
