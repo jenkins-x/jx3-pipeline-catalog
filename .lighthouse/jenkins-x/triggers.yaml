@@ -9,12 +9,26 @@ spec:
     trigger: (?m)^/test( all| go.*),?(s+|$)
     rerun_command: /test go
     source: "pullrequest.yaml"
+  - name: gradledemo
+    context: "gradledemo"
+    always_run: false
+    optional: false
+    trigger: (?m)^/test( all| gradle.*),?(s+|$)
+    rerun_command: /test gradle
+    source: "pullrequest.yaml"
   - name: nodedemo
     context: "nodedemo"
     always_run: false
     optional: false
     trigger: (?m)^/test( all| node.*),?(s+|$)
     rerun_command: /test node
+    source: "pullrequest.yaml"
+  - name: pythondemo
+    context: "pythondemo"
+    always_run: false
+    optional: false
+    trigger: (?m)^/test( all| python.*),?(s+|$)
+    rerun_command: /test python
     source: "pullrequest.yaml"
   - name: springdemo
     context: "springdemo"
