@@ -38,19 +38,19 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: node:9-slim
+        - image: node:12-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
             npm install
-        - image: node:9-slim
+        - image: node:12-slim
           name: build-npm-test
           resources: {}
           script: |
             #!/bin/sh
             CI=true DISPLAY=:99 npm test
-        - image: node:9-slim
+        - image: node:12-slim
           name: build-ui-build
           resources: {}
           script: |
@@ -72,7 +72,7 @@ spec:
             source /workspace/source/.jx/variables.sh
 
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
-            sed -i -e "s/version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
+            sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
             sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
             sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi

@@ -27,7 +27,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-gradle:2.1.150-769
+        - image: gradle:openj9
           name: build-gradle-build
           resources: {}
           script: |
