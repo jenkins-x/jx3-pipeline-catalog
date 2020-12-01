@@ -39,13 +39,12 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - args:
-          - pr
-          command:
-          - make
-          image: gcr.io/jenkinsxio/jx-boot:3.0.755
-          name: make-pr
-          resources: {}
+        - image: gcr.io/jenkinsxio/jx-cli:3.0.762
+          name: admin-log
+          script: |
+            #!/usr/bin/env sh
+            echo "viewing the git operator boot job log for commit sha: $PULL_BASE_SHA"
+            jx admin log --commit-sha $PULL_BASE_SHA
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
