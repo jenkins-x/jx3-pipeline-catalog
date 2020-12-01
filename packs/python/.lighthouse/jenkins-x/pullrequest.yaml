@@ -25,7 +25,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-python:2.1.150-769
+        - image: python:3.6.12-alpine
           name: build-python-unittest
           resources: {}
           script: |
