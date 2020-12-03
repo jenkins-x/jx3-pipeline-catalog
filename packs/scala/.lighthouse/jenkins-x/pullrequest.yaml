@@ -19,7 +19,7 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.768
           name: jx-variables
           resources: {}
           script: |
@@ -48,7 +48,7 @@ spec:
         - env:
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          image: gcr.io/jenkinsxio/jx-preview:0.0.122
+          image: gcr.io/jenkinsxio/jx-preview:0.0.128
           name: promote-jx-preview
           resources: {}
           script: |
