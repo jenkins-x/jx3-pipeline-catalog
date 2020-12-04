@@ -25,7 +25,7 @@ spec:
             echo $VERSION > VERSION
 
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.768
           name: jx-variables
           resources: {}
           script: |
@@ -53,7 +53,7 @@ spec:
             #!/bin/ash
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.768
           name: release-chart
           resources: {}
           script: |
@@ -85,6 +85,13 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             make goreleaser
+        - image: google/cloud-sdk:slim
+          name: build-and-push-image
+          resources: {}
+          script: |
+            #!/bin/bash
+            source .jx/variables.sh
+            gcloud builds submit --config cloudbuild.yaml --project jenkinsxio --substitutions=_VERSION="$VERSION"
         - command:
           - jx-updatebot
           - pr
