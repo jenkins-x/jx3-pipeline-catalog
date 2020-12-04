@@ -86,7 +86,7 @@ spec:
             source .jx/variables.sh
             make goreleaser
         - image: google/cloud-sdk:slim
-          name: build-and-push-image
+          name: multi-arch-images
           resources: {}
           script: |
             #!/bin/bash
