@@ -28,7 +28,7 @@ spec:
           - pr
           command:
           - make
-          image: gcr.io/jenkinsxio/jx-boot:3.0.755
+          image: gcr.io/jenkinsxio/jx-boot:3.0.773
           name: make-pr
           resources: {}
   podTemplate: {}

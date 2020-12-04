@@ -19,12 +19,6 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - command:
-          - ""
-          image: gcr.io/jenkinsxio-labs-private/jxl:0.0.136
-          name: ""
-          resources: {}
-          workingDir: /home/jenkins/go/src/REPLACE_ME_GIT_PROVIDER/REPLACE_ME_ORG/REPLACE_ME_APP_NAME
         - image: gcr.io/jenkinsxio/jx-release-version:1.0.42
           name: next-version
           resources: {}
@@ -32,8 +26,7 @@ spec:
             #!/usr/bin/env bash
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
-
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
           name: jx-variables
           resources: {}
           script: |
@@ -70,13 +63,13 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-promote:0.0.145
+        - image: gcr.io/jenkinsxio/jx-promote:0.0.148
           name: promote-jx-promote
           resources: {}
           script: |
