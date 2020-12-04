@@ -25,7 +25,7 @@ spec:
             echo $VERSION > VERSION
 
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
           name: jx-variables
           resources: {}
           script: |
@@ -53,7 +53,7 @@ spec:
             #!/bin/ash
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.755
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
           name: release-chart
           resources: {}
           script: |
@@ -85,15 +85,10 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             make goreleaser
-        - image: gcr.io/jenkinsxio/builder-go:2.1.142-761
+        - command:
+          - jx-updatebot
+          - pr
+          image: gcr.io/jenkinsxio/jx-updatebot:latest
           name: promote-release
-          resources: {}
-          script: |
-            #!/bin/bash
-            source .jx/variables.sh
-            ./promote.sh
-
-  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
-status: {}

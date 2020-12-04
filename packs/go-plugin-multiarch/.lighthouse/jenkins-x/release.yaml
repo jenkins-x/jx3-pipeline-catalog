@@ -7,7 +7,7 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
+    - name: chart
       resources: {}
       taskSpec:
         metadata: {}
@@ -24,37 +24,48 @@ spec:
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
+
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.768
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: cpp
-          name: build-cmake
+        - image: golang:1.15
+          name: release-binary
           resources: {}
           script: |
-            #!/bin/sh
-            cmake3 CMakeLists.txt
-        - image: cpp
-          name: build-make
-          resources: {}
-          script: |
-            #!/bin/sh
-            make
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            make release
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
-          name: build-container-build
+          name: build-and-push-image
           resources: {}
           script: |
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.8
-          name: promote-changelog
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=gcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION
+        - image: jnorwood/helm-docs:v1.4.0
+          name: chart-docs
+          resources: {}
+          script: |
+            #!/bin/ash
+            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
+            helm-docs; else echo no charts; fi
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.768
+          name: release-chart
+          resources: {}
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
+            cd /workspace/source/charts/$REPO_NAME
+            make release; else echo no charts; fi
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.8
+          name: changelog
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
 
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
             sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
@@ -66,22 +77,25 @@ spec:
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push origin v$VERSION
 
-            jx changelog create --version v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
-          name: promote-helm-release
+            jx changelog create --verbose --header-file=hack/changelog-header.md --version=$VERSION --rev=$PULL_BASE_SHA --output-markdown=changelog.md --update-release=false
+        - image: gcr.io/jenkinsxio/step-go-releaser:0.0.14
+          name: upload-binaries
           resources: {}
           script: |
-            #!/usr/bin/env sh
-            jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-promote:0.0.148
-          name: promote-jx-promote
+            #!/bin/bash
+            source .jx/variables.sh
+            make goreleaser
+        - image: google/cloud-sdk:slim
+          name: multi-arch-images
           resources: {}
           script: |
-            #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
-            jx promote -b --all-auto --timeout 1h --no-poll
-
-  podTemplate: {}
+            #!/bin/bash
+            source .jx/variables.sh
+            gcloud builds submit --config cloudbuild.yaml --project jenkinsxio --substitutions=_VERSION="$VERSION"
+        - command:
+          - jx-updatebot
+          - pr
+          image: gcr.io/jenkinsxio/jx-updatebot:latest
+          name: promote-release
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
-status: {}

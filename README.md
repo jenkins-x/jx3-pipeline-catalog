@@ -4,7 +4,7 @@ The default pipeline catalog for Jenkins X 3.x
 
 Jenkins X 3.x comes with its own default pipeline catalog for different languages, tools and frameworks. This catalog contains reusable steps, Tasks, Pipelines and Packs you can use on any project.
 
-For more information check out the [Jenkins X 3.x support for Tekton Catalog](https://jenkins-x.io/docs/v3/guides/pipeline-catalog/)
+For more information check out the [Jenkins X 3.x support for Tekton Catalog](https://jenkins-x.io/v3/develop/pipeline-catalog/)
 
 
 ## Contents
