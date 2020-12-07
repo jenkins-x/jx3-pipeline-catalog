@@ -16,13 +16,13 @@ spec:
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.789
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.795
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.789
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.795
           name: build-dummy-build
           resources: {}
           script: |
