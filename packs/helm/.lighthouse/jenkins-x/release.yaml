@@ -27,7 +27,7 @@ spec:
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.795
           name: jx-variables
           resources: {}
           script: |
@@ -51,13 +51,13 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.0.773
+        - image: gcr.io/jenkinsxio/jx-boot:3.0.795
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-promote:0.0.148
+        - image: gcr.io/jenkinsxio/jx-promote:0.0.153
           name: promote-jx-promote
           resources: {}
           script: |
