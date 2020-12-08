@@ -12,9 +12,6 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          env:
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           resources:
             requests:
               cpu: 400m
@@ -34,7 +31,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gradle:openj9
+        - image: gradle:jdk11-openj9
           name: build-gradle-build
           resources: {}
           script: |
