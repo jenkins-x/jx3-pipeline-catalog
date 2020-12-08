@@ -53,14 +53,6 @@ spec:
             #!/bin/ash
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.9
-          name: release-chart
-          resources: {}
-          script: |
-            #!/usr/bin/env sh
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
-            cd /workspace/source/charts/$REPO_NAME
-            make release; else echo no charts; fi
         - image: gcr.io/jenkinsxio/jx-changelog:0.0.8
           name: changelog
           script: |
@@ -78,6 +70,14 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --verbose --header-file=hack/changelog-header.md --version=$VERSION --rev=$PULL_BASE_SHA --output-markdown=changelog.md --update-release=false
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.9
+          name: release-chart
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
+            cd /workspace/source/charts/$REPO_NAME
+            make release; else echo no charts; fi
         - image: gcr.io/jenkinsxio/step-go-releaser:0.0.14
           name: upload-binaries
           resources: {}
