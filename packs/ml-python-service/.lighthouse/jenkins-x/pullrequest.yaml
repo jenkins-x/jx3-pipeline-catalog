@@ -19,7 +19,7 @@ spec:
               memory: 4Gi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.3
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.6
           name: jx-variables
           resources: {}
           script: |
@@ -55,7 +55,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: gcr.io/jenkinsxio/jx-preview:0.0.131
+        - image: gcr.io/jenkinsxio/jx-preview:0.0.132
           name: promote-jx-preview
           resources: {}
           script: |

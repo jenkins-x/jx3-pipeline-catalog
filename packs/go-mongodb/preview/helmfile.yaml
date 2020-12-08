@@ -10,7 +10,6 @@ releases:
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
   values:
   - jx-values.yaml
-  - imagePullSecrets.yaml
   - values.yaml.gotmpl
   hooks:
   - events: ["presync"]
