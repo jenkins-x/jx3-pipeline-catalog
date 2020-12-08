@@ -67,7 +67,7 @@ spec:
             sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
 
-            git commit -a -m "release $VERSION" --allow-empty
+            git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push origin v$VERSION
 
