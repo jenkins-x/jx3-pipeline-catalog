@@ -27,7 +27,7 @@ spec:
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.23
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.24
           name: jx-variables
           resources: {}
           script: |
@@ -76,7 +76,7 @@ spec:
         - env:
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          image: gcr.io/jenkinsxio/jx-boot:3.1.23
+          image: gcr.io/jenkinsxio/jx-boot:3.1.24
           name: promote-helm-release
           resources: {}
           script: |
