@@ -16,7 +16,7 @@ spec:
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.51
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.52
           name: jx-variables
           resources: {}
           script: |
@@ -28,7 +28,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx step changelog --verbose --version ${VERSION} --rev v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.51
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.52
           name: promote
           resources: {}
           script: |
