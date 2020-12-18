@@ -31,3 +31,13 @@ spec:
     image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
     name: setup-builder-home
     resources: {}
+  - args:
+    - submodule
+    - update
+    - --init
+    - --recursive
+    command:
+    - git
+    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    name: git-submodule
+    workingDir: /workspace/source
