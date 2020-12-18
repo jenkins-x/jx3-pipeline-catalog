@@ -19,15 +19,7 @@ spec:
       cd $SUBDIR
       git checkout $PULL_BASE_SHA
       echo "checked out revision: $PULL_BASE_SHA to dir: $SUBDIR"
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-clone
     resources: { }
     workingDir: /workspace
-  - args:
-    - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-    command:
-    - /bin/sh
-    - -c
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-    name: setup-builder-home
-    resources: {}
