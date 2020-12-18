@@ -9,7 +9,7 @@ spec:
     mountPath: /workspace
   steps:
   - script: |
-      #!/usr/bin/env bash
+      #!/bin/sh
       export SUBDIR="source"
       echo "git cloning url: $REPO_URL version $PULL_BASE_SHA to dir: $SUBDIR"
       git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
