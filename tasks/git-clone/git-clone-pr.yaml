@@ -9,7 +9,7 @@ spec:
     mountPath: /workspace
   steps:
   - script: |
-      #!/usr/bin/env bash
+      #!/bin/sh
       export SUBDIR="source"
       echo "git cloning url: $REPO_URL version $PULL_PULL_SHA to dir: $SUBDIR"
       git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
@@ -19,31 +19,14 @@ spec:
       cd $SUBDIR
       git checkout $PULL_PULL_SHA
       echo "checked out revision: $PULL_PULL_SHA to dir: $SUBDIR"
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-clone
     resources: { }
     workingDir: /workspace
-  - args:
-    - '[ -d /builder/home ] || mkdir -p /builder && ln -s /tekton/home /builder/home'
-    command:
-    - /bin/sh
-    - -c
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
-    name: setup-builder-home
-    resources: {}
-  - args:
-    - step
-    - git
-    - merge
-    - --verbose
-    - --baseSHA
-    - $(params.PULL_BASE_SHA)
-    - --sha
-    - $(params.PULL_PULL_SHA)
-    - --baseBranch
-    - $(params.PULL_BASE_REF)
-    command:
-    - jx
-    image: gcr.io/jenkinsxio/builder-jx:2.1.142-761
+  - image: gcr.io/jenkinsxio/jx-boot:3.1.62
     name: git-merge
+    resources: {}
+    script: |
+      #!/usr/bin/env sh
+      jx gitops git merge variables
     workingDir: /workspace/source
