@@ -35,7 +35,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            /app/bin/jenkinsfile-runner-launcher -w /app/jenkins -p /usr/share/jenkins/ref/plugins -f /workspace/source --runWorkspace /workspace/build
+            /app/bin/jenkinsfile-runner-launcher run -w /app/jenkins -p /usr/share/jenkins/ref/plugins -f /workspace/source --runWorkspace /workspace/build
 
   podTemplate: {}
   serviceAccountName: tekton-bot
