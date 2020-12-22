@@ -33,7 +33,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.15
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.16
           name: promote-changelog
           resources: {}
           script: |
