@@ -53,7 +53,7 @@ spec:
             #!/bin/ash
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.16
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.17
           name: changelog
           script: |
             #!/usr/bin/env sh
