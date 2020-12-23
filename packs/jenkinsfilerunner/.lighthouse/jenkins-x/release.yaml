@@ -24,7 +24,7 @@ spec:
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.73
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.74
           name: jx-variables
           resources: {}
           script: |
