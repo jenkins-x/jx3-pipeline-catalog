@@ -6,8 +6,6 @@ spec:
     context: "verify"
     always_run: true
     optional: false
-    trigger: "/test"
-    rerun_command: "/retest"
     source: "pullrequest.yaml"
     queries:
       - excludedBranches: { }
