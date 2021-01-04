@@ -6,6 +6,4 @@ spec:
     context: "lint"
     always_run: true
     optional: false
-    trigger: "/lint"
-    rerun_command: "/relint"
     source: "lint.yaml"
