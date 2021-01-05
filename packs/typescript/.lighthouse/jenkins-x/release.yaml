@@ -19,7 +19,7 @@ spec:
               memory: 512Mi
           volumeMounts:
           - name: npmrc
-            mountPath: /builder/home/.npmrc
+            mountPath: /tekton/home/.npmrc
             key: file
           workingDir: /workspace/source
         steps:
