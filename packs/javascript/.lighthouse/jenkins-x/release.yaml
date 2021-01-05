@@ -12,15 +12,16 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          name: ""
+          env:
+          - name: NPM_CONFIG_USERCONFIG
+            value: /tekton/home/npm/.npmrc
           resources:
             requests:
               cpu: 400m
               memory: 512Mi
           volumeMounts:
           - name: npmrc
-            mountPath: /tekton/home/.npmrc
-            key: file
+            mountPath: /tekton/home/npm
           workingDir: /workspace/source
         steps:
         - image: gcr.io/jenkinsxio/jx-release-version:1.0.42
