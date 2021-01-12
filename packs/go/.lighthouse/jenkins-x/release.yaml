@@ -50,7 +50,7 @@ spec:
           name: promote-changelog
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            source .jx/variables.sh
 
             if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
             sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
@@ -74,7 +74,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            source .jx/variables.sh
             jx promote -b --all --timeout 1h --no-poll
 
   podTemplate: {}

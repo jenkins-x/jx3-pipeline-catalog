@@ -44,7 +44,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            source .jx/variables.sh
             jx preview create
 
   podTemplate: {}
