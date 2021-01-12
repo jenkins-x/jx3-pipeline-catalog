@@ -24,13 +24,13 @@ spec:
             VERSION=$(jx-release-version)
             echo $VERSION > VERSION
 
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.111
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.112
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.111
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.112
           name: build-dummy-release
           resources: {}
           script: |
