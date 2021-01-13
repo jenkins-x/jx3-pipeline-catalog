@@ -24,8 +24,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            VERSION=$(jx-release-version)
-            echo $VERSION > VERSION
+            jx-release-version > VERSION
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push origin v$VERSION
