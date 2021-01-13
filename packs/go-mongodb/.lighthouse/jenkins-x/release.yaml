@@ -24,8 +24,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            VERSION=$(jx-release-version)
-            echo $VERSION > VERSION
+            jx-release-version > VERSION
         - image: gcr.io/jenkinsxio/jx-boot:3.1.114
           name: jx-variables
           resources: {}
@@ -45,15 +44,15 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
         - image: gcr.io/jenkinsxio/jx-changelog:0.0.18
           name: promote-changelog
           resources: {}
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            source .jx/variables.sh
 
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
+            if [ -d "charts/$REPO_NAME" ]; then
             sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
             sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
             sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
@@ -75,7 +74,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            source /workspace/source/.jx/variables.sh
+            source .jx/variables.sh
             jx promote -b --all --timeout 1h --no-poll
 
   podTemplate: {}
