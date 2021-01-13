@@ -42,8 +42,8 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
-            cd /workspace/source/charts/$REPO_NAME
+            if [ -d "charts/$REPO_NAME" ]; then source .jx/variables.sh
+            cd charts/$REPO_NAME
             make release; else echo no charts; fi
         - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
           name: promote-release

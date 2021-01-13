@@ -42,13 +42,13 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=/workspace/source/Dockerfile --destination=gcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=gcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION
         - image: jnorwood/helm-docs:v1.4.0
           name: chart-docs
           resources: {}
           script: |
             #!/bin/ash
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then cd /workspace/source/charts/$REPO_NAME
+            if [ -d "charts/$REPO_NAME" ]; then cd charts/$REPO_NAME
             helm-docs; else echo no charts; fi
         - image: gcr.io/jenkinsxio/jx-changelog:0.0.18
           name: changelog
@@ -56,7 +56,7 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
 
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then
+            if [ -d "charts/$REPO_NAME" ]; then
             sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
             sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
             sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
@@ -72,8 +72,8 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            if [ -d "/workspace/source/charts/$REPO_NAME" ]; then source .jx/variables.sh
-            cd /workspace/source/charts/$REPO_NAME
+            if [ -d "charts/$REPO_NAME" ]; then source .jx/variables.sh
+            cd charts/$REPO_NAME
             make release; else echo no charts; fi
         - image: gcr.io/jenkinsxio/step-go-releaser:0.0.14
           name: upload-binaries
