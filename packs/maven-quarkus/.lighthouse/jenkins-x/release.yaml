@@ -32,7 +32,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.122
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.124
           name: jx-variables
           resources: {}
           script: |
@@ -69,7 +69,7 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.122
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.124
           name: promote-helm-release
           resources: {}
           script: |
