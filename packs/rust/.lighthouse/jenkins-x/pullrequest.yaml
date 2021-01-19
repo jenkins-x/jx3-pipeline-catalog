@@ -19,7 +19,7 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.153
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.152
           name: jx-variables
           resources: {}
           script: |
@@ -36,7 +36,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            cargo install
+            cargo install --path .
         - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
           name: build-copy-bin
           resources: {}
