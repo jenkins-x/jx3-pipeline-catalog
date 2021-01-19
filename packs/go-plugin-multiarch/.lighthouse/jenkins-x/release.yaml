@@ -22,7 +22,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.154
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.155
           name: jx-variables
           resources: {}
           script: |
@@ -67,7 +67,7 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --verbose --header-file=hack/changelog-header.md --version=$VERSION --rev=$PULL_BASE_SHA --output-markdown=changelog.md --update-release=false
-        - image: gcr.io/jenkinsxio/jx-cli:3.1.154
+        - image: gcr.io/jenkinsxio/jx-cli:3.1.155
           name: release-chart
           resources: {}
           script: |
