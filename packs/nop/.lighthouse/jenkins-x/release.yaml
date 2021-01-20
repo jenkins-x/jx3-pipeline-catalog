@@ -22,13 +22,13 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.155
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.156
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.155
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.156
           name: build-dummy-release
           resources: {}
           script: |
