@@ -32,7 +32,7 @@ spec:
           name: release-binary
           resources: {}
           script: |
-            #!/usr/bin/env sh
+            #!/usr/bin/env bash
             source .jx/variables.sh
             make release
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
