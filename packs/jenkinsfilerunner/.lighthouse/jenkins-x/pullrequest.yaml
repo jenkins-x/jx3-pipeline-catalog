@@ -1,8 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone-pr.yaml
+  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
@@ -12,23 +11,15 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          image: uses:jstrachan/jx3-pipeline-catalog/tasks/jenkinsfilerunner/pullrequest.yaml@versionStream
           name: ""
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.159
-          name: jx-variables
+        - name: jx-variables
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
-        - image: jenkins4eval/jenkinsfile-runner
-          name: build-run
+        - name: build-run
           resources: {}
-          script: |
-            #!/bin/sh
-            /app/bin/jenkinsfile-runner-launcher run -w /app/jenkins -p /usr/share/jenkins/ref/plugins -f /workspace/source --runWorkspace /workspace/build
-
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

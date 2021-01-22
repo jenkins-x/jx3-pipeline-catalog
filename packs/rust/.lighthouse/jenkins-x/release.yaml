@@ -1,8 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone.yaml
+  creationTimestamp: null
   name: release
 spec:
   pipelineSpec:
@@ -12,6 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          image: uses:jstrachan/jx3-pipeline-catalog/tasks/rust/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -19,75 +19,24 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:1.0.46
-          name: next-version
+        - name: next-version
           resources: {}
-          script: |
-            #!/usr/bin/env bash
-            jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.159
-          name: jx-variables
+        - name: jx-variables
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
-          name: build-rustup
+        - name: build-rustup
           resources: {}
-          script: |
-            #!/bin/sh
-            rustup override set nightly
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
-          name: build-cargo-install
+        - name: build-cargo-install
           resources: {}
-          script: |
-            #!/bin/sh
-            cargo install
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
-          name: build-copy-bin
+        - name: build-copy-bin
           resources: {}
-          script: |
-            #!/bin/sh
-            cp ~/.cargo/bin/REPLACE_ME_APP_NAME .
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
-          name: build-container-build
+        - name: build-container-build
           resources: {}
-          script: |
-            #!/busybox/sh
-            source .jx/variables.sh
-            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.25
-          name: promote-changelog
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-
-            if [ -d "charts/$REPO_NAME" ]; then
-            sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
-            sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
-            sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
-            else echo no charts; fi
-
-            git commit -a -m "chore: release $VERSION" --allow-empty
-            git tag -fa v$VERSION -m "Release version $VERSION"
-            git push origin v$VERSION
-
-            jx changelog create --version v${VERSION}
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.159
-          name: promote-helm-release
+        - name: promote-changelog
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-promote:0.0.179
-          name: promote-jx-promote
+        - name: promote-helm-release
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-            jx promote -b --all --timeout 1h --no-poll
-
+        - name: promote-jx-promote
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

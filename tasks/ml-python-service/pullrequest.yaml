@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          name: ""
+          resources:
+            requests:
+              cpu: "2"
+              memory: 4Gi
+          workingDir: /workspace/source
+        steps:
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.159
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+          name: build-step2
+          resources: {}
+          script: |
+            #!/bin/sh
+            source /root/.bashrc
+            git lfs install
+            git lfs pull
+        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+          name: build-flake8
+          resources: {}
+          script: |
+            #!/bin/sh
+            source /root/.bashrc
+            flake8
+        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+          name: build-testing
+          resources: {}
+          script: |
+            #!/bin/sh
+            source /root/.bashrc
+            pytest
+        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+          name: build-container-build
+          resources: {}
+          script: |
+            #!/busybox/sh
+            source .jx/variables.sh
+            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+        - image: gcr.io/jenkinsxio/jx-preview:0.0.143
+          name: promote-jx-preview
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx preview create
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
