@@ -39,7 +39,7 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-cli:3.1.159
+        - image: gcr.io/jenkinsxio/jx-cli:3.1.160
           name: admin-log
           script: |
             #!/usr/bin/env sh
