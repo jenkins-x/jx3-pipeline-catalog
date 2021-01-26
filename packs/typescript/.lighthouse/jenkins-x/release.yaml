@@ -88,12 +88,9 @@ spec:
             source .jx/variables.sh
             jx promote -b --all --timeout 1h --no-poll
         volumes:
-        - name: maven-settings
+        - name: npmrc
           secret:
-            secretName: jenkins-maven-settings
-        - name: release-gpg
-          secret:
-            secretName: jenkins-release-gpg
+            secretName: npmrc
             optional: true
   podTemplate: {}
   serviceAccountName: tekton-bot
