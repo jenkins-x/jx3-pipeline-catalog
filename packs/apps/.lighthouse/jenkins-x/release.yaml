@@ -25,7 +25,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.166
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.167
           name: jx-variables
           resources: {}
           script: |
@@ -37,7 +37,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.166
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.167
           name: release-chart
           resources: {}
           script: |
@@ -51,7 +51,7 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.166
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.167
           name: promote-helm-release
           resources: {}
           script: |
