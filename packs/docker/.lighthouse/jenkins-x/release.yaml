@@ -28,7 +28,7 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push origin v$VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.168
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
           name: jx-variables
           resources: {}
           script: |
