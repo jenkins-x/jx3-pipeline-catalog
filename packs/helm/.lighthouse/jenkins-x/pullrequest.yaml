@@ -19,13 +19,13 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.166
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.167
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image:  gcr.io/jenkinsxio/jx-boot:3.1.166
+        - image:  gcr.io/jenkinsxio/jx-boot:3.1.167
           name: build-helm-build
           resources: {}
           script: |
