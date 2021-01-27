@@ -15,7 +15,7 @@ spec:
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.170
           name: jx-variables
           resources: {}
           script: |
