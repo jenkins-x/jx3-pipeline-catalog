@@ -77,6 +77,12 @@ spec:
             make release; else echo no charts; fi
         - image: goreleaser/goreleaser:v0.155.0
           name: upload-binaries
+          env:
+          - name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: tekton-git
+                key: password
           resources: {}
           script: |
             #!/bin/bash
