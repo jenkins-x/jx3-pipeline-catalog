@@ -1,8 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone-pr.yaml
+  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
@@ -12,6 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/ml-python-training/pullrequest.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -19,35 +19,17 @@ spec:
               memory: 4Gi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
-          name: jx-variables
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
-          name: build-flake8
+        - name: jx-variables
           resources: {}
-          script: |
-            #!/bin/sh
-            source /root/.bashrc
-            flake8
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
-          name: build-testing
+        - name: build-flake8
           resources: {}
-          script: |
-            #!/bin/sh
-            source /root/.bashrc
-            pytest
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
-          name: build-training
+        - name: build-testing
           resources: {}
-          script: |
-            #!/bin/sh
-            source /root/.bashrc
-            python3 -m pip install -r ./requirements.txt
-            python3 app.py
-
+        - name: build-training
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

@@ -1,8 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone-pr.yaml
+  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
@@ -14,7 +13,11 @@ spec:
         stepTemplate:
           env:
           - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+              -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
+              -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+              -Xms10m -Xmx192m
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven/pullrequest.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -22,40 +25,19 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
-          name: jx-variables
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
-        - image: maven:3.6-openjdk-8-slim
-          name: build-set-version
+        - name: jx-variables
           resources: {}
-          script: |
-            #!/bin/sh
-            source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
-        - image: maven:3.6-openjdk-8-slim
-          name: build-mvn-install
+        - name: build-set-version
           resources: {}
-          script: |
-            #!/bin/sh
-            mvn --no-transfer-progress install
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
-          name: build-container-build
+        - name: build-mvn-install
           resources: {}
-          script: |
-            #!/busybox/sh
-            source .jx/variables.sh
-            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: gcr.io/jenkinsxio/jx-preview:0.0.143
-          name: promote-jx-preview
+        - name: build-container-build
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-            jx preview create
+        - name: promote-jx-preview
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
