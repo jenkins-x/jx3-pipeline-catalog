@@ -41,7 +41,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            cargo install
+            cargo install --path .
         - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
           name: build-copy-bin
           resources: {}
