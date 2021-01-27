@@ -1,8 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone.yaml
+  creationTimestamp: null
   name: release
 spec:
   pipelineSpec:
@@ -12,6 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/apps/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -19,51 +19,23 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:1.0.46
-          name: next-version
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
           resources: {}
-          script: |
-            #!/usr/bin/env bash
-            jx-release-version > VERSION
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
-          name: jx-variables
+        - name: next-version
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
-          name: build-build
+        - name: jx-variables
           resources: {}
-          script: |
-            #!/bin/sh
-            make build
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
-          name: release-chart
+        - name: build-build
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            if [ -d "charts/$REPO_NAME" ]; then source .jx/variables.sh
-            cd charts/$REPO_NAME
-            make release; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
-          name: promote-release
+        - name: release-chart
           resources: {}
-          script: |
-            #!/bin/sh
-            make release
-        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
-          name: promote-helm-release
+        - name: promote-release
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops helm release
-        - image: gcr.io/jenkinsxio/jx-promote:0.0.179
-          name: promote-jx-promote
+        - name: promote-helm-release
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-            jx promote -b --all --timeout 1h --no-poll
+        - name: promote-jx-promote
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s

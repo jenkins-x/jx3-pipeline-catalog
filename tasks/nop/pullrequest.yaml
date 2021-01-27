@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          name: ""
+          resources: {}
+          workingDir: /workspace/source
+        steps:
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: build-dummy-build
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            echo PR
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}

@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          name: ""
+          resources: {}
+          workingDir: /workspace/source
+        steps:
+        - image: gcr.io/jenkinsxio/jx-release-version:1.0.46
+          name: next-version
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            jx-release-version > VERSION
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: jenkins4eval/jenkinsfile-runner
+          name: build-run
+          resources: {}
+          script: |
+            #!/bin/sh
+            /app/bin/jenkinsfile-runner-launcher run -w /app/jenkins -p /usr/share/jenkins/ref/plugins -f /workspace/source --runWorkspace /workspace/build
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}

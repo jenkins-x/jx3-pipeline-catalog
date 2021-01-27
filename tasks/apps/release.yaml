@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 600Mi
+          workingDir: /workspace/source
+        steps:
+        - image: gcr.io/jenkinsxio/jx-release-version:1.0.46
+          name: next-version
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            jx-release-version > VERSION
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
+          name: build-build
+          resources: {}
+          script: |
+            #!/bin/sh
+            make build
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: release-chart
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            if [ -d "charts/$REPO_NAME" ]; then source .jx/variables.sh
+            cd charts/$REPO_NAME
+            make release; else echo no charts; fi
+        - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
+          name: promote-release
+          resources: {}
+          script: |
+            #!/bin/sh
+            make release
+        - image: gcr.io/jenkinsxio/jx-boot:3.1.169
+          name: promote-helm-release
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops helm release
+        - image: gcr.io/jenkinsxio/jx-promote:0.0.179
+          name: promote-jx-promote
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx promote -b --all --timeout 1h --no-poll
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
