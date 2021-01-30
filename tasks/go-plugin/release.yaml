@@ -98,7 +98,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.47
+          image: gcr.io/jenkinsxio/jx-updatebot:0.0.49
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
