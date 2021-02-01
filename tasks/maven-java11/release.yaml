@@ -28,7 +28,7 @@ spec:
             name: release-gpg
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:1.0.49
+        - image: gcr.io/jenkinsxio/jx-release-version:2.0.0
           name: next-version
           resources: {}
           script: |
