@@ -28,9 +28,8 @@ spec:
           name: next-version
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             jx-release-version > VERSION
-            jx step tag --version $(cat VERSION)
         - image: ghcr.io/jenkins-x/jx-boot:3.1.215
           name: jx-variables
           resources: {}
