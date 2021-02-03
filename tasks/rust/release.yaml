@@ -30,25 +30,12 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: rust:1.49
-          name: build-rustup
-          resources: {}
-          script: |
-            #!/bin/sh
-            rustup override set nightly
-        - image: rust:1.49
+        - image: rust:1.49.0-alpine3.12
           name: build-cargo-install
           resources: {}
           script: |
             #!/bin/sh
             cargo install --path .
-        - image: rust:1.49
-          name: build-copy-bin
-          resources: {}
-          script: |
-            #!/bin/sh
-            source .jx/variables.sh
-            cp ~/.cargo/bin/$APP_NAME .
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}
