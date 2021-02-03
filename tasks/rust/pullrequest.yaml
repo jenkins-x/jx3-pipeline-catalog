@@ -41,7 +41,8 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            cp ~/.cargo/bin/REPLACE_ME_APP_NAME .
+            source .jx/variables.sh
+            cp ~/.cargo/bin/$APP_NAME .
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}
