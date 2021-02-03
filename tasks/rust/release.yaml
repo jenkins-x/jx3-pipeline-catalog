@@ -30,7 +30,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: rust:1.49.0-alpine3.12
+        - image: rust:1.49.0
           name: build-cargo-install
           resources: {}
           script: |
