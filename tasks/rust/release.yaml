@@ -30,19 +30,19 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
+        - image: rust:1.49
           name: build-rustup
           resources: {}
           script: |
             #!/bin/sh
             rustup override set nightly
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
+        - image: rust:1.49
           name: build-cargo-install
           resources: {}
           script: |
             #!/bin/sh
             cargo install --path .
-        - image: gcr.io/jenkinsxio/builder-rust:2.1.150-769
+        - image: rust:1.49
           name: build-copy-bin
           resources: {}
           script: |
