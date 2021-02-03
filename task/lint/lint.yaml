@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: linter
   annotations:
-    "lighthouse.jenkins-x.io/prependStepsURL": "https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/master/tasks/git-clone/git-clone-pr.yaml"
+    "lighthouse.jenkins-x.io/prependStepsURL": "https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/master/task/git-clone/git-clone-pr.yaml"
 spec:
   stepTemplate:
     resources:

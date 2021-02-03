@@ -13,7 +13,7 @@ If you are using [Jenkins X V3](https://jenkins-x.io/v3/about/) or using in-repo
 
 ```bash
 mkdir -p .lighthouse
-kpt pkg get https://github.com/jenkins-x/jx3-pipeline-catalog.git/tasks/lint .lighthouse/lint
+kpt pkg get https://github.com/jenkins-x/jx3-pipeline-catalog.git/task/lint .lighthouse/lint
 git add .lighthouse
 git commit -a -m "chore: added linter"
 ```

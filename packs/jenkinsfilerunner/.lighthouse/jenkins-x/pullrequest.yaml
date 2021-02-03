@@ -11,12 +11,12 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/jenkinsfilerunner/pullrequest.yaml@versionStream
+          image: uses:jenkins-x/jx3-pipeline-catalog/task/jenkinsfilerunner/pullrequest.yaml@versionStream
           name: ""
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+        - image: uses:jenkins-x/jx3-pipeline-catalog/task/git-clone/git-clone-pr.yaml@versionStream
           name: ""
           resources: {}
         - name: jx-variables
