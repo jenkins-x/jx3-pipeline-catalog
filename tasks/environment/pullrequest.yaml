@@ -10,12 +10,6 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          env:
-          - name: PIPELINE_KIND
-            value: pullrequest
-          - name: JX_BATCH_MODE
-            value: "true"
-          name: ""
           resources:
             requests:
               cpu: 400m

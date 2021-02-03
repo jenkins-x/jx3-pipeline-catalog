@@ -4,33 +4,13 @@ metadata:
   name: release
 spec:
   pipelineSpec:
-    params:
-    - default: master
-      description: git revision to checkout (branch, tag, sha, ref…)
-      name: revision
-      type: string
     tasks:
     - name: from-build-pack
-      params:
-      - name: revision
-        value: $(params.revision)
       resources: {}
       taskSpec:
         metadata: {}
         params:
-        - default: master
-          description: git revision to checkout (branch, tag, sha, ref…)
-          name: revision
-          type: string
         stepTemplate:
-          env:
-          - name: PIPELINE_KIND
-            value: release
-          - name: JX_BATCH_MODE
-            value: "true"
-          - name: VERSION
-            value: $(inputs.params.version)
-          name: ""
           resources:
             requests:
               cpu: 400m
