@@ -75,7 +75,7 @@ spec:
             git add * || true
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
-            git push origin v$VERSION
+            git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
         - image: ghcr.io/jenkins-x/jx-boot:3.1.221
