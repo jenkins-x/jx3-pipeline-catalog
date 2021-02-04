@@ -75,6 +75,7 @@ spec:
 
             jx changelog create --version v${VERSION}
 
+            git add * || true
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
