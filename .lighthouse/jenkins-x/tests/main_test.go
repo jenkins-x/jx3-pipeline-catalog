@@ -185,7 +185,7 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 		if err != nil {
 			return errors.Wrapf(err, "failed to run %s", c.CLI())
 		}
-		t.Logf("regenerated the pipeline catalog in dir %s\n", dir)
+		o.Infof("regenerated the pipeline catalog in dir %s\n", dir)
 
 		// lets replace @version with the current git SHA
 		sha, err := gitclient.GetLatestCommitSha(o.GitClient, dir)
