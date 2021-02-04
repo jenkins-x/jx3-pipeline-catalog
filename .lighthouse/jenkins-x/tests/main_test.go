@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/jenkins-x/jx-helpers/v3/pkg/files"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -183,7 +185,21 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 		if err != nil {
 			return errors.Wrapf(err, "failed to run %s", c.CLI())
 		}
-		t.Logf("regenerated the pipeline catalog in dir %s", dir)
+		o.Infof("regenerated the pipeline catalog in dir %s\n", dir)
+
+		// lets replace @version with the current git SHA
+		sha := os.Getenv("PULL_PULL_SHA")
+		if sha == "" {
+			sha, err = gitclient.GetLatestCommitSha(o.GitClient, dir)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get the latest git sha")
+			}
+		}
+		o.Infof("updating the pipelines to use the sha %s/n", sha)
+		err = o.replaceGitSHA(dir, sha)
+		if err != nil {
+			return errors.Wrapf(err, "failed to replace git sha in dir %s", dir)
+		}
 		return nil
 	}
 
@@ -687,4 +703,44 @@ func (o *Options) waitForVersionInStaging(version string) {
 	}
 	err := o.PollLoop(o.ReleasePollTimeout, o.ReleasePollPeriod, message, fn)
 	require.NoError(t, err, "failed to wait for version %s to be in Staging", ns, version)
+}
+
+func (o *Options) replaceGitSHA(dir string, sha string) error {
+	jxDir := filepath.Join(dir, ".lighthouse", "jenkins-x")
+	fs, err := ioutil.ReadDir(jxDir)
+	if err != nil {
+		return errors.Wrapf(err, "failed to read dir %s", jxDir)
+	}
+
+	replaceSHA := "@" + sha
+	count := 0
+	for _, f := range fs {
+		name := f.Name()
+		if f.IsDir() || !strings.HasSuffix(name, ".yaml") || name == "triggers.yaml" {
+			continue
+		}
+
+		path := filepath.Join(jxDir, name)
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			return errors.Wrapf(err, "failed to load file %s", path)
+		}
+
+		initial := string(data)
+		text := strings.ReplaceAll(initial, "@versionStream", replaceSHA)
+
+		if initial == text {
+			o.Infof("no @versionStream in file %s", path)
+			continue
+		}
+
+		err = ioutil.WriteFile(path, []byte(text), files.DefaultFileWritePermissions)
+		if err != nil {
+			return errors.Wrapf(err, "failed to save file %s", path)
+		}
+		o.Infof("replaced @versionStream to %s in file %s", replaceSHA, path)
+		count++
+	}
+	o.Infof("replaced %d files with @versionStream to %s ", count, replaceSHA)
+	return nil
 }

@@ -19,7 +19,7 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
           name: ""
           resources: {}
         - name: next-version
@@ -40,6 +40,7 @@ spec:
             source .jx/variables.sh
             echo running bdd test $JOB_NAME
             cd /workspace/source/.lighthouse/jenkins-x/tests
+            go mod download
             make test
   podTemplate: {}
   serviceAccountName: tekton-bot
