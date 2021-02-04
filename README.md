@@ -11,6 +11,7 @@ For more information check out the [Jenkins X 3.x support for Tekton Catalog](ht
 
 * [tasks](tasks) a reusable folder of tasks and associated triggers
 * [packs](packs) contains the language and/or framework specific packs containing tekton pipelines and associated files used by the pipelines such as `Dockerfile` or helm charts.
+  * e.g. the [javascript](packs/javascript) pack has the Jenkins X pipelines at [packs/javascript/.lighthouse/jenkins-x](packs/javascript/.lighthouse/jenkins-x)
 * [helm](helm) contains reusable helm charts that are imported into the various folders in [packs](packs) such as [packs/javascript/charts](packs/javascript/charts) to share charts across the different programming languages
 
 
