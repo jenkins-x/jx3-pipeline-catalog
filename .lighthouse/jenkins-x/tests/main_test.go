@@ -192,7 +192,7 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 		if err != nil {
 			return errors.Wrapf(err, "failed to get the latest git sha")
 		}
-		t.Logf("updating the pipelines to use the sha %s/n", sha)
+		o.Infof("updating the pipelines to use the sha %s/n", sha)
 		err = o.replaceGitSHA(dir, sha)
 		if err != nil {
 			return errors.Wrapf(err, "failed to replace git sha in dir %s", dir)
@@ -710,6 +710,7 @@ func (o *Options) replaceGitSHA(dir string, sha string) error {
 	}
 
 	replaceSHA := "@" + sha
+	count := 0
 	for _, f := range fs {
 		name := f.Name()
 		if f.IsDir() || !strings.HasSuffix(name, ".yaml") || name == "triggers.yaml" {
@@ -734,6 +735,9 @@ func (o *Options) replaceGitSHA(dir string, sha string) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to save file %s", path)
 		}
+		o.Infof("replaced @versionStream to %s in file %s", replaceSHA, path)
+		count++
 	}
+	o.Infof("replaced %d files with @versionStream to %s ", count, replaceSHA)
 	return nil
 }
