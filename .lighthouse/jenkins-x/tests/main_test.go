@@ -188,9 +188,12 @@ func (o *Options) CreatePullRequest() *scm.PullRequest {
 		o.Infof("regenerated the pipeline catalog in dir %s\n", dir)
 
 		// lets replace @version with the current git SHA
-		sha, err := gitclient.GetLatestCommitSha(o.GitClient, dir)
-		if err != nil {
-			return errors.Wrapf(err, "failed to get the latest git sha")
+		sha := os.Getenv("PULL_PULL_SHA")
+		if sha == "" {
+			sha, err = gitclient.GetLatestCommitSha(o.GitClient, dir)
+			if err != nil {
+				return errors.Wrapf(err, "failed to get the latest git sha")
+			}
 		}
 		o.Infof("updating the pipelines to use the sha %s/n", sha)
 		err = o.replaceGitSHA(dir, sha)
