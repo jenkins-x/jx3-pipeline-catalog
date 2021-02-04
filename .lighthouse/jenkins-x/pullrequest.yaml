@@ -31,7 +31,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 key: password
-                name: bdd-pipeline-token-github
+                name: bdd-git
           image: ghcr.io/jenkins-x/jx-go-maven:latest
           name: runci
           resources: {}
