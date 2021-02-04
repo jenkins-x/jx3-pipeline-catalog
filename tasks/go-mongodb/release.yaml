@@ -24,7 +24,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.220
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.221
           name: jx-variables
           resources: {}
           script: |
@@ -62,13 +62,13 @@ spec:
             git push origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.220
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.221
           name: promote-step6
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.220
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.221
           name: promote-step7
           resources: {}
           script: |
