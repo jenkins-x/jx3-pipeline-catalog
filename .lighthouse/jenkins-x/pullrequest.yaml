@@ -32,7 +32,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: bdd-pipeline-token-github
-          image: gcr.io/jenkinsxio/jx-go-maven:latest
+          image: ghcr.io/jenkins-x/jx-go-maven:latest
           name: runci
           resources: {}
           script: |
