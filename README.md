@@ -6,7 +6,6 @@ Jenkins X 3.x comes with its own default pipeline catalog for different language
 
 For more information check out the [Jenkins X 3.x support for Tekton Catalog](https://jenkins-x.io/v3/develop/pipeline-catalog/)
 
-
 ## Contents
 
 * [tasks](tasks) a reusable folder of tasks and associated triggers
