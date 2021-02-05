@@ -24,7 +24,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.226
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.227
           name: jx-variables
           resources: {}
           script: |
@@ -81,7 +81,7 @@ spec:
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
               -Xms10m -Xmx192m
-          image: ghcr.io/jenkins-x/jx-boot:3.1.226
+          image: ghcr.io/jenkins-x/jx-boot:3.1.227
           name: promote-step6
           resources: {}
           script: |
@@ -93,7 +93,7 @@ spec:
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
               -Xms10m -Xmx192m
-          image: ghcr.io/jenkins-x/jx-boot:3.1.226
+          image: ghcr.io/jenkins-x/jx-boot:3.1.227
           name: promote-jx
           resources: {}
           script: |
