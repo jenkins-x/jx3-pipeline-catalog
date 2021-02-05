@@ -56,7 +56,7 @@ spec:
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
               -Xms10m -Xmx192m
-          image: ghcr.io/jenkins-x/jx-preview:0.0.155
+          image: ghcr.io/jenkins-x/jx-preview:0.0.157
           name: promote-jx-preview
           resources: {}
           script: |

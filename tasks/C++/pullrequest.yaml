@@ -41,7 +41,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-preview:0.0.155
+        - image: ghcr.io/jenkins-x/jx-preview:0.0.157
           name: promote-jx-preview
           resources: {}
           script: |
