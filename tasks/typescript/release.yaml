@@ -24,7 +24,7 @@ spec:
             name: npmrc
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.2.2
+        - image: gcr.io/jenkinsxio/jx-release-version:2.2.3
           name: next-version
           resources: {}
           script: |
