@@ -5,7 +5,13 @@ environments:
 helmDefaults:
   # time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks, and waits on pod/pvc/svc/deployment readiness) (default 300)
   timeout: 600
+repositories:
+- name: jx3
+  url: https://storage.googleapis.com/jenkinsxio/charts
 releases:
+- chart: jx3/jx-verify
+  name: jx-verify
+  namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
 - chart: '../charts/{{ requiredEnv "APP_NAME" }}'
   name: preview
   wait: true
@@ -13,6 +19,7 @@ releases:
   namespace: '{{ requiredEnv "PREVIEW_NAMESPACE" }}'
   values:
   - jx-values.yaml
+  - imagePullSecrets.yaml
   - values.yaml.gotmpl
   hooks:
   - events: ["presync"]
