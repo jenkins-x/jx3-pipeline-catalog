@@ -35,7 +35,7 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
+            echo "not changing version for SNAPSHOT"
         - image: gcr.io/jenkinsxio/builder-maven-graalvm:2.1.150-769
           name: build-mvn-install
           resources: {}

@@ -35,7 +35,7 @@ spec:
           script: |
             #!/bin/sh
             source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
+            echo "not changing version for SNAPSHOT"
         - image: maven:3.6-openjdk-11
           name: build-mvn-install
           resources: {}
