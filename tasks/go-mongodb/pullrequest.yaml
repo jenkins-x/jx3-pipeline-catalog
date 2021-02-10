@@ -24,7 +24,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-go:2.1.150-769
+        - image: golang:1.15
           name: build-make-linux
           resources: {}
           script: |
