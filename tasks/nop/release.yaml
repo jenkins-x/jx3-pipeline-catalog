@@ -21,13 +21,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.240
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.241
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.240
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.241
           name: build-dummy-release
           resources: {}
           script: |
