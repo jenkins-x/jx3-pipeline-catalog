@@ -39,7 +39,7 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-admin:0.0.172
+        - image: ghcr.io/jenkins-x/jx-admin:0.0.173
           name: admin-log
           script: |
             #!/usr/bin/env sh
