@@ -23,6 +23,9 @@ spec:
             requests:
               cpu: 400m
               memory: 2Gi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
           workingDir: /workspace/source
         steps:
         - image: ghcr.io/jenkins-x/jx-boot:3.1.258
@@ -61,6 +64,10 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx preview create
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
