@@ -35,7 +35,9 @@ spec:
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+              -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           image: maven:3.6-openjdk-8
           name: build-mvn-deploy
           resources: {}
@@ -47,7 +49,13 @@ spec:
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+              -Xms10m -Xmx192m
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}
@@ -80,7 +88,13 @@ spec:
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+              -Xms10m -Xmx192m
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           image: ghcr.io/jenkins-x/jx-boot:3.1.252
           name: promote-step6
           resources: {}
@@ -92,7 +106,13 @@ spec:
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
               -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+              -Xms10m -Xmx192m
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           image: ghcr.io/jenkins-x/jx-boot:3.1.252
           name: promote-jx
           resources: {}
