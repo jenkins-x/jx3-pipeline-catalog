@@ -38,6 +38,8 @@ spec:
           resources: {}
         - name: build-ui-build
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-changelog

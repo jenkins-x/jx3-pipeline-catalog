@@ -33,6 +33,8 @@ spec:
           resources: {}
         - name: build-mvn-install
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-jx-preview

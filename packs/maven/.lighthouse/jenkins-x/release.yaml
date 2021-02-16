@@ -39,6 +39,8 @@ spec:
           resources: {}
         - name: build-mvn-deploy
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-changelog

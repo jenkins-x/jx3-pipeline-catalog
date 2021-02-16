@@ -36,6 +36,8 @@ spec:
           resources: {}
         - name: build-npm-test
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-changelog
