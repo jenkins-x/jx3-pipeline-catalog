@@ -49,7 +49,7 @@ spec:
             #!/bin/ash
             if [ -d "charts/$REPO_NAME" ]; then cd charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.32
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.33
           name: changelog
           resources: {}
           script: |
@@ -99,7 +99,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.54
+          image: gcr.io/jenkinsxio/jx-updatebot:0.0.55
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
