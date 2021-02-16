@@ -36,7 +36,7 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.4
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.5
           name: check-registry
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
