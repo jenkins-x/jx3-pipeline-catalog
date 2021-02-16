@@ -25,6 +25,9 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
@@ -42,6 +45,10 @@ spec:
           resources: {}
         - name: promote-jx-preview
           resources: {}
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
