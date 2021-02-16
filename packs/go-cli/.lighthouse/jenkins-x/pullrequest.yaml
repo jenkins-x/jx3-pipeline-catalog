@@ -28,6 +28,8 @@ spec:
           resources: {}
         - name: build-make-test
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
   podTemplate: {}

@@ -26,6 +26,8 @@ spec:
           resources: {}
         - name: build-sbt-assembly
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-jx-preview

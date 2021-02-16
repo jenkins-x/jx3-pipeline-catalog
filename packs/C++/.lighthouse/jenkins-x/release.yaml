@@ -27,6 +27,8 @@ spec:
           resources: {}
         - name: build-make
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-changelog

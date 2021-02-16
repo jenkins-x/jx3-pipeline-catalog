@@ -30,6 +30,8 @@ spec:
           resources: {}
         - name: build-testing
           resources: {}
+        - name: check-registry
+          resources: {}
         - name: build-container-build
           resources: {}
         - name: promote-jx-preview
