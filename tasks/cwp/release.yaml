@@ -11,6 +11,14 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          env:
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+              -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
+              -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+              -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           name: ""
           resources:
             requests:
@@ -83,37 +91,13 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - env:
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-              -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
-              -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
-              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
-              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          - name: MAVEN_OPTS
-            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-          image: ghcr.io/jenkins-x/jx-boot:3.1.258
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.252
           name: promote-step6
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops helm release
-        - env:
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-              -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
-              -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
-              -Xms10m -Xmx192m
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
-              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
-              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
-          - name: MAVEN_OPTS
-            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-          image: ghcr.io/jenkins-x/jx-boot:3.1.258
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.252
           name: promote-jx
           resources: {}
           script: |
