@@ -48,7 +48,7 @@ spec:
           script: |
             #!/bin/sh
             CI=true DISPLAY=:99 npm test
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.5
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.6
           name: check-registry
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
