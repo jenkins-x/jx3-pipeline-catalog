@@ -38,7 +38,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.8
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.9
           name: check-registry
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
