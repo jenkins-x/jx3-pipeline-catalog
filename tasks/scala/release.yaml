@@ -43,7 +43,7 @@ spec:
           script: |
             #!/bin/sh
             sbt clean compile assembly
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.7
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.8
           name: check-registry
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
