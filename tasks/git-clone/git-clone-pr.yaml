@@ -23,7 +23,7 @@ spec:
     name: git-clone
     resources: { }
     workingDir: /workspace
-  - image: ghcr.io/jenkins-x/jx-boot:3.1.273
+  - image: ghcr.io/jenkins-x/jx-boot:3.1.274
     name: git-merge
     resources: {}
     script: |
