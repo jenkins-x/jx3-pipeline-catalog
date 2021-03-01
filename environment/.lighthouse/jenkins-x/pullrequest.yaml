@@ -17,6 +17,10 @@ spec:
             value: pullrequest
           - name: JX_BATCH_MODE
             value: "true"
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
           name: ""
           resources:
             requests:
