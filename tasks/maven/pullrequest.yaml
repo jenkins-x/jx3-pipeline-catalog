@@ -39,14 +39,14 @@ spec:
           name: build-set-version
           resources: {}
           script: |
-            #!/bin/sh
-            source .jx/variables.sh
-            mvn --no-transfer-progress versions:set -DnewVersion=$VERSION
+            #!/usr/bin/env bash
+            echo "not changing version for SNAPSHOT"
         - image: maven:3.6-openjdk-8-slim
           name: build-mvn-install
           resources: {}
           script: |
-            #!/bin/sh
+            #!/usr/bin/env bash
+            source .jx/variables.sh
             mvn --no-transfer-progress install
         - image: gcr.io/jenkinsxio/jx-registry:0.0.11
           name: check-registry

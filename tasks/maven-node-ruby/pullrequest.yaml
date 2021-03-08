@@ -46,7 +46,8 @@ spec:
           name: build-mvn-install
           resources: {}
           script: |
-            #!/bin/sh
+            #!/usr/bin/env bash
+            source .jx/variables.sh
             mvn --no-transfer-progress install
         - image: gcr.io/jenkinsxio/jx-registry:0.0.11
           name: check-registry
