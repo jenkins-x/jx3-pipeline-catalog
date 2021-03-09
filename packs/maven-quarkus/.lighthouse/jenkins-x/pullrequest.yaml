@@ -17,7 +17,7 @@ spec:
               -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
               -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx1800m
           - name: MAVEN_OPTS
-            value: -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
           image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-quarkus/pullrequest.yaml@versionStream
           name: ""
           resources:
