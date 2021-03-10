@@ -32,7 +32,7 @@ spec:
           - pr
           command:
           - make
-          image: ghcr.io/jenkins-x/jx-boot:3.1.299
+          image: ghcr.io/jenkins-x/jx-boot:3.1.300
           name: make-pr
           resources: {}
   podTemplate: {}
