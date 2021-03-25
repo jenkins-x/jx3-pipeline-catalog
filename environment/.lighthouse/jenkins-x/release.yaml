@@ -1,37 +1,17 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  annotations:
-    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/60bed6408732c1eda91a15713f51a9f97dcb1757/tasks/git-clone/git-clone.yaml
+  creationTimestamp: null
   name: release
 spec:
   pipelineSpec:
-    params:
-    - default: master
-      description: git revision to checkout (branch, tag, sha, ref…)
-      name: revision
-      type: string
     tasks:
     - name: from-build-pack
-      params:
-      - name: revision
-        value: $(params.revision)
       resources: {}
       taskSpec:
         metadata: {}
-        params:
-        - default: master
-          description: git revision to checkout (branch, tag, sha, ref…)
-          name: revision
-          type: string
         stepTemplate:
-          env:
-          - name: PIPELINE_KIND
-            value: release
-          - name: JX_BATCH_MODE
-            value: "true"
-          - name: VERSION
-            value: $(inputs.params.version)
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/environment/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -39,12 +19,11 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-admin:0.0.173
-          name: admin-log
-          script: |
-            #!/usr/bin/env sh
-            echo "viewing the git operator boot job log for commit sha: $PULL_BASE_SHA"
-            jx admin log --commit-sha $PULL_BASE_SHA
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: admin-log
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
