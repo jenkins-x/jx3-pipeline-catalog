@@ -83,7 +83,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-promote:0.0.243
+        - image: ghcr.io/jenkins-x/jx-promote:0.0.244
           name: promote-jx-promote
           resources: {}
           script: |
