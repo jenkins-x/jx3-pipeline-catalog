@@ -9,7 +9,11 @@ image:
 
 # optional list of image pull secrets to use to pull images
 jx:
+  # optional image pull secrets
   imagePullSecrets: []
+
+  # whether to create a Release CRD when installing charts with Release CRDs included
+  releaseCRD: true
 
 # define environment variables here as a map of key: value
 env:
