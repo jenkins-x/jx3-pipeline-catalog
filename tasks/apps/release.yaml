@@ -57,7 +57,7 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-promote:0.0.246
+        - image: ghcr.io/jenkins-x/jx-promote:0.0.247
           name: promote-jx-promote
           resources: {}
           script: |
