@@ -85,6 +85,7 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
+            source .jx/variables.sh
             jx gitops helm release
         - image: ghcr.io/jenkins-x/jx-boot:3.1.344
           name: promote-step9
