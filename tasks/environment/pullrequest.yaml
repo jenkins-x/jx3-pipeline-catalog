@@ -20,6 +20,10 @@ spec:
           - pr
           command:
           - make
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
           image: ghcr.io/jenkins-x/jx-boot:3.1.350
           name: make-pr
           resources: {}
