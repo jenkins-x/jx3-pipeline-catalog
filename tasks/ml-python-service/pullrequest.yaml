@@ -18,7 +18,7 @@ spec:
               memory: 4Gi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.1.351
+        - image: ghcr.io/jenkins-x/jx-boot:3.1.352
           name: jx-variables
           resources: {}
           script: |
