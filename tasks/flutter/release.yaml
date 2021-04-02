@@ -62,7 +62,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.57
+          image: gcr.io/jenkinsxio/jx-updatebot:0.0.58
           name: promote-release
           resources: {}
         volumes:
