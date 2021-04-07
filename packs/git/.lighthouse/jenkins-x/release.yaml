@@ -24,7 +24,18 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            jx-release-version > VERSION
+            jx-release-version --tag > VERSION
+          env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: tekton-git
+                key: password
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: tekton-git
+                key: username
         - image: ghcr.io/jenkins-x/jx-boot:3.2.15
           name: jx-variables
           resources: {}
