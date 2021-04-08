@@ -15,7 +15,7 @@ spec:
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.3.1
+        - image: gcr.io/jenkinsxio/jx-release-version:2.3.2
           name: next-version
           resources: {}
           script: |
