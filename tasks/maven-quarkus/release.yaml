@@ -47,7 +47,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.21
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.22
           name: jx-variables
           resources: {}
           script: |
@@ -94,7 +94,7 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.21
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.22
           name: promote-helm-release
           resources: {}
           script: |
