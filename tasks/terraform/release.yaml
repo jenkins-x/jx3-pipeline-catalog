@@ -1,0 +1,74 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 600Mi
+          workingDir: /workspace/source
+        steps:
+        - image: gcr.io/jenkinsxio/jx-release-version:2.3.3
+          name: next-version
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx-release-version --tag > VERSION
+          env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: tekton-git
+                key: password
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                name: tekton-git
+                key: username
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.22
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: ghcr.io/jenkins-x/terraform-operator-gcp
+          name: lint
+          resources: {}
+          script: |
+            #!/bin/sh
+            terraform init
+            terraform version
+            terraform validate
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.38
+          name: changelog
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+
+            git add * || true
+            git commit -a -m "chore: release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Release version $VERSION"
+            git push --force origin v$VERSION
+
+            jx changelog create --version v${VERSION}
+        - command:
+          - jx-updatebot
+          - pr
+          image: gcr.io/jenkinsxio/jx-updatebot:0.0.59
+          name: promote
+          resources: {}
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
