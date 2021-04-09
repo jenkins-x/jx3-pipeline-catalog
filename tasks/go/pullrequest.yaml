@@ -39,8 +39,14 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-preview:0.0.172
+            /kaniko/executor $KANIKO_FLAGS \
+              --build-arg=DOCKER_REGISTRY=$DOCKER_REGISTRY/jx \
+              --context=/workspace/source \
+              --cache=true \
+              --cache-repo=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME \
+              --dockerfile=Dockerfile \
+              --destination=$DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+        - image: ghcr.io/jenkins-x/jx-preview:0.0.171
           name: promote-jx-preview
           resources: {}
           script: |
