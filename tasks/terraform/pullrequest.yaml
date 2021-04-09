@@ -15,23 +15,23 @@ spec:
           resources:
             requests:
               cpu: 400m
-              memory: 512Mi
+              memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.23
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.22
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: mobiledevops/flutter-sdk-image:2.0.1
-          name: build
+        - image: ghcr.io/jenkins-x/terraform-operator-gcp
+          name: lint
           resources: {}
           script: |
-            #!/usr/bin/bash
-            flutter pub get
-            flutter test
-            flutter build apk
+            #!/bin/sh
+            terraform init
+            terraform version
+            terraform validate
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
