@@ -40,8 +40,8 @@ spec:
 
 
   postsubmits:
-  - name: release
-    context: "release"
+  - name: bootjob
+    context: "bootjob"
     source: "release.yaml"
     branches:
     - ^main$
