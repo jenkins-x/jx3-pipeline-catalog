@@ -11,7 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@versionStream
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@b52a202405538287e2058b754aa761cd17baf2d7
           name: ""
           resources:
             requests:
