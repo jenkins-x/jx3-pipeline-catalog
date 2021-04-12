@@ -28,6 +28,20 @@ spec:
           resources: {}
         - name: promote-changelog
           resources: {}
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.36
+          name: promote-pullrequest
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+
+            git clone https://github.com/jenkins-x/$REPO_NAME new-main
+            cd new-main
+            sed -i -e "s|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@versionStream.*|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@$PULL_BASE_SHA|" .lighthouse/jenkins-x/pullrequest.yaml
+
+            git add * || true
+            git commit -a -m "chore: upgrade environment pull request to $PULL_BASE_SHA" --allow-empty
+            git push
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
