@@ -37,7 +37,7 @@ spec:
 
             git clone https://github.com/jenkins-x/$REPO_NAME new-main
             cd new-main
-            sed -i -e "s|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@versionStream.*|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@$PULL_BASE_SHA|" .lighthouse/jenkins-x/pullrequest.yaml
+            sed -i -e "s|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@versionStream.*|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@$PULL_BASE_SHA|" environment/.lighthouse/jenkins-x/pullrequest.yaml
 
             git add * || true
             git commit -a -m "chore: upgrade environment pull request to $PULL_BASE_SHA" --allow-empty
