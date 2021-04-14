@@ -28,7 +28,7 @@ spec:
           resources: {}
         - name: promote-changelog
           resources: {}
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.36
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.39
           name: promote-pullrequest
           resources: {}
           script: |
