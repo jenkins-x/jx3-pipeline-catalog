@@ -43,7 +43,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.32
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.33
           name: jx-variables
           resources: {}
           script: |
@@ -102,14 +102,14 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.32
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.33
           name: promote-step6
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.32
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.33
           name: promote-jx
           resources: {}
           script: |
