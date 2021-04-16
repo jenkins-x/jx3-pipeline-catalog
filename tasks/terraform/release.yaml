@@ -65,7 +65,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.66
+          image: gcr.io/jenkinsxio/jx-updatebot:0.0.67
           name: promote
           resources: {}
   podTemplate: {}
