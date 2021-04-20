@@ -55,7 +55,7 @@ spec:
             flutter pub get
             flutter test
             flutter build apk
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.39
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.40
           name: promote-changelog
           resources: {}
           script: |
