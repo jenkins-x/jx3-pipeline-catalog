@@ -24,7 +24,7 @@ spec:
           - secretRef:
               name: jx-boot-job-env-vars
               optional: true
-          image: ghcr.io/jenkins-x/jx-boot:3.2.52
+          image: ghcr.io/jenkins-x/jx-boot:3.2.53
           name: make-pr
           resources: {}
   podTemplate: {}
