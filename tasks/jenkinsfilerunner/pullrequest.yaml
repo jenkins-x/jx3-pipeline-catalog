@@ -21,6 +21,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
+            jx gitops pr variables
         - image: jenkins4eval/jenkinsfile-runner
           name: build-run
           resources: {}

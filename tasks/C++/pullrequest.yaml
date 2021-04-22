@@ -21,6 +21,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
+            jx gitops pr variables
         - image: cpp
           name: build-cmake
           resources: {}
