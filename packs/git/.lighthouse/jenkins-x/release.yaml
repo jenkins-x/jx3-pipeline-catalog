@@ -19,7 +19,7 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.4.3
+        - image: gcr.io/jenkinsxio/jx-release-version:2.4.4
           name: next-version
           resources: {}
           script: |
