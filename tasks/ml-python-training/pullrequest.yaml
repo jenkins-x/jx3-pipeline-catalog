@@ -25,21 +25,21 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+        - image: ghcr.io/jenkins-x/builder-machine-learning:0.1.1317
           name: build-flake8
           resources: {}
           script: |
             #!/bin/sh
             source /root/.bashrc
             flake8
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+        - image: ghcr.io/jenkins-x/builder-machine-learning:0.1.1317
           name: build-testing
           resources: {}
           script: |
             #!/bin/sh
             source /root/.bashrc
             pytest
-        - image: gcr.io/jenkinsxio/builder-machine-learning:2.1.150-769
+        - image: ghcr.io/jenkins-x/builder-machine-learning:0.1.1317
           name: build-training
           resources: {}
           script: |
