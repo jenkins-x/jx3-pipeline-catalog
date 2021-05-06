@@ -81,6 +81,7 @@ spec:
 
             if [ -d "charts/$REPO_NAME" ]; then
             jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
+            jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
             jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
             jx gitops yset -p 'image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
