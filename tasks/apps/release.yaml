@@ -35,7 +35,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.77
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.78
           name: jx-variables
           resources: {}
           script: |
@@ -47,7 +47,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.77
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.78
           name: release-chart
           resources: {}
           script: |
@@ -61,7 +61,7 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.77
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.78
           name: promote-helm-release
           resources: {}
           script: |
