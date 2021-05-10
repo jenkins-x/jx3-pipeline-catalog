@@ -18,7 +18,7 @@ For more information check out the [Jenkins X 3.x support for Tekton Catalog](ht
 ## Custom Pipeline Catalogs
 ([Blog article](https://jenkins-x.io/blog/2020/11/11/accelerate-tekton/#custom-pipeline-catalogs))
 
-To use your own custom pipeline catalog, you can [fork this catalog](https://github.com/jenkins-x/jx3-pipeline-catalog/fork) to make changes for your team or share between teams in your company. You can make as many catalogs as you like and put whichever catalogs you want in the extensions/pipeline-catalogs.yaml file of your cluster git repository of your Jenkins X 3.x install, like for example:
+To use your own custom pipeline catalog, you can [fork this catalog](https://github.com/jenkins-x/jx3-pipeline-catalog/fork) to make changes for your team or share between teams in your company. You can make as many catalogs as you like and put whichever catalogs you want in the extensions/pipeline-catalog.yaml file of your cluster git repository of your Jenkins X 3.x install, like for example:
 ```
 # Source: <boot-repo>/extensions/pipeline-catalog.yaml
 apiVersion: project.jenkins-x.io/v1alpha1
