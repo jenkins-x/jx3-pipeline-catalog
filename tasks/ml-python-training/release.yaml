@@ -56,23 +56,38 @@ spec:
             source /root/.bashrc
             python3 -m pip install -r ./requirements.txt
             python3 app.py
-        - image: ghcr.io/jenkins-x/builder-machine-learning:0.1.1317
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.88
           name: build-export-model
           resources: {}
+          env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: tekton-git
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: tekton-git
           script: |+
-            #!/bin/sh
-            source /root/.bashrc
-            export TARGET_SERVICE=`echo $APP_NAME | sed -Ee s/-training$/-service/`
-            export GIT_PROVIDER=`jx repo -qub | grep -oP '(^https?:\/\/[a-zA-Z\d-\.]+)'`
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            export TARGET_SERVICE=`echo $REPO_NAME | sed -Ee s/-training$/-service/`
+            export GIT_PROVIDER=`echo $REPO_URL | grep -oE '(^https?:\/\/[a-zA-Z\d\-\.]+)'`
             export TARGET_SERVICE_REPO=`echo $GIT_PROVIDER/$REPO_OWNER/$TARGET_SERVICE`
+            export TARGET_BRANCH=`echo sync-$VERSION`
+            echo "Deploying model to ${TARGET_SERVICE_REPO}"
             git clone $TARGET_SERVICE_REPO
             cd $TARGET_SERVICE
-            git checkout syncmodel || git checkout -b syncmodel
+            git checkout $TARGET_BRANCH || git checkout -b $TARGET_BRANCH
             git lfs install
             git lfs track '*.onnx'
-            cp ../*.onnx .
+            \cp ../*.onnx .
             git add *.onnx
-            { jx create pullrequest --push -b --title 'New model trained' --body 'feat: New model trained' || echo 'Using previous PR'; }
+            git commit -m "New model trained from ${GIT_PROVIDER}/${REPO_OWNER}/${REPO_NAME}/commit/${PULL_BASE_SHA}"
+            git push --set-upstream origin $TARGET_BRANCH
+            { jx project pullrequest --title 'New model trained' --body "Exported from training version ${GIT_PROVIDER}/${REPO_OWNER}/${REPO_NAME}/commit/${PULL_BASE_SHA}" || echo 'Using previous PR'; }
             sha1sum *.onnx >&2
 
   podTemplate: {}
