@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: environment
+      taskSpec:
+        stepTemplate:
+          workingDir: /workspace/source
+        steps:
+        - command:
+          - jx-kube-test
+          - run
+          - --chart-dir
+          - charts
+          image: gcr.io/jenkinsxio/jx-kube-test:0.0.3
+          name: kubetest
+          resources: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
