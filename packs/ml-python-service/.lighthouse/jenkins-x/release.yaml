@@ -40,7 +40,7 @@ spec:
           resources: {}
         - name: promote-step8
           resources: {}
-        - name: promote-step9
+        - name: promote-jx-promote
           resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
