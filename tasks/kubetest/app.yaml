@@ -16,7 +16,7 @@ spec:
           - run
           - --chart-dir
           - charts
-          image: gcr.io/jenkinsxio/jx-kube-test:0.0.5
+          image: gcr.io/jenkinsxio/jx-kube-test:0.0.6
           name: kubetest
           resources: {}
   serviceAccountName: tekton-bot
