@@ -35,7 +35,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.95
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.96
           name: jx-variables
           resources: {}
           script: |
@@ -56,7 +56,7 @@ spec:
             source /root/.bashrc
             python3 -m pip install -r ./requirements.txt
             python3 app.py
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.95
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.96
           name: build-export-model
           resources: {}
           env:
