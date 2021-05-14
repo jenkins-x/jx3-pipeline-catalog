@@ -66,5 +66,5 @@ spec:
             jx promote -b --all --timeout 1h --no-poll
   podTemplate: {}
   serviceAccountName: tekton-bot
-  timeout: 240h0m0s
+  timeout: 12h0m0s
 status: {}
