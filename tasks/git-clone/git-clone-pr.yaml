@@ -21,10 +21,18 @@ spec:
       echo "checked out revision: $PULL_PULL_SHA to dir: $SUBDIR"
     image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
     name: git-clone
-    resources: { }
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    resources: {}
     workingDir: /workspace
   - image: ghcr.io/jenkins-x/jx-boot:3.2.99
     name: git-merge
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
     resources: {}
     script: |
       #!/usr/bin/env sh
