@@ -73,5 +73,5 @@ spec:
             jx changelog create --version v${VERSION}
   podTemplate: {}
   serviceAccountName: tekton-bot
-  timeout: 240h0m0s
+  timeout: 12h0m0s
 status: {}
