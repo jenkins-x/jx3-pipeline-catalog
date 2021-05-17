@@ -27,7 +27,7 @@ spec:
         optional: true
     resources: {}
     workingDir: /workspace
-  - image: ghcr.io/jenkins-x/jx-boot:3.2.99
+  - image: ghcr.io/jenkins-x/jx-boot:3.2.100
     name: git-merge
     envFrom:
     - secretRef:
