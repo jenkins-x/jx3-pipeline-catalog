@@ -63,6 +63,8 @@ spec:
           script: |
             #!/bin/sh
             mvn --no-transfer-progress clean deploy
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.12
+          name: check-registry
         - env:
           - name: _JAVA_OPTIONS
             value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
