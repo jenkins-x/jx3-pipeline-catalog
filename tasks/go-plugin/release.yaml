@@ -11,27 +11,30 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
           name: ""
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.4.4
+        - env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: tekton-git
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: tekton-git
+          image: gcr.io/jenkinsxio/jx-release-version:2.4.4
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-          env:
-          - name: GIT_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: password
-          - name: GIT_USER
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: username
         - image: ghcr.io/jenkins-x/jx-boot:3.2.100
           name: jx-variables
           resources: {}
@@ -83,14 +86,14 @@ spec:
             if [ -d "charts/$REPO_NAME" ]; then source .jx/variables.sh
             cd charts/$REPO_NAME
             make release; else echo no charts; fi
-        - image: goreleaser/goreleaser:v0.155.0
-          name: upload-binaries
-          env:
+        - env:
           - name: GITHUB_TOKEN
             valueFrom:
               secretKeyRef:
-                name: tekton-git
                 key: password
+                name: tekton-git
+          image: goreleaser/goreleaser:v0.155.0
+          name: upload-binaries
           resources: {}
           script: |
             #!/bin/bash

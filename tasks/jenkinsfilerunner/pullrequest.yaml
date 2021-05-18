@@ -11,6 +11,9 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
           name: ""
           resources: {}
           workingDir: /workspace/source

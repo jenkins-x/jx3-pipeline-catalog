@@ -11,6 +11,9 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
           name: ""
           resources:
             requests:
@@ -27,6 +30,7 @@ spec:
             jx gitops pr variables
         - image: gcr.io/jenkinsxio/jx-registry:0.0.12
           name: check-registry
+          resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}

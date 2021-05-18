@@ -1,34 +1,41 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: linter
   annotations:
-    "lighthouse.jenkins-x.io/prependStepsURL": "https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/master/tasks/git-clone/git-clone-pr.yaml"
+    lighthouse.jenkins-x.io/prependStepsURL: https://raw.githubusercontent.com/jenkins-x/jx3-pipeline-catalog/master/tasks/git-clone/git-clone-pr.yaml
+  creationTimestamp: null
+  name: linter
 spec:
   stepTemplate:
+    env:
+    - name: HOME
+      value: /tekton/home
+    name: ""
     resources:
       requests:
         cpu: 400m
         memory: 512Mi
     workingDir: /workspace/source
   steps:
-    - env:
-        - name: DEFAULT_WORKSPACE
-          value: "."
-        - name: DISABLE_ERRORS
-          value: "true"
-        - name: OUTPUT_DETAILS
-          value: "detailed"
-        - name: OUTPUT_FORMAT
-          value: "tap"
-        - name: RUN_LOCAL
-          value: "true"
-        - name: VALIDATE_ALL_CODEBASE
-          value: "true"
-      image: github/super-linter:v3.13.1
-      name: lint
-    - script: |
-        #!/usr/bin/env bash
-        jx-tap tap -d super-linter.report
-      image: gcr.io/jenkinsxio/jx-tap:latest
-      name: pr-comment
+  - env:
+    - name: DEFAULT_WORKSPACE
+      value: .
+    - name: DISABLE_ERRORS
+      value: "true"
+    - name: OUTPUT_DETAILS
+      value: detailed
+    - name: OUTPUT_FORMAT
+      value: tap
+    - name: RUN_LOCAL
+      value: "true"
+    - name: VALIDATE_ALL_CODEBASE
+      value: "true"
+    image: github/super-linter:v3.13.1
+    name: lint
+    resources: {}
+  - image: gcr.io/jenkinsxio/jx-tap:latest
+    name: pr-comment
+    resources: {}
+    script: |
+      #!/usr/bin/env bash
+      jx-tap tap -d super-linter.report
