@@ -67,7 +67,7 @@ spec:
           script: |
             #!/bin/sh
             mvn --no-transfer-progress clean deploy
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.12
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.14
           name: check-registry
           resources: {}
         - env:
