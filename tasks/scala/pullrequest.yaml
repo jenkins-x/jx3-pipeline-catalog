@@ -29,7 +29,7 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.102
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.103
           name: jx-variables
           resources: {}
           script: |
