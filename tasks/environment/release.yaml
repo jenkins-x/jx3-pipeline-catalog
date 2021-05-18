@@ -1,6 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
+  creationTimestamp: null
   name: release
 spec:
   pipelineSpec:
@@ -9,8 +10,11 @@ spec:
       resources: {}
       taskSpec:
         metadata: {}
-        params:
         stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          name: ""
           resources:
             requests:
               cpu: 400m
@@ -19,6 +23,7 @@ spec:
         steps:
         - image: ghcr.io/jenkins-x/jx-admin:0.0.174
           name: admin-log
+          resources: {}
           script: |
             #!/usr/bin/env sh
             echo "viewing the git operator boot job log for commit sha: $PULL_BASE_SHA"

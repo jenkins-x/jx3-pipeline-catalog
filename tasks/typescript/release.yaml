@@ -14,6 +14,8 @@ spec:
           env:
           - name: NPM_CONFIG_USERCONFIG
             value: /tekton/home/npm/.npmrc
+          - name: HOME
+            value: /tekton/home
           name: ""
           resources:
             requests:
@@ -24,23 +26,23 @@ spec:
             name: npmrc
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.4.4
+        - env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: tekton-git
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: tekton-git
+          image: gcr.io/jenkinsxio/jx-release-version:2.4.4
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-          env:
-          - name: GIT_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: password
-          - name: GIT_USER
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: username
         - image: ghcr.io/jenkins-x/jx-boot:3.2.100
           name: jx-variables
           resources: {}
@@ -61,6 +63,7 @@ spec:
             CI=true DISPLAY=:99 npm test
         - image: gcr.io/jenkinsxio/jx-registry:0.0.12
           name: check-registry
+          resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}

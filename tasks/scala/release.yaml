@@ -18,30 +18,34 @@ spec:
               -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
               -Xms10m -Xmx192m
           - name: MAVEN_OPTS
-            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
+              -Dmaven.wagon.http.retryHandler.count=3
+          - name: HOME
+            value: /tekton/home
+          name: ""
           resources:
             requests:
               cpu: 400m
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: gcr.io/jenkinsxio/jx-release-version:2.4.4
+        - env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: tekton-git
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: tekton-git
+          image: gcr.io/jenkinsxio/jx-release-version:2.4.4
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-          env:
-          - name: GIT_TOKEN
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: password
-          - name: GIT_USER
-            valueFrom:
-              secretKeyRef:
-                name: tekton-git
-                key: username
         - image: ghcr.io/jenkins-x/jx-boot:3.2.100
           name: jx-variables
           resources: {}
@@ -56,6 +60,7 @@ spec:
             sbt clean compile assembly
         - image: gcr.io/jenkinsxio/jx-registry:0.0.12
           name: check-registry
+          resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
           name: build-container-build
           resources: {}

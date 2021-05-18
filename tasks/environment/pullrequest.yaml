@@ -1,6 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
+  creationTimestamp: null
   name: pullrequest
 spec:
   pipelineSpec:
@@ -10,6 +11,10 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          name: ""
           resources:
             requests:
               cpu: 400m
@@ -29,6 +34,7 @@ spec:
           resources: {}
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/kubetest/environment.yaml@versionStream
           name: ""
+          resources: {}
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
