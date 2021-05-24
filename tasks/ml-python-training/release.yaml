@@ -42,7 +42,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.111
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.112
           name: jx-variables
           resources: {}
           script: |
@@ -74,7 +74,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-boot:3.2.111
+          image: ghcr.io/jenkins-x/jx-boot:3.2.112
           name: build-export-model
           resources: {}
           script: |+
