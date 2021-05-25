@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/ml-python-gpu-training/release.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: "1"
+              memory: 4Gi
+              nvidia.com/gpu: 0
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: next-version
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - name: build-flake8
+          resources: {}
+        - name: build-training
+          resources: {}
+        - name: build-export-model
+          resources: {}
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
