@@ -21,6 +21,10 @@ spec:
               -Dmaven.wagon.http.retryHandler.count=3
           - name: HOME
             value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
           name: ""
           resources:
             requests:

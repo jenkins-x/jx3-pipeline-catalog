@@ -16,6 +16,10 @@ spec:
             value: /tekton/home/npm/.npmrc
           - name: HOME
             value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
           name: ""
           resources:
             requests:

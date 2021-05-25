@@ -8,6 +8,10 @@ spec:
     env:
     - name: HOME
       value: /tekton/home
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
     name: ""
     resources: {}
   steps:
