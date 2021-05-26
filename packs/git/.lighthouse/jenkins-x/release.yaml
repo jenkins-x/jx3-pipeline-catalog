@@ -19,7 +19,7 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-release-version:2.4.5
+        - image: ghcr.io/jenkins-x/jx-release-version:2.4.6
           name: next-version
           resources: {}
           script: |
