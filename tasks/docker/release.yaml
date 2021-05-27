@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.14
+        - image: gcr.io/jenkinsxio/jx-registry:0.0.15
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
