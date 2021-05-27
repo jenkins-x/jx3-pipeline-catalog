@@ -56,7 +56,7 @@ spec:
             terraform init
             terraform version
             terraform validate
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.42
+        - image: ghcr.io/jenkins-x/jx-changelog:0.0.43
           name: changelog
           resources: {}
           script: |
@@ -72,7 +72,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.74
+          image: ghcr.io/jenkins-x/jx-updatebot:0.0.75
           name: promote
           resources: {}
   podTemplate: {}

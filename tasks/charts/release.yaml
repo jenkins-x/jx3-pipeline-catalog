@@ -45,19 +45,19 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gcr.io/jenkinsxio/builder-go:2.1.142-761
+        - image: ghcr.io/jenkins-x/builder-go:2.1.155-779
           name: build-basic-auth-username
           resources: {}
           script: |
             #!/usr/bin/env bash
             jx step credential -s jenkins-x-chartmuseum -k BASIC_AUTH_USER -f /builder/home/basic-auth-user.json
-        - image: gcr.io/jenkinsxio/builder-go:2.1.142-761
+        - image: ghcr.io/jenkins-x/builder-go:2.1.155-779
           name: build-basic-auth-password
           resources: {}
           script: |
             #!/usr/bin/env bash
             jx step credential -s jenkins-x-chartmuseum -k BASIC_AUTH_PASS -f /builder/home/basic-auth-pass.json
-        - image: gcr.io/jenkinsxio/builder-go:2.1.142-761
+        - image: ghcr.io/jenkins-x/builder-go:2.1.155-779
           name: build-release
           resources: {}
           script: |

@@ -32,13 +32,13 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: gcr.io/jenkinsxio/builder-dlang:2.1.150-769
+        - image: ghcr.io/jenkins-x/builder-dlang:2.1.155-779
           name: build-dub-build
           resources: {}
           script: |
             #!/bin/sh
             dub build --build=release
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.15
+        - image: ghcr.io/jenkins-x/jx-registry:0.0.16
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
