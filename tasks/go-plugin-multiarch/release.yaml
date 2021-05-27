@@ -125,11 +125,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-<<<<<<< HEAD
-          image: gcr.io/jenkinsxio/jx-updatebot:0.0.74
-=======
           image: ghcr.io/jenkins-x/jx-updatebot:0.0.75
->>>>>>> 2311eed25... chore: more ghcr image moves
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
