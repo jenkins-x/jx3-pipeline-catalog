@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: cosign
+spec:
+  pipelineSpec:
+    tasks:
+    - name: cosign
+      taskSpec:
+        stepTemplate:
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
+          name: cosign
+          script: |
+            #!/busybox/sh
+            source .jx/variables.sh
+
+            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+            cosign sign -key /cosign/cosign.key $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+          env:
+          - name: COSIGN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: cosign
+                key: password
+          volumeMounts:
+          - name: cosign-volume
+            readOnly: true
+            mountPath: "/cosign"
+        volumes:
+        - name: cosign-volume
+          secret:
+            secretName: cosign
+            items:
+            - key: cosign.key
+              path: cosign.key
+  serviceAccountName: tekton-bot
+  timeout: 1m0s
+status: {}
