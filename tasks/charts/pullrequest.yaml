@@ -29,7 +29,7 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: gcr.io/jenkinsxio/builder-go:2.1.142-761
+        - image: ghcr.io/jenkins-x/builder-go:2.1.155-779
           name: build-build
           resources: {}
           script: |

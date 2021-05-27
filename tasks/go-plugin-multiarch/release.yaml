@@ -67,7 +67,7 @@ spec:
             #!/bin/ash
             if [ -d "charts/$REPO_NAME" ]; then cd charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.42
+        - image: ghcr.io/jenkins-x/jx-changelog:0.0.43
           name: changelog
           resources: {}
           script: |
@@ -125,7 +125,11 @@ spec:
         - command:
           - jx-updatebot
           - pr
+<<<<<<< HEAD
           image: gcr.io/jenkinsxio/jx-updatebot:0.0.74
+=======
+          image: ghcr.io/jenkins-x/jx-updatebot:0.0.75
+>>>>>>> 2311eed25... chore: more ghcr image moves
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot

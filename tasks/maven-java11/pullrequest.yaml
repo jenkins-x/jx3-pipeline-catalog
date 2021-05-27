@@ -55,7 +55,7 @@ spec:
             #!/usr/bin/env bash
             source .jx/variables.sh
             mvn --no-transfer-progress install
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.15
+        - image: ghcr.io/jenkins-x/jx-registry:0.0.16
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0

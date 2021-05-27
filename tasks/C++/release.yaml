@@ -57,7 +57,7 @@ spec:
           script: |
             #!/bin/sh
             make
-        - image: gcr.io/jenkinsxio/jx-registry:0.0.15
+        - image: ghcr.io/jenkins-x/jx-registry:0.0.16
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
@@ -68,7 +68,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=Dockerfile --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: gcr.io/jenkinsxio/jx-changelog:0.0.42
+        - image: ghcr.io/jenkins-x/jx-changelog:0.0.43
           name: promote-changelog
           resources: {}
           script: |
