@@ -33,7 +33,7 @@ spec:
     image: github/super-linter:v3.13.1
     name: lint
     resources: {}
-  - image: gcr.io/jenkinsxio/jx-tap:latest
+  - image: ghcr.io/jenkins-x/jx-tap:0.0.14
     name: pr-comment
     resources: {}
     script: |
