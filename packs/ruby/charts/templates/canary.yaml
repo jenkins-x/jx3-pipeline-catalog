@@ -6,6 +6,9 @@ metadata:
   labels:
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+{{- if .Values.canary.labels }}
+{{ toYaml .Values.canary.labels | indent 4 }}
+{{- end }}
 spec:
   provider: istio
   targetRef:
@@ -46,6 +49,10 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: {{ template "fullname" . }}
+{{- if .Values.canary.gatewayLabels }}
+  labels:
+{{ toYaml .Values.canary.gatewayLabels | indent 4 }}
+{{- end }}
 spec:
   selector:
     istio: ingressgateway

@@ -9,11 +9,18 @@ metadata:
   {{- end }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+{{- if .Values.service.labels }}
+{{ toYaml .Values.service.labels | indent 4 }}
+{{- end }}
 spec:
   template:
     metadata:
       annotations:
         autoscaling.knative.dev/minScale: "0"
+{{- if .Values.podsLabels }}
+      labels:
+{{ toYaml .Values.podsLabels | indent 8 }}
+{{- end }}
     spec:
       containers:
         - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

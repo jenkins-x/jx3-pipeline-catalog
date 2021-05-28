@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: e95d99e4f74847a5eed092d3799fb7cfed5d0eac
+    commit: cfa7cf77df5527de2f7168c41b1b2edb807946d5
     repo: https://github.com/jenkins-x/jx3-pipeline-catalog
     directory: /helm/preview
     ref: master

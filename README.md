@@ -36,3 +36,14 @@ For more detail there's [the configuration reference here](https://github.com/je
 Then when developers create a new quickstart or import a repository developers will be asked to pick the catalog they want from your list if there is more than one, or the configured catalog is silently used.
 
 This gives you complete freedom to configure things at a global, team or repository level while also making it easy to share changes across projects, teams and companies.
+
+
+## Upgrading Charts
+
+Many of these packs contain helm charts such as [packs/javascript/charts](packs/javascript/charts) which are managed via [kpt](https://googlecontainertools.github.io/kpt/).
+
+If the [helm/charts](helm/charts) folder is modified you can upgrade the charts in each pack via:
+
+```bash 
+jx gitops upgrade --ignore-yaml-error 
+```
