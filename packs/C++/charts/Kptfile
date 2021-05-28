@@ -5,7 +5,7 @@ metadata:
 upstream:
   type: git
   git:
-    commit: 0f095a2771b4ce7cf0a1d332635e98b5bbf5f2b0
+    commit: 0b05c5252b2a0e5b25a1449f3f7a1c1f04d492ab
     repo: https://github.com/jenkins-x/jx3-pipeline-catalog
     directory: /helm/charts
     ref: master
