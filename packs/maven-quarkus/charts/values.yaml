@@ -6,6 +6,9 @@ replicaCount: 1
 podAnnotations: {}
 # Add labels to the pods
 podsLabels: {}
+# Add labels to the deployment
+deploymentLabels: {}
+
 image:
   repository: draft
   tag: dev
