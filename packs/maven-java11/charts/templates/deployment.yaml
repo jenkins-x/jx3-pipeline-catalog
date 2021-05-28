@@ -7,8 +7,8 @@ metadata:
   labels:
     draft: {{ default "draft-app" .Values.draft }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-{{- if .Values.deployment.labels }}
-{{ toYaml .Values.deployment.labels | indent 4 }}
+{{- if .Values.deploymentLabels }}
+{{ toYaml .Values.deploymentLabels | indent 4 }}
 {{- end }}
 spec:
   selector:
