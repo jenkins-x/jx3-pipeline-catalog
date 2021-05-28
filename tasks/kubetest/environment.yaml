@@ -26,7 +26,7 @@ spec:
           - run
           - --source-dir
           - config-root
-          image: gcr.io/jenkinsxio/jx-kube-test:0.0.8
+          image: gcr.io/jenkinsxio/jx-kube-test:0.0.10
           name: kubetest
           resources: {}
   serviceAccountName: tekton-bot
