@@ -15,6 +15,9 @@ metadata:
 {{ toYaml $annotations | indent 4 }}
 {{- end }}
   name: {{ .Values.service.name }}
+{{- if .Values.ingress.labels }}
+{{ toYaml .Values.ingress.labels | indent 4 }}
+{{- end }}
 spec:
   rules:
   - http:
