@@ -24,6 +24,10 @@ spec:
               cpu: "1"
               memory: 4Gi
               nvidia.com/gpu: 0
+            limits:
+              cpu: "1"
+              memory: 4Gi
+              nvidia.com/gpu: "0"
           workingDir: /workspace/source
         steps:
         - env:
@@ -63,6 +67,10 @@ spec:
               cpu: "1"
               memory: 4Gi
               nvidia.com/gpu: 1
+            limits:
+              cpu: "1"
+              memory: 4Gi
+              nvidia.com/gpu: "1"
           script: |
             #!/bin/sh
             source /root/.bashrc
