@@ -20,8 +20,14 @@ spec:
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
+          name: git-clone
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: git-merge
           resources: {}
+          script: |
+            #!/usr/bin/env sh
+            # lets avoid git rebase/merge conflicts on promotions
+            jx gitops git --merge-arg "-sours" merge
         - name: make-pr
           resources: {}
   podTemplate: {}
