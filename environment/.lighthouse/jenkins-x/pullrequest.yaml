@@ -26,9 +26,8 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env sh
-            # lets avoid git rebase/merge conflicts on promotions
-            #jx gitops git --merge-arg "-sours" merge
-            jx gitops git merge
+            # lets rebase to the latest main branch and avoid conflicts via merge strategy:
+            jx gitops git merge --rebase --merge-arg "-sours"
         - name: make-pr
           resources: {}
   podTemplate: {}
