@@ -19,15 +19,8 @@ spec:
               memory: 512Mi
           workingDir: /workspace/source
         steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: git-clone
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: git-merge
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-env-pr.yaml@versionStream
           resources: {}
-          script: |
-            #!/usr/bin/env sh
-            # lets rebase to the latest main branch and avoid conflicts via merge strategy:
-            jx gitops git merge --rebase --merge-arg "-sours"
         - name: make-pr
           resources: {}
   podTemplate: {}

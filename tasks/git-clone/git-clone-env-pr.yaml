@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: git-clone-pr
+spec:
+  stepTemplate:
+    env:
+    - name: HOME
+      value: /tekton/home
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    name: ""
+    resources: {}
+  steps:
+  - envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    name: git-clone
+    resources: {}
+    script: |
+      #!/bin/sh
+      export SUBDIR="source"
+      echo "git cloning url: $REPO_URL version $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
+      git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
+      git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}
+      git config --global credential.helper store
+      git clone $REPO_URL $SUBDIR
+      cd $SUBDIR
+      git fetch origin $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+      git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+      git reset --hard $PULL_PULL_SHA
+      echo "checked out revision: $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
+    workingDir: /workspace
+  - envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    image: ghcr.io/jenkins-x/jx-boot:3.2.135
+    name: git-merge
+    resources: {}
+      script: |
+        #!/usr/bin/env sh
+        # lets avoid git rebase/merge conflicts on promotions
+        jx gitops git merge --rebase --merge-arg "-Xtheirs"
+    workingDir: /workspace/source
+  workspaces:
+  - description: The git repo will be cloned onto the volume backing this workspace
+    mountPath: /workspace
+    name: output
