@@ -43,10 +43,10 @@ spec:
     image: ghcr.io/jenkins-x/jx-boot:3.2.136
     name: git-merge
     resources: {}
-      script: |
-        #!/usr/bin/env sh
-        # lets avoid git rebase/merge conflicts on promotions
-        jx gitops git merge --rebase --merge-arg "-Xtheirs"
+    script: |
+      #!/usr/bin/env sh
+      # lets avoid git rebase/merge conflicts on promotions
+      jx gitops git merge --rebase --merge-arg "-Xtheirs"
     workingDir: /workspace/source
   workspaces:
   - description: The git repo will be cloned onto the volume backing this workspace
