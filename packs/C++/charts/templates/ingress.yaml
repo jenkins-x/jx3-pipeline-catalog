@@ -22,9 +22,12 @@ spec:
   rules:
   - http:
       paths:
-      - backend:
-          serviceName: {{ .Values.service.name }}
-          servicePort: 80
+      - pathType: {{ .Values.ingress.pathType | default "ImplementationSpecific" }}
+        backend:
+          service:
+            name: {{ .Values.service.name }}
+            port:
+              number: {{ .Values.service.externalPort }}
 {{- if eq "NodePort" .Values.jxRequirements.ingress.serviceType }}
         path: "/{{ .Release.Namespace }}/hook"
 {{- else if .Values.jxRequirements.ingress.domain }}
