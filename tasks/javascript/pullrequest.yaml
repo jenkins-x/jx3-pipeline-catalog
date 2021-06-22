@@ -49,7 +49,7 @@ spec:
           script: |
             #!/bin/sh
             CI=true DISPLAY=:99 npm test
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.0
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0
