@@ -73,7 +73,7 @@ spec:
             export GOVERSION="1.15"
             export ROOTPACKAGE="github.com/$REPO_OWNER/$REPO_NAME"
             goreleaser release
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.0
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:debug-v1.3.0

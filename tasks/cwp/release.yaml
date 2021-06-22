@@ -71,7 +71,7 @@ spec:
           script: |
             #!/bin/sh
             mvn --no-transfer-progress clean deploy
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.0
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
         - env:
