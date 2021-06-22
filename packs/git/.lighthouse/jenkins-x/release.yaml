@@ -36,7 +36,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.144
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.145
           name: jx-variables
           resources: {}
           script: |
