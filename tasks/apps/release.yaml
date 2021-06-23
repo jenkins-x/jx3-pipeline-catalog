@@ -42,7 +42,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.146
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.147
           name: jx-variables
           resources: {}
           script: |
@@ -54,7 +54,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.146
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.147
           name: release-chart
           resources: {}
           script: |
@@ -68,7 +68,7 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.146
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.147
           name: promote-helm-release
           resources: {}
           script: |
