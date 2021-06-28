@@ -1,0 +1,81 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx4096m
+          - name: MAVEN_OPTS
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
+              -Dmaven.wagon.http.retryHandler.count=3
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-quarkus/release.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 2Gi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          - mountPath: /root/.gnupg
+            name: release-gpg
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: next-version
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - image: 794657423961.dkr.ecr.eu-west-2.amazonaws.com/property-xyz/build-native-mvn-mandrel:0.0.1
+          name: build-mvn-deploy
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "8"
+            limits:
+              memory: "8Gi"
+              cpu: "12"
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+
+            # modify the pom.xml
+            echo "upgrading the pom to version $VERSION"
+            mvn versions:set -DnewVersion=$VERSION
+
+            mvn --no-transfer-progress clean deploy -Pnative
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+        - name: promote-changelog
+          resources: {}
+        - name: promote-helm-release
+          resources: {}
+        - name: promote-jx-promote
+          resources: {}
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+        - name: release-gpg
+          secret:
+            optional: true
+            secretName: jenkins-release-gpg
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
