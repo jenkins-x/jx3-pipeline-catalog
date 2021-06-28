@@ -24,7 +24,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: ghcr.io/jenkins-x/jx-updatebot:0.0.79
+          image: ghcr.io/jenkins-x/jx-updatebot:0.0.82
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
