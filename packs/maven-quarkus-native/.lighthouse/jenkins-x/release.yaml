@@ -19,7 +19,7 @@ spec:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
               -Dmaven.wagon.http.retryHandler.count=3
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-quarkus/release.yaml@versionStream
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-quarkus-native/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -39,24 +39,8 @@ spec:
           resources: {}
         - name: jx-variables
           resources: {}
-        - image: 794657423961.dkr.ecr.eu-west-2.amazonaws.com/property-xyz/build-native-mvn-mandrel:0.0.1
-          name: build-mvn-deploy
-          resources:
-            requests:
-              memory: "4Gi"
-              cpu: "8"
-            limits:
-              memory: "8Gi"
-              cpu: "12"
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-
-            # modify the pom.xml
-            echo "upgrading the pom to version $VERSION"
-            mvn versions:set -DnewVersion=$VERSION
-
-            mvn --no-transfer-progress clean deploy -Pnative
+        - name: build-mvn-deploy
+          resources: {}
         - name: check-registry
           resources: {}
         - name: build-container-build
@@ -77,5 +61,5 @@ spec:
             secretName: jenkins-release-gpg
   podTemplate: {}
   serviceAccountName: tekton-bot
-  timeout: 240h0m0s
+  timeout: 12h0m0s
 status: {}
