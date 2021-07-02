@@ -59,7 +59,7 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION --destination=ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:latest
         - image: jnorwood/helm-docs:v1.4.0
           name: chart-docs
           resources: {}
