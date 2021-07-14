@@ -21,8 +21,8 @@ spec:
           name: ""
           resources:
             requests:
-              cpu: 400m
-              memory: 600Mi
+              cpu: 0.1
+              memory: 128Mi
           workingDir: /workspace/source
         steps:
         - image: ghcr.io/jenkins-x/jx-boot:3.2.170

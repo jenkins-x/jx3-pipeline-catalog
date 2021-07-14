@@ -15,8 +15,8 @@ spec:
           name: ""
           resources:
             requests:
-              cpu: 400m
-              memory: 600Mi
+              cpu: 0.1
+              memory: 128Mi
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
