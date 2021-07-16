@@ -58,7 +58,9 @@ spec:
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx preview create
+            if [ "$PR_LABEL_PREVIEW" = true ]; then
+              jx preview create
+            fi
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
