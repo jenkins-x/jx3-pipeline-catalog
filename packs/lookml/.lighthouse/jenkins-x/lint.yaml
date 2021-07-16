@@ -1,0 +1,81 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: lint
+spec:
+  workspaces:
+  - name: output
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/lookml/lint.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          workingDir: $(workspaces.output.path)/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - name: build-lookml-lint
+          resources: {}
+    finally:
+    - name: lookml-lint-pr-comment
+      workspaces:
+      - name: output
+        workspace: output
+      params:
+      - name: PULL_NUMBER
+        value: $(params.PULL_NUMBER)
+      - name: REPO_URL
+        value: $(params.REPO_URL)
+      taskSpec:
+        workspaces:
+          - name: output
+        metadata: {}
+        params:
+        - default: ""
+          description: git pull request number
+          name: PULL_NUMBER
+          type: string
+        - description: git url to clone
+          name: REPO_URL
+          type: string
+        stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          - name: PULL_NUMBER
+            value: $(params.PULL_NUMBER)
+          - name: REPO_URL
+            value: $(params.REPO_URL)
+          name: ""
+          workingDir: $(workspaces.output.path)/source
+        steps:
+        - name: lookml-lint-pr-comment
+          image: ghcr.io/jenkins-x/jx-gitops:0.3.1
+          script: |
+            #!/bin/sh
+            set -x
+            . .jx/variables.sh
+            jx gitops pr comment -c "$(cat issues.md)"
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
