@@ -1,0 +1,107 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release-jx-develop
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-java11/release.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          - mountPath: /root/.gnupg
+            name: release-gpg
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}   
+        - name: next-version
+          resources: {}
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.115
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+            source .jx/variables.sh
+            sed -i \
+              -e "s/VERSION=.*/VERSION=\'$VERSION-jx-develop\'/" \
+              -e "s+MINK_IMAGE=.*+MINK_IMAGE=\'$MINK_IMAGE-jx-develop\'+" \
+              ./.jx/variables.sh
+        - image: maven:3.6-openjdk-11
+          name: build-mvn-deploy
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            # modify the pom.xml
+            echo "upgrading the pom to version $VERSION"
+            mvn versions:set -DnewVersion=$VERSION
+            mvn --no-transfer-progress clean verify -DskipTests
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+        # changes the dev placeholder version to the actual version and updates the git tags on the remote repo 
+        - image: gcr.io/jenkinsxio/jx-changelog:0.0.38
+          name: promote-changelog
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+
+            if [ -d "charts/$REPO_NAME" ]; then
+            sed -i -e "s/^version:.*/version: $VERSION/" ./charts/$REPO_NAME/Chart.yaml
+            sed -i -e "s/repository:.*/repository: $DOCKER_REGISTRY\/$DOCKER_REGISTRY_ORG\/$APP_NAME/" ./charts/$REPO_NAME/values.yaml
+            sed -i -e "s/tag:.*/tag: $VERSION/" ./charts/$REPO_NAME/values.yaml;
+            else echo no charts; fi
+
+            git add * || true
+            git commit -a -m "chore: release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Release version $VERSION"
+            git push --force origin v$VERSION
+
+            jx changelog create --version v${VERSION}
+
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.115
+          name: helm-build-and-deploy
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            helm package charts/$APP_NAME/ --version $VERSION
+            curl -u `kubectl get secrets -n jx jenkins-x-chartmuseum  -o=jsonpath='{.data.BASIC_AUTH_USER}' | base64 -d`:`kubectl get secrets -n jx jenkins-x-chartmuseum  -o=jsonpath='{.data.BASIC_AUTH_PASS}' | base64 -d` \
+              --data-binary "@$APP_NAME-$VERSION.tgz" $JX_CHART_REPOSITORY/api/charts
+            helm upgrade --install $APP_NAME ./charts/$APP_NAME -n jx-develop
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+        - name: release-gpg
+          secret:
+            optional: true
+            secretName: jenkins-release-gpg
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
+

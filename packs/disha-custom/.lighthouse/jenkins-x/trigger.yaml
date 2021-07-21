@@ -1,0 +1,24 @@
+apiVersion: config.lighthouse.jenkins-x.io/v1alpha1
+kind: TriggerConfig
+spec:
+  presubmits:
+  - name: pr
+    context: "pr"
+    always_run: true
+    optional: false
+    source: "pullrequest.yaml"
+  postsubmits:
+  - name: release
+    context: "release"
+    source: "release.yaml"
+    branches:
+    - ^main$
+    - ^master$
+    - ^devel-release-test$
+  - name: release-jx-develop
+    context: "release-jx-develop"
+    source: release-jx-develop.yaml
+    branches:
+    - ^jx-develop$
+    namespace: "jx-develop"
+

@@ -1,0 +1,154 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
+              -XX:+UseConcMarkSweepGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
+              -XX:AdaptiveSizePolicyWeight=90 -Xms1024m -Xmx3024m 
+          - name: MAVEN_OPTS
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-java11/pullrequest.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          volumeMounts: 
+          - mountPath: /root/.m2/
+            name: maven-settings
+          - mountPath: /home/jenkins/
+            name: efs-volume-1
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources: {}  
+        - name: build-set-version
+          resources: {}
+        - name: helm-deploy-deps
+          image: ghcr.io/jenkins-x/jx-boot:3.2.92
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            ns=`echo jx-$REPO_OWNER-$REPO_NAME-$BRANCH_NAME-$BUILD_NUMBER-pre-preview-env | tr [:upper:] [:lower:]`
+            helm repo add chartmuseum $JX_CHART_REPOSITORY
+            helm repo update
+            helm upgrade  --install --create-namespace `echo $REPO_NAME-$BRANCH_NAME-$BUILD_NUMBER-pre-prev-deps | tr [:upper:] [:lower:]` \
+              chartmuseum/dpt-dependencies \
+              -n $ns \
+              --set localInfrastructure.redis=true \
+              --set localInfrastructure.postgres_pre=true \
+              --set localInfrastructure.rabbitmq=true
+       
+        - image: maven:3.6-openjdk-11
+          name: build-mvn-install
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            # cp -r /mnt/repository /root/.m2/repository
+            # cp -r /mnt/wrapper /root/.m2/wrapper
+            ns=`echo jx-$REPO_OWNER-$REPO_NAME-$BRANCH_NAME-$BUILD_NUMBER-pre-preview-env | tr [:upper:] [:lower:]`
+            export MODIFIER=$ns
+            mvn -X -e --no-transfer-progress verify -Dspring.profiles.active=docker-compose-testing-isolated -Powasp-dependency-check -Dintegration-tests=1
+          # volumeMounts:
+          # - name: efs-volume-1
+          #   mountPath: /root/.m2/
+          resources:
+            requests:
+              cpu: "1"
+              memory: "3Gi"
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+        - name: delete-ns
+          image: ghcr.io/jenkins-x/jx-boot:3.2.92
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            ns=`echo jx-$REPO_OWNER-$REPO_NAME-$BRANCH_NAME-$BUILD_NUMBER-pre-preview-env | tr [:upper:] [:lower:]`
+            kubectl delete ns $ns
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+        - image: sonarsource/sonar-scanner-cli:latest
+          name: sonar-scan
+          resources: {}
+          env:
+          - name: SONAR_LOGIN
+            valueFrom:
+              secretKeyRef:
+                key: sonar_token
+                name: sonar-qube-token
+          - name: SONAR_HOST_URL
+            value: http://sonarqube-sonarqube:9000
+          - name: _JAVA_OPTIONS
+            value: -XX:+UseParallelGC -Dsonar.projectKey=docomo-pre-api -Dsonar.java.binaries=target/classes
+        - image: anchore/engine-cli
+          name: cve-scan
+          env:
+          - name: ANCHORE_CLI_URL
+            value: "http://anchore-anchore-engine-api.anchore.svc.cluster.local:8228/v1"
+          securityContext:
+            runAsUser: 0
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            yum install jq -y
+            anchore-cli registry add $PUSH_CONTAINER_REGISTRY awsauto awsauto --registry-type=awsecr
+            anchore-cli image add $MINK_IMAGE --dockerfile Dockerfile
+            anchore-cli image wait $MINK_IMAGE
+            anchore-cli image vuln $MINK_IMAGE all | tee vulns.output
+            
+            curl -X POST -F 'fileX=@vulns.output' --url 'https://prod-228.westeurope.logic.azure.com:443/workflows/2ab1fdcf13084fe5a148b347aeb2de97/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8OOLpmUlpoEfK0ksWq5NoRezx5Q7Nfgtb5J3teSJseY'
+            if anchore-cli --json image vuln $MINK_IMAGE all | jq '.vulnerabilities[].severity=="High"' 1>/dev/null
+            then
+                echo "High severity vulnerabilities detected. See print out above."
+                curl -X POST -H "Content-type: application/json" --data '{"email":"ram.tandukar@docomodigital.com", "url": "https://dashboard-jx.dpt-test-fra-dev.frc2-apm-dev.dodi.io/docomo-digital/docomo-pre-api6/$PULL_NUMBER/1"}' --url 'https://prod-239.westeurope.logic.azure.com:443/workflows/5db4e49bb36f4c78bea179d2ebfd1670/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=H8wIYvXQyhTj1WRssUgyYsENISJwvXXQnLR2LNyt6kU' 
+            else
+                echo "No high severity vulnerabilities detected"
+            fi
+        - name: promote-jx-preview
+          resources: {}
+        - image: owasp/zap2docker-stable
+          name: owasp-zap-scan
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            printenv | sort
+            zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' https://preview-$PULL_NUMBER-preapi.dpt-test-fra-dev-mesh.frc2-apm-dev.dodi.io | tee zap.output
+            # $PREVIEW_URL
+          securityContext:
+            runAsUser: 0
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+        - name: efs-volume-1
+          persistentVolumeClaim:
+            claimName: mvn-efs-pvc
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 240h0m0s
+status: {}
+
