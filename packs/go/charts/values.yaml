@@ -3,7 +3,9 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 # Add annotations to the pods
-podAnnotations: {}
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9090"
 # Add labels to the pods
 podsLabels: {}
 # Add labels to the deployment
@@ -66,6 +68,7 @@ service:
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
+  adminPort: 9090
   annotations: {}
   # Add labels to the service
   labels: {}
@@ -76,7 +79,7 @@ resources:
   requests:
     cpu: 200m
     memory: 128Mi
-probePath: /
+probePath: /status
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -107,7 +110,7 @@ serviceAccount:
   enabled: true
   name: ""
   annotations: {}
-#    iam.gke.io/gcp-service-account: my-sa-in-gke
+  #    iam.gke.io/gcp-service-account: my-sa-in-gke
   # Add labels to the SA
   labels: {}
 #    my-custom-label: value
@@ -131,5 +134,3 @@ jxRequirements:
       enabled: false
       production: false
       secretName: ""
-
-

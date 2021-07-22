@@ -54,6 +54,8 @@ spec:
         ports:
         - name: http
           containerPort: {{ .Values.service.internalPort }}
+        - name: admin
+          containerPort: {{ .Values.service.adminPort }}
         livenessProbe:
           httpGet:
             path: {{ .Values.livenessProbe.probePath | default .Values.probePath }}

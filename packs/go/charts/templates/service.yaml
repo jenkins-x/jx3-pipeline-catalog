@@ -24,6 +24,10 @@ spec:
     targetPort: {{ .Values.service.internalPort }}
     protocol: TCP
     name: http
+  - port: {{ .Values.service.adminPort }}
+    targetPort: {{ .Values.service.adminPort }}
+    protocol: TCP
+    name: admin
   selector:
     app: {{ template "fullname" . }}
 {{- end }}
