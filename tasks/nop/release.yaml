@@ -39,13 +39,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.174
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.175
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.174
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.175
           name: build-dummy-release
           resources: {}
           script: |

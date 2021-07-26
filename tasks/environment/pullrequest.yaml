@@ -33,7 +33,7 @@ spec:
           - secretRef:
               name: jx-boot-job-env-vars
               optional: true
-          image: ghcr.io/jenkins-x/jx-boot:3.2.174
+          image: ghcr.io/jenkins-x/jx-boot:3.2.175
           name: make-pr
           resources: {}
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/kubetest/environment.yaml@versionStream
