@@ -28,7 +28,7 @@ spec:
           resources: {}
         - name: promote-changelog
           resources: {}
-        - image: ghcr.io/jenkins-x/jx-changelog:0.0.43
+        - image: ghcr.io/jenkins-x/jx-changelog:0.0.45
           name: promote-pullrequest
           resources: {}
           script: |
