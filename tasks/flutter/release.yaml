@@ -79,7 +79,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: ghcr.io/jenkins-x/jx-updatebot:0.0.86
+          image: ghcr.io/jenkins-x/jx-updatebot:0.0.89
           name: promote-release
           resources: {}
         volumes:
