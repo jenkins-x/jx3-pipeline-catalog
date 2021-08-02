@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: exit-if-newer-build-has-started
+spec:
+  steps:
+  - envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    image: gcr.io/cloud-builders/kubectl
+    name: exit-if-newer-build-has-started
+    script: |
+      #!/usr/bin/env bash
+      source .jx/variables.sh
+      if [ -n $(kubectl get pipelineruns.tekton.dev  -l branch=$BRANCH_NAME,build=$(( $BUILD_NUMBER + 1 )),owner=$REPO_OWNER,repository=$REPO_NAME -oname --no-headers) ]; then
+      echo Newer build exists. Aborting pipeline.
+        exit 1
+      fi
+    resources: {}
+    workingDir: /workspace
+  workspaces:
+  - description: The git repo will be cloned onto the volume backing this workspace
+    mountPath: /workspace
+    name: output
