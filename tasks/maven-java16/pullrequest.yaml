@@ -44,7 +44,8 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "not changing version for SNAPSHOT"
-        - name: build-mvn-install
+        - image: maven:3.8-openjdk-16
+          name: build-mvn-install
           resources: {}
           script: |
             #!/usr/bin/env bash
