@@ -73,6 +73,13 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             mvn --no-transfer-progress clean deploy
+        - image: maven:3.6-openjdk-8-slim
+          name: build-mvn-install
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            mvn --no-transfer-progress install
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
