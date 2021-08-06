@@ -38,14 +38,13 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: maven:3.8-openjdk-15
+        - image: maven:3.8-openjdk-16
           name: build-set-version
           resources: {}
           script: |
             #!/usr/bin/env bash
             echo "not changing version for SNAPSHOT"
-        - image: maven:3.8-openjdk-15
-          name: build-mvn-install
+        - name: build-mvn-install
           resources: {}
           script: |
             #!/usr/bin/env bash

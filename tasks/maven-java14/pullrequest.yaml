@@ -12,10 +12,6 @@ spec:
         metadata: {}
         stepTemplate:
           env:
-          - name: _JAVA_OPTIONS
-            value: -XX:+UnlockExperimentalVMOptions -Dsun.zip.disableMemoryMapping=true
-              -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4
-              -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
               -Dmaven.wagon.http.retryHandler.count=3
@@ -48,8 +44,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             echo "not changing version for SNAPSHOT"
-        - image: maven:3.8-openjdk-15
-          name: build-mvn-install
+        - name: build-mvn-install
           resources: {}
           script: |
             #!/usr/bin/env bash
