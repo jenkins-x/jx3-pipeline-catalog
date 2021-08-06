@@ -1,7 +1,5 @@
 # jx3-pipeline-catalog
 
-CUSTOMIZED VERSION :: Lots of goodies added. 
-
 The default pipeline catalog for Jenkins X 3.x
 
 Jenkins X 3.x comes with its own default pipeline catalog for different languages, tools and frameworks. This catalog contains reusable steps, Tasks, Pipelines and Packs you can use on any project.
@@ -46,6 +44,6 @@ Many of these packs contain helm charts such as [packs/javascript/charts](packs/
 
 If the [helm/charts](helm/charts) folder is modified you can upgrade the charts in each pack via:
 
-```bash 
-jx gitops upgrade --ignore-yaml-error 
+```bash
+jx gitops upgrade --ignore-yaml-error
 ```
