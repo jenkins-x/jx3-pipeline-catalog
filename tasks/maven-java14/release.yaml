@@ -61,17 +61,12 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
         - image: maven:3.8-openjdk-15
-          name: build-mvn-deploy
+          name: build-mvn-install
           resources: {}
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-
-            # modify the pom.xml
-            echo "upgrading the pom to version $VERSION"
-            mvn versions:set -DnewVersion=$VERSION
-
-            mvn --no-transfer-progress clean deploy
+            mvn --no-transfer-progress install
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
