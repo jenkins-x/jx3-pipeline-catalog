@@ -19,7 +19,7 @@ spec:
         exit 1
       fi
     resources: {}
-    workingDir: /workspace
+    workingDir: /workspace/source
   workspaces:
   - description: The git repo will be cloned onto the volume backing this workspace
     mountPath: /workspace
