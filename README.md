@@ -44,6 +44,6 @@ Many of these packs contain helm charts such as [packs/javascript/charts](packs/
 
 If the [helm/charts](helm/charts) folder is modified you can upgrade the charts in each pack via:
 
-```bash 
-jx gitops upgrade --ignore-yaml-error 
+```bash
+jx gitops upgrade --ignore-yaml-error
 ```
