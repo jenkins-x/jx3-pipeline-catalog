@@ -1,0 +1,56 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.169
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+            jx gitops pr variables
+        - image: python:3.7-alpine
+          name: build-lookml-datatest
+          resources: {}
+          script: |
+            #!/bin/sh
+            . .jx/variables.sh
+            pip install spectacles
+            set -x 
+            spectacles assert \
+              --port 443 \
+              --branch $PR_HEAD_REF \
+              --remote-reset
+
+            spectacles sql \
+              --port 443 \
+              --branch $PR_HEAD_REF \
+              --remote-reset \
+              --mode batch
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
