@@ -38,7 +38,7 @@ spec:
           resources: {}
         - name: jx-variables
           resources: {}
-        - name: build-mvn-deploy
+        - name: build-mvn-install
           resources: {}
         - name: check-registry
           resources: {}
