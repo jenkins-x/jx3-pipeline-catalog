@@ -50,7 +50,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.182
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.186
           name: jx-variables
           resources: {}
           script: |
@@ -68,14 +68,6 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             mvn --no-transfer-progress clean deploy
-        - image: maven:3.8-openjdk-16
-          name: build-mvn-install
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-            mvn --no-transfer-progress install
-
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
@@ -107,14 +99,14 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.182
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.186
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.0.276
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.0.277
           name: promote-jx-promote
           resources: {}
           script: |
