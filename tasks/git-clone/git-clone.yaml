@@ -19,7 +19,7 @@ spec:
     - secretRef:
         name: jx-boot-job-env-vars
         optional: true
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.26.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.27.0
     name: git-clone
     resources: {}
     script: |
