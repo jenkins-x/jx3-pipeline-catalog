@@ -39,7 +39,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.187
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.188
           name: jx-variables
           resources: {}
           script: |
@@ -82,7 +82,7 @@ spec:
             else echo no charts; fi
 
             jx changelog create --verbose --header-file=hack/changelog-header.md --version=$VERSION --rev=$PULL_BASE_SHA --output-markdown=changelog.md --update-release=true
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.187
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.188
           name: release-chart
           resources: {}
           script: |
