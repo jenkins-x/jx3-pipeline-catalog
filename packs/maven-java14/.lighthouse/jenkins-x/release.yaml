@@ -18,7 +18,7 @@ spec:
               -XX:AdaptiveSizePolicyWeight=90 -Xms10m -Xmx192m
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-          image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-java14/release.yaml@versionStream
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-java14/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -31,7 +31,7 @@ spec:
             name: release-gpg
           workingDir: /workspace/source
         steps:
-        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
           resources: {}
         - name: next-version
