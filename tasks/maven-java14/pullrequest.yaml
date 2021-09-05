@@ -14,7 +14,7 @@ spec:
           env:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
-              -Dmaven.wagon.http.retryHandler.count=3
+              -Dmaven.wagon.http.retryHandler.count=3 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
           - name: HOME
             value: /tekton/home
           envFrom:
@@ -50,7 +50,7 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            mvn --no-transfer-progress install
+            mvn -B --no-transfer-progress install
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
