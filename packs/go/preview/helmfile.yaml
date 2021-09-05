@@ -7,7 +7,7 @@ helmDefaults:
   timeout: 600
 repositories:
 - name: jx3
-  url: https://storage.googleapis.com/jenkinsxio/charts
+  url: https://jenkins-x-charts.github.io/repo
 releases:
 - chart: jx3/jx-verify
   name: jx-verify

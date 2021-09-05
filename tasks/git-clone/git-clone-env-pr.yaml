@@ -19,7 +19,7 @@ spec:
     - secretRef:
         name: jx-boot-job-env-vars
         optional: true
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.27.0
     name: git-clone
     resources: {}
     script: |
@@ -45,8 +45,17 @@ spec:
     resources: {}
     script: |
       #!/usr/bin/env sh
-      # lets avoid git rebase/merge conflicts on promotions
-      jx gitops git merge --rebase --merge-arg "-Xtheirs"
+      counter=0
+      until [ "$counter" -eq 3 ]; do
+        # lets avoid git rebase/merge conflicts on promotions
+        jx gitops git merge --rebase --merge-arg "-Xtheirs" && exit 0
+        counter=$((counter+1))
+        git rebase --abort
+        if git log -1 --pretty=%B | grep -i regenerate; then
+          git reset --hard HEAD~1
+        fi
+      done
+      exit 1
     workingDir: /workspace/source
   workspaces:
   - description: The git repo will be cloned onto the volume backing this workspace
