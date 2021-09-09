@@ -11,7 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-                image: uses:zebratechnologies/jx3-pipeline-catalog-1/tasks/voiceai-gradle/release.yaml@voiceai-specific
+          image: uses:zebratechnologies/jx3-pipeline-catalog-1/tasks/voiceai-gradle/release.yaml@voiceai-specific
           name: ""
           resources:
             requests:
