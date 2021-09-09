@@ -1,0 +1,78 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.188
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+            jx gitops pr variables
+        - image: gradle:6.8.3-jdk8
+          name: build-gradle-build
+          env:
+          - name: ORG_GRADLE_PROJECT_ctoSIMavenUser
+            valueFrom:
+              secretKeyRef:
+                name: nexus-java
+                key: username
+          - name: ORG_GRADLE_PROJECT_ctoSIMavenPassword
+            valueFrom:
+              secretKeyRef:
+                name: nexus-java
+                key: password
+          - name: ORG_GRADLE_PROJECT_ctoSIMavenUsername
+            valueFrom:
+              secretKeyRef:
+                name: nexus-java
+                key: username
+          resources: {}
+          script: |
+            #!/bin/sh
+            gradle clean build
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
+          name: check-registry
+          resources: {}
+        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+          name: build-container-build
+          resources: {}
+          script: |
+            #!/busybox/sh
+            source .jx/variables.sh
+            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.192
+          name: promote-jx-preview
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx preview create
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}

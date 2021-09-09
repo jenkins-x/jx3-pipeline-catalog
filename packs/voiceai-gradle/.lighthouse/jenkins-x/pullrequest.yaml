@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:zebratechnologies/jx3-pipeline-catalog-1/tasks/voiceai-gradle/pullrequest.yaml@voiceai-specific
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - name: build-gradle-build
+          resources: {}
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+        - name: promote-jx-preview
+          resources: {}
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
