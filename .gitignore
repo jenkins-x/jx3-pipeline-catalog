@@ -16,3 +16,7 @@
 
 # IntelliJ IDEs
 .idea/
+
+# Eclipse
+.gitignore
+.project

@@ -1,0 +1,5 @@
+dependencies:
+- alias: REPLACE_ME_APP_NAMEdb
+  name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 10.4.8
