@@ -52,7 +52,7 @@ spec:
             #!/usr/bin/env bash
             source .jx/variables.sh
             make release
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+        - image: gcr.io/kaniko-project/executor:v1.6.0-debug
           name: build-and-push-image
           resources: {}
           script: |
