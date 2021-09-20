@@ -11,7 +11,7 @@ spec:
       taskSpec:
         metadata: {}
         stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@b52a202405538287e2058b754aa761cd17baf2d7
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@a5ab19ebc5a074e0402c5016b11bc11b32cc5c83
           name: ""
           resources:
             requests:
@@ -32,7 +32,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: bdd-git
-          image: ghcr.io/jenkins-x/jx-go-maven:latest
+          image: ghcr.io/jenkins-x/jx-go-maven:3.2.197
           name: runci
           resources: {}
           script: |
