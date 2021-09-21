@@ -24,6 +24,9 @@ spec:
           resources: {}
         - name: next-version
           resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx-release-version -next-version=from-file:build.gradle --tag > VERSION
         - name: jx-variables
           resources: {}
         - name: build-gradle-build
