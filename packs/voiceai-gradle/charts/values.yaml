@@ -66,9 +66,7 @@ service:
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
-  annotations: {
-        beta.cloud.google.com/backend-config: '{"default": "iap-config"}'
-  }
+  annotations: {}
 resources:
   limits:
     cpu: 400m
@@ -76,7 +74,7 @@ resources:
   requests:
     cpu: 200m
     memory: 128Mi
-probePath: /
+probePath: /actuator/health
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
