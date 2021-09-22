@@ -32,6 +32,7 @@ spec:
       git clone $REPO_URL $SUBDIR
       cd $SUBDIR
       git reset --hard $PULL_BASE_SHA
+      git submodule update --init
       echo "checked out revision: $PULL_BASE_REF@$PULL_BASE_SHA to dir: $SUBDIR"
 
     workingDir: /workspace
