@@ -38,6 +38,12 @@ spec:
           script: |
             #!/bin/sh
             make linux
+        - image: golangci/golangci-lint:v1.42.1-alpine
+          name: make-lint
+          resources: {}
+          script: |
+            #!/bin/sh
+            golangci-lint run --verbose --deadline 15m0s
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
