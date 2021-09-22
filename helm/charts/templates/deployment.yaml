@@ -28,7 +28,7 @@ spec:
 {{- end }}
 {{- if .Values.podAnnotations }}
       annotations:
-{{ toYaml .Values.podAnnotations | indent 8 }}
+{{ tpl (toYaml .Values.podAnnotations) $ | indent 8 }}
 {{- end }}
     spec:
 {{- if .Values.serviceAccount.enabled }}
