@@ -1,5 +1,5 @@
 {{- if or .Values.knativeDeploy .Values.canary.enabled }}
-{{- else if (not .Values.internal)}}
+{{- else }}
 apiVersion: v1
 kind: Service
 metadata:
