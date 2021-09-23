@@ -48,11 +48,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: python:3.6.12-alpine
+        - image: python:3.8-alpine
           name: build-python-unittest
           resources: {}
           script: |
             #!/bin/sh
+            pip install -r oasis/requirements.txt
+            pip install -r requirements.txt
             python -m unittest
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
