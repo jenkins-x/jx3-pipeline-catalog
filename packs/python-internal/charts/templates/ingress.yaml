@@ -1,4 +1,4 @@
-{{- if and (.Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
+{{- if and (not .Values.internal) (.Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
 {{- $annotations := dict }}
 {{- $_ := merge $annotations .Values.ingress.annotations .Values.jxRequirements.ingress.annotations  }}
 {{- if not (hasKey $annotations "kubernetes.io/ingress.class") }}

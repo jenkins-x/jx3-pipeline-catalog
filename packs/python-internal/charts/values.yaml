@@ -131,3 +131,5 @@ jxRequirements:
       enabled: false
       production: false
       secretName: ""
+
+internal: true
