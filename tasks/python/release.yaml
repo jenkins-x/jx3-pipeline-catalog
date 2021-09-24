@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: python:3.8-alpine
+        - image: python:3.8
           name: build-python-unittest
           resources: {}
           script: |
