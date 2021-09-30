@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   creationTimestamp: null
-  name: pullrequest
+  name: release
 spec:
   pipelineSpec:
     tasks:
@@ -14,7 +14,7 @@ spec:
           env:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-java16/pullrequest.yaml@versionStream
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/maven-java17/release.yaml@versionStream
           name: ""
           resources:
             requests:
@@ -23,27 +23,37 @@ spec:
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
+          - mountPath: /root/.gnupg
+            name: release-gpg
           workingDir: /workspace/source
         steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
           name: ""
+          resources: {}
+        - name: next-version
           resources: {}
         - name: jx-variables
           resources: {}
-        - name: build-set-version
-          resources: {}
-        - name: build-mvn-install
+        - name: build-mvn-deploy
           resources: {}
         - name: check-registry
           resources: {}
         - name: build-container-build
           resources: {}
-        - name: promote-jx-preview
+        - name: promote-changelog
+          resources: {}
+        - name: promote-helm-release
+          resources: {}
+        - name: promote-jx-promote
           resources: {}
         volumes:
         - name: maven-settings
           secret:
             secretName: jenkins-maven-settings
+        - name: release-gpg
+          secret:
+            optional: true
+            secretName: jenkins-release-gpg
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
