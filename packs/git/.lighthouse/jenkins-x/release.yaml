@@ -19,7 +19,7 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-release-version:2.4.13
+        - image: ghcr.io/jenkins-x/jx-release-version:2.5.0
           name: next-version
           resources: {}
           script: |
@@ -36,7 +36,11 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
+<<<<<<< HEAD
         - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+=======
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
+>>>>>>> e74c795989c16092d4cc5cf31a2f09db4b042251
           name: jx-variables
           resources: {}
           script: |

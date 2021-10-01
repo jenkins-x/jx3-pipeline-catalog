@@ -44,13 +44,13 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.4.13
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.0
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: jx-variables
           resources: {}
           script: |
@@ -87,7 +87,7 @@ spec:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
               -Dmaven.wagon.http.retryHandler.count=3
-          image: gcr.io/kaniko-project/executor:debug-v1.3.0
+          image: gcr.io/kaniko-project/executor:v1.6.0-debug
           name: build-container-build
           resources: {}
           script: |
@@ -115,14 +115,14 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: promote-step6
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: promote-jx
           resources: {}
           script: |
