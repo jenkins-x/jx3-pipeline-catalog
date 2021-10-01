@@ -14,7 +14,7 @@ spec:
           env:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
-              -Dmaven.wagon.http.retryHandler.count=3 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+              -Dmaven.wagon.http.retryHandler.count=3
           - name: HOME
             value: /tekton/home
           envFrom:
@@ -31,7 +31,7 @@ spec:
             name: maven-settings
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: jx-variables
           resources: {}
           script: |
@@ -50,11 +50,11 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            mvn -B --no-transfer-progress install
+            mvn --no-transfer-progress install
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+        - image: gcr.io/kaniko-project/executor:v1.6.0-debug
           name: build-container-build
           resources: {}
           script: |

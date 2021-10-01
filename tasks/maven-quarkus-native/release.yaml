@@ -48,13 +48,13 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.4.13
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.0
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: jx-variables
           resources: {}
           script: |
@@ -81,7 +81,7 @@ spec:
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+        - image: gcr.io/kaniko-project/executor:v1.6.0-debug
           name: build-container-build
           resources: {}
           script: |
@@ -109,14 +109,14 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.202
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.0.278
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.1.0
           name: promote-jx-promote
           resources: {}
           script: |
