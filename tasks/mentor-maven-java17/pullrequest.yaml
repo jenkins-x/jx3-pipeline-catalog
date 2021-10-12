@@ -5,6 +5,9 @@ metadata:
   name: pullrequest
 spec:
   pipelineSpec:
+    params:
+    - name: SONAR_PROJECT_KEY
+      value: "project key in sonar cloud. Must be filled in or this message will be shown"
     tasks:
     - name: from-build-pack
       resources: {}
@@ -62,8 +65,8 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            echo "SONAR_PROJECT_KEY '$SONAR_PROJECT_KEY'"
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.login=$SONAR_TOKEN
+            echo "SONAR_PROJECT_KEY $(params.SONAR_PROJECT_KEY)"
+            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$(params.SONAR_PROJECT_KEY) -Dsonar.login=$SONAR_TOKEN
 
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
