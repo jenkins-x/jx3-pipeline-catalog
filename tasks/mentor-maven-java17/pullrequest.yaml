@@ -70,7 +70,7 @@ spec:
             type: string
           env:
            - name: SONAR_PROJECT_KEY
-             value: Mentor-Medier_vipps-checkout
+             value: $(params.SONAR_PROJECT_KEY)
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
