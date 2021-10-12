@@ -65,7 +65,8 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            echo "SONAR_PROJECT_KEY $(params.SONAR_PROJECT_KEY)"
+            echo "SONAR_PROJECT_KEY "
+            echo -n $(params.SONAR_PROJECT_KEY)
             mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$(params.SONAR_PROJECT_KEY) -Dsonar.login=$SONAR_TOKEN
 
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
