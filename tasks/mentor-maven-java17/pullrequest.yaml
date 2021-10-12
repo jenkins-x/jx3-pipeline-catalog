@@ -7,13 +7,16 @@ spec:
   pipelineSpec:
     params:
     - name: SONAR_PROJECT_KEY
-      value: "project key in sonar cloud. Must be filled in or this message will be shown"
+      type: string
     tasks:
     - name: from-build-pack
       resources: {}
       taskSpec:
         metadata: {}
         stepTemplate:
+          params:
+          - name: SONAR_PROJECT_KEY
+            type: string
           env:
           - name: SONAR_TOKEN
             valueFrom:
@@ -62,6 +65,9 @@ spec:
         - name: sonarscan
           image: maven:3.8.2-openjdk-17
           resources: {}
+          params:
+          - name: SONAR_PROJECT_KEY
+            type: string
           env:
            - name: SONAR_PROJECT_KEY
              value: $(params.SONAR_PROJECT_KEY)
