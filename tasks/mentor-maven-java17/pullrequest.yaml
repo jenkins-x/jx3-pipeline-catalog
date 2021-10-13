@@ -5,18 +5,12 @@ metadata:
   name: pullrequest
 spec:
   pipelineSpec:
-    params:
-    - name: SONAR_PROJECT_KEY
-      type: string
     tasks:
     - name: from-build-pack
       resources: {}
       taskSpec:
         metadata: {}
         stepTemplate:
-          params:
-          - name: SONAR_PROJECT_KEY
-            type: string
           env:
           - name: SONAR_TOKEN
             valueFrom:
@@ -65,17 +59,15 @@ spec:
         - name: sonarscan
           image: maven:3.8.2-openjdk-17
           resources: {}
-          params:
-          - name: SONAR_PROJECT_KEY
-            type: string
           env:
-           - name: SONAR_PROJECT_KEY
-             value: $(params.SONAR_PROJECT_KEY)
+          - name: SONARCLOUD_REPO_NAME
+            value: "${REPO_OWNER}-${REPO_NAME}"
+
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            echo "SONAR_PROJECT_KEY  $SONAR_PROJECT_KEY = ok"
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.login=$SONAR_TOKEN
+            echo "SONARCLOUD_REPO_NAME $SONARCLOUD_REPO_NAME "
+            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$SONARCLOUD_REPO_NAME -Dsonar.login=$SONAR_TOKEN
 
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
