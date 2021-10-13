@@ -71,7 +71,8 @@ spec:
             echo "upgrading the pom to version $VERSION"
             mvn versions:set -DnewVersion=$VERSION
 
-            mvn  -e --no-transfer-progress verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.login=$SONAR_TOKEN
+            echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME}"
+            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
 
         - image: maven:3.8.2-openjdk-17
           name: build-mvn-deploy
