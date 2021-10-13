@@ -4,10 +4,10 @@ metadata:
   creationTimestamp: null
   name: pullrequest
 spec:
+  params:
+  - name: SONAR_PROJECT_KEY
+    type: string
   pipelineSpec:
-    params:
-    - name: SONAR_PROJECT_KEY
-      type: string
     tasks:
     - name: from-build-pack
       resources: {}
