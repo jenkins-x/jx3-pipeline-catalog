@@ -55,17 +55,25 @@ spec:
         - name: http
           containerPort: {{ .Values.service.internalPort }}
         livenessProbe:
-          httpGet:
-            path: {{ .Values.livenessProbe.probePath | default .Values.probePath }}
-            port: {{ .Values.service.internalPort }}
+          exec:
+            command:
+              - python
+              - '--version'
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
         readinessProbe:
-          httpGet:
-            path: {{ .Values.readinessProbe.probePath | default .Values.probePath }}
-            port: {{ .Values.service.internalPort }}
+          exec:
+            command:
+              - bash
+              - '-ec'
+              - >
+                processNum=$(ps ax | grep -v grep | grep -c 'python main.py')
+
+                if [[ $processNum -lt 1 ]]; then
+                  exit 1
+                fi
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
