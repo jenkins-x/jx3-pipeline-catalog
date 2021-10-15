@@ -67,6 +67,8 @@ service:
   externalPort: 80
   internalPort: 8080
   annotations: {}
+  # Add labels to the service
+  labels: {}
 resources:
   limits:
     cpu: 400m
