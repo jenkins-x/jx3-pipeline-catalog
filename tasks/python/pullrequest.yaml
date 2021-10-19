@@ -37,7 +37,12 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            pip install -r oasis/requirements.txt
+            if [ -f "oasis/requirements.txt" ]; then
+                pip install -r oasis/requirements.txt
+            fi
+            if [ -f "dungeon/requirements.txt" ]; then
+                pip install -r dungeon/requirements.txt
+            fi
             pip install -r requirements.txt
             python -m unittest
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
