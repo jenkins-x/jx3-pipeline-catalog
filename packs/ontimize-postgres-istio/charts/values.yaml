@@ -82,16 +82,17 @@ resources:
     memory: 128Mi
 
 # default spring boot probe path
-probePath: /
+probePath: /health
 
 livenessProbe:
-  initialDelaySeconds: 30
+  initialDelaySeconds: 60
   periodSeconds: 10
   successThreshold: 1
   timeoutSeconds: 1
   # Optional distinct liveness probe path, if empty the probePath is used
   probePath: ""
 readinessProbe:
+  initialDelaySeconds: 15
   failureThreshold: 3
   periodSeconds: 10
   successThreshold: 1

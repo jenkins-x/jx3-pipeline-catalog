@@ -76,6 +76,7 @@ spec:
           httpGet:
             path: {{ .Values.readinessProbe.probePath | default .Values.probePath }}
             port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
