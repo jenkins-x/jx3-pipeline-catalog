@@ -1,0 +1,31 @@
+version: '3'
+services:
+  database:
+    image: bitnami/postgresql:11.12.0-debian-10-r13
+    environment:
+      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_PASSWORD=testuser
+      - POSTGRESQL_DATABASE=REPLACE_ME_APP_NAME
+      - POSTGRESQL_POSTGRES_PASSWORD=testuser
+    hostname: database
+    container_name: database
+    restart: always
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+  app:
+    image: maven:3-jdk-11
+    hostname: app
+    container_name: app
+    working_dir: /app
+    command: sh -c "mvn install -P compose && java -jar REPLACE_ME_APP_NAME-boot/target/REPLACE_ME_APP_NAME-boot.jar --spring.profiles.active=compose"
+    volumes:
+      - ../:/app/
+    restart: always
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
