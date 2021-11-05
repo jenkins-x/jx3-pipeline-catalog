@@ -57,6 +57,8 @@ spec:
           value: {{ .Values.service.name }}
         - name: NAMESPACE_SUBDOMAIN 
           value: {{ .Values.jxRequirements.ingress.namespaceSubDomain }}
+        - name: DOMAIN 
+          value: {{ .Values.jxRequirements.ingress.domain }}
         - name: DATABASE_SERVICE
           value: {{ .Release.Name }}-{{ .Chart.Name }}db
         envFrom:
