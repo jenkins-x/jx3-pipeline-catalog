@@ -60,7 +60,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/maven-quarkus-mandrel:0.0.1
+        - image: ghcr.io/jenkins-x/maven-quarkus-mandrel:0.0.2
           name: build-mvn-deploy
           resources:
             requests:
