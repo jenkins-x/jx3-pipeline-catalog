@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/jx-changelog:0.0.47
+        - image: ghcr.io/jenkins-x/jx-changelog:0.1.1
           name: promote-changelog
           resources: {}
           script: |
