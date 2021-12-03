@@ -5,16 +5,12 @@ metadata:
   name: exit-if-newer-build-has-started
 spec:
   steps:
-  - envFrom:
-    - secretRef:
-        name: jx-boot-job-env-vars
-        optional: true
-    image: gcr.io/cloud-builders/kubectl
+  - image: gcr.io/cloud-builders/kubectl
     name: exit-if-newer-build-has-started
     script: |
       #!/usr/bin/env bash
       source .jx/variables.sh
-      if [ $(kubectl get pipelineruns.tekton.dev  -l "lighthouse.jenkins-x.io/branch=$BRANCH_NAME,lighthouse.jenkins-x.io/buildNum>$BUILD_ID,lighthouse.jenkins-x.io/refs.org=$REPO_OWNER,lighthouse.jenkins-x.io/refs.repo=$REPO_NAME" -oname --no-headers) ]
+      if [ $(kubectl get pipelineruns.tekton.dev  -l "lighthouse.jenkins-x.io/job=$JOB_NAME,lighthouse.jenkins-x.io/branch=$BRANCH_NAME,lighthouse.jenkins-x.io/buildNum>$BUILD_ID,lighthouse.jenkins-x.io/refs.org=$REPO_OWNER,lighthouse.jenkins-x.io/refs.repo=$REPO_NAME" -oname --no-headers) ]
       then
         echo Newer build exists. Aborting pipeline.
         exit 1
