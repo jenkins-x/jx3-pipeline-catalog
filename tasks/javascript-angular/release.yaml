@@ -65,7 +65,10 @@ spec:
             CI=true DISPLAY=:99 npm run ng -- test --watch=false
         - image: node:12-slim
           name: build-ui-build
-          resources: {}
+          resources:
+            requests:
+              cpu: 500m
+              memory: 3Gi
           script: |
             #!/bin/sh
             npm run ng -- build --prod --output-path=dist
