@@ -47,7 +47,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.234
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.235
           name: jx-variables
           resources: {}
           script: |
