@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: python:3.8
+        - image: push 621785427668.dkr.ecr.us-east-1.amazonaws.com/python:3.8.12
           name: build-python-unittest
           resources: {}
           script: |
