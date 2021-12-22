@@ -1,18 +1,47 @@
 #!/bin/bash
 
-WORKDIR="/opt/delete"
+exec >> logfile.txt 2>&1
+
 CLUSTER_REPO=demo-jx3-gke-gsm
 SCRIPTNAME=`basename "$0"`
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-if [[ $# -ne 1 ]]; then
-    echo "`date`: ERROR: Illegal number of parameters: $SCRIPTNAME $@"  >> $WORKDIR/error.log
-    exit 2
+while getopts u:t:o:a:h flag
+do
+    case "${flag}" in
+        u) GITUSER=${OPTARG};;
+        t) GITTOKEN=${OPTARG};;
+        o) ORGANIZATION=${OPTARG};;
+        a) APPNAME=${OPTARG};;
+        h) echo "Usage: $SCRIPTNAME -u <git user> -t <git token> -o <organization> -a <app to delete>";echo "       -h show this help";exit 0;;
+    esac
+done
+
+# only ask if in interactive mode
+if [[ -z ${GITUSER} ]];then
+  echo -n "Gituser ? "
+  read -r GITUSER
 fi
 
-APPNAME=$1
+if [[ -z ${GITTOKEN} ]];then
+  echo -n "Git token ? "
+  read -r GITTOKEN
+fi
 
-exec >> $APPNAME.txt 2>&1
+if [[ -z ${APPNAME} ]];then
+  echo -n "Application to delete ? "
+  read -r APPNAME
+fi
+
+if [[ -z ${ORGANIZATION} ]];then
+  echo -n "Git organization ? "
+  read -r ORGANIZATION
+fi
+
+#echo "Git user: $GITUSER";
+#echo "Git token: $GITTOKEN";
+#echo "Git organization: $ORGANIZATION";
+#echo "App name: $APPNAME";
 
 # Debug
 set -x
@@ -21,9 +50,7 @@ echo "`date`: Deleting app $APPNAME..."
 
 echo "Cloning or pulling cluster repository..."
 
-cd $WORKDIR
-
-git clone https://github.com/${ORGANIZATION}/${CLUSTER_REPO}.git || (echo "Repo already exists, pulling..." && git -C ${CLUSTER_REPO}/ pull origin)
+git clone https://oauth2:$GITTOKEN@github.com/${ORGANIZATION}/${CLUSTER_REPO}.git || (echo "Repo already exists, pulling..." && git -C ${CLUSTER_REPO}/ pull origin)
 
 cd ${CLUSTER_REPO}
 
