@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: build-scan-push
+spec:
+  stepTemplate:
+    env:
+    - name: HOME
+      value: /tekton/home
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    name: ""
+    resources: {}
+    workingDir: /workspace/source
+  steps:
+  - image: gcr.io/kaniko-project/executor:v1.6.0-debug
+    name: build-container
+    resources: {}
+    script: |
+      #!/busybox/sh
+      source .jx/variables.sh
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+      /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
+  - image: ghcr.io/alexkondrat/trivydb:latest
+    name: copy-vulns-db
+    resources: {}
+    script: |
+      #!/bin/sh
+      mkdir -p ~/.cache/trivy/db
+      mv /trivydb/* ~/.cache/trivy/db/
+  - image: aquasec/trivy:0.20.2
+    name: vulnscan
+    resources: {}
+    script: |
+      trivy image --skip-update --input /workspace/source/image.tar > /workspace/source/scanresults.txt
+  - image: ghcr.io/alexkondrat/container-tools:latest
+    name: analyze
+    resources: {}
+    script: |
+      #!/bin/bash
+      source .jx/variables.sh
+      cat /workspace/source/scanresults.txt
+      if egrep -ri 'HIGH|CRITICAL' /workspace/source/scanresults.txt | grep -v 'Total'
+      then
+      echo "Vulnerabilities found!"
+      exit 1
+      else
+      echo "No vulnerabilities found."
+      fi
+  - image: ghcr.io/alexkondrat/container-tools:latest
+    name: push-sign-verify
+    resources: {}
+    script: |
+      #!/bin/bash
+      source .jx/variables.sh
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+      cosign sign --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+      cosign verify --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+      rm /workspace/source/image.tar /workspace/source/scanresults.txt
+  workspaces:
+  - description: Build, scan and push to ACR
+    mountPath: /workspace
+    name: output
