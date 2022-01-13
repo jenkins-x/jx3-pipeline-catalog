@@ -3,7 +3,7 @@ services:
   database:
     image: bitnami/postgresql:11.12.0-debian-10-r13
     environment:
-      - POSTGRESQL_USERNAME=user
+      - POSTGRESQL_USERNAME=testuser
       - POSTGRESQL_PASSWORD=testuser
       - POSTGRESQL_DATABASE=REPLACE_ME_APP_NAME
       - POSTGRESQL_POSTGRES_PASSWORD=testuser
