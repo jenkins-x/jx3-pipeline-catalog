@@ -79,6 +79,7 @@ resources:
 
 # default spring boot probe path
 probePath: /ontimize/health
+probePort: 8081
 
 livenessProbe:
   initialDelaySeconds: 60
@@ -86,7 +87,7 @@ livenessProbe:
   successThreshold: 1
   timeoutSeconds: 1
   # Optional distinct liveness probe path, if empty the probePath is used
-  probePath: ""
+  probePath: /ontimize/health/liveness
 readinessProbe:
   initialDelaySeconds: 50
   failureThreshold: 3
@@ -94,7 +95,7 @@ readinessProbe:
   successThreshold: 1
   timeoutSeconds: 1
   # Optional distinct readiness probe path, if empty the probePath is used
-  probePath: ""
+  probePath: /ontimize/health/readiness
 
 # custom ingress annotations on this service
 ingress:
