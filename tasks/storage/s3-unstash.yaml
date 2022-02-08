@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: s3-unstash
+spec:
+  stepTemplate:
+    env:
+    - name: HOME
+      value: /tekton/home
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    name: ""
+    resources: {}
+  steps:
+  - image: ghcr.io/jenkins-x/jx-boot:3.2.180
+    name: get-jx-repository
+    resources: {}
+    workingDir: /workspace
+    script: |
+      #!/usr/bin/env sh
+      kubectl get env dev -o go-template='{{range .spec.teamSettings.storageLocations}}{{if eq .classifier "repository"}}{{.bucketUrl}}{{end}}{{end}}' > repository_bucket
+  - image: public.ecr.aws/bitnami/aws-cli:2
+    name: unstash
+    workingDir: /stash
+    script: |
+      #!/bin/sh
+      set -ex
+      if [ ! -d .git ]
+      then
+        aws s3 cp --only-show-errors $(cat /workspace/repository_bucket)/cache/${REPO_OWNER}/${REPO_NAME}/stash.tar.gz - | tar zx
+      fi
+  workspaces:
+  - description: The bucket will be stored here between steps
+    mountPath: /workspace
+    name: output
+ - description: The content of the stash will be unpacked here
+   mountPath: /stash
+   name: stash
