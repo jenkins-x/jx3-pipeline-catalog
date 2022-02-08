@@ -36,6 +36,6 @@ spec:
   - description: The bucket will be stored here between steps
     mountPath: /workspace
     name: output
- - description: The content of the stash will be unpacked here
-   mountPath: /stash
-   name: stash
+  - description: The content of the stash will be unpacked here
+    mountPath: /stash
+    name: stash
