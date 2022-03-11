@@ -50,10 +50,20 @@ spec:
               secretKeyRef:
                 name: nexus-java
                 key: username
+          - name: ORG_GRADLE_PROJECT_ctoSISQToken
+            valueFrom:
+              secretKeyRef:
+                key: token
+                name: sonarqube-config
+          - name: ORG_GRADLE_PROJECT_ctoSISQURL
+            valueFrom:
+              secretKeyRef:
+                key: url
+                name: sonarqube-config
           resources: {}
           script: |
             #!/bin/sh
-            gradle clean build
+            gradle clean build sonarqube
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
