@@ -16,7 +16,7 @@ spec:
     resources: {}
     workingDir: /workspace/source
   steps:
-  - image: gcr.io/kaniko-project/executor:v1.6.0-debug
+  - image: gcr.io/kaniko-project/executor:v1.8.0-debug
     name: build-container
     resources: {}
     script: |
@@ -24,7 +24,7 @@ spec:
       source .jx/variables.sh
       cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
-  - image: ghcr.io/alexkondrat/trivydb:latest
+  - image: ghcr.io/jenkins-x/trivydb:latest
     name: copy-vulns-db
     resources: {}
     script: |
@@ -50,14 +50,21 @@ spec:
       else
       echo "No vulnerabilities found."
       fi
-  - image: ghcr.io/alexkondrat/container-tools:latest
-    name: push-sign-verify
+  - image: gcr.io/go-containerregistry/crane:debug
+    name: push-container
     resources: {}
     script: |
       #!/bin/bash
       source .jx/variables.sh
       cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+  - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
+    name: sign-and-push-signature
+    resources: {}
+    script: |
+      #!/bin/bash
+      source .jx/variables.sh
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       cosign sign --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       cosign verify --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       rm /workspace/source/image.tar /workspace/source/scanresults.txt
