@@ -14,9 +14,8 @@ spec:
           image: uses:jenkins-x/jx3-pipeline-catalog/tasks/terraform/release.yaml@versionStream
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 600Mi
+            # override limits for all containers here
+            limits: {}
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
@@ -25,7 +24,11 @@ spec:
         - name: next-version
           resources: {}
         - name: jx-variables
-          resources: {}
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 600Mi
         - name: lint
           resources: {}
         - name: changelog
