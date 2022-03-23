@@ -30,7 +30,7 @@ spec:
             name: npmrc
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.267
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.268
           name: jx-variables
           resources: {}
           script: |
