@@ -31,7 +31,7 @@ spec:
             name: maven-settings
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.275
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.276
           name: jx-variables
           resources: {}
           script: |
