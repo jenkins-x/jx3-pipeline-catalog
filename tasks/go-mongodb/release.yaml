@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.15
+        - image: golang:1.17.8
           name: build-make-build
           resources: {}
           script: |
