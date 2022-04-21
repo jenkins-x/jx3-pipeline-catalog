@@ -54,7 +54,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: tekton-git
-          image: goreleaser/goreleaser:v0.155.0
+          image: goreleaser/goreleaser:v1.8.3
           name: upload-binaries
           resources: {}
           script: |
