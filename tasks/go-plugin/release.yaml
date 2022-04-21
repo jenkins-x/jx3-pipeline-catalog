@@ -45,7 +45,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.17.8
+        - image: golang:1.17.9
           name: release-binary
           resources: {}
           script: |
@@ -111,7 +111,7 @@ spec:
             export BRANCH=$(git rev-parse --abbrev-ref HEAD)
             export BUILDDATE=$(date)
             export REV=$(git rev-parse HEAD)
-            export GOVERSION="1.17.8"
+            export GOVERSION="1.17.9"
             export ROOTPACKAGE="github.com/$REPO_OWNER/$REPO_NAME"
             goreleaser release --timeout 1h
         - command:
