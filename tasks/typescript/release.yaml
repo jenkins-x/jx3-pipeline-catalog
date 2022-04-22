@@ -53,13 +53,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
             npm install
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-test
           resources: {}
           script: |
