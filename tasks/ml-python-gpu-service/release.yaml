@@ -20,9 +20,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: "1"
-              memory: 1Gi
+            limits: {}
           workingDir: /workspace/source
         steps:
         - env:
@@ -44,7 +42,11 @@ spec:
             jx-release-version --tag > VERSION
         - image: ghcr.io/jenkins-x/jx-boot:3.2.304
           name: jx-variables
-          resources: {}
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: "1"
+              memory: 1Gi
           script: |
             #!/usr/bin/env sh
             jx gitops variables

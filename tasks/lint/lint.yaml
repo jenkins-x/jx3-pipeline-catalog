@@ -12,9 +12,7 @@ spec:
       value: /tekton/home
     name: ""
     resources:
-      requests:
-        cpu: 400m
-        memory: 512Mi
+      limits: {}
     workingDir: /workspace/source
   steps:
   - env:
@@ -32,7 +30,10 @@ spec:
       value: "true"
     image: github/super-linter:v3.13.1
     name: lint
-    resources: {}
+    resources:
+      requests:
+        cpu: 400m
+        memory: 512Mi
   - image: ghcr.io/jenkins-x/jx-tap:0.0.14
     name: pr-comment
     resources: {}
