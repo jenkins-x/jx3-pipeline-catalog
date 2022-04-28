@@ -27,10 +27,7 @@ spec:
               name: jx-boot-job-env-vars
               optional: true
           name: ""
-          resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+          resources: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
@@ -153,5 +150,5 @@ spec:
             secretName: jenkins-release-gpg
   podTemplate: {}
   serviceAccountName: tekton-bot
-  timeout: 12h0m0s
+  timeout: 1h0m0s
 status: {}
