@@ -23,9 +23,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
@@ -50,9 +48,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.295
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.308
           name: jx-variables
-          resources: {}
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
           script: |
             #!/usr/bin/env sh
             jx gitops variables
@@ -99,14 +101,14 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.295
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.308
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.5
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.8
           name: promote-jx-promote
           resources: {}
           script: |

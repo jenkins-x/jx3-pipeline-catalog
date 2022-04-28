@@ -14,10 +14,8 @@ spec:
           image: uses:jenkins-x/jx3-pipeline-catalog/tasks/ml-python-gpu-training/release.yaml@versionStream
           name: ""
           resources:
-            requests:
-              cpu: "1"
-              memory: 4Gi
-              nvidia.com/gpu: 0
+            # override limits for all containers here
+            limits: {}
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
@@ -26,7 +24,12 @@ spec:
         - name: next-version
           resources: {}
         - name: jx-variables
-          resources: {}
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: "1"
+              memory: 4Gi
+              nvidia.com/gpu: 0
         - name: build-flake8
           resources: {}
         - name: build-training

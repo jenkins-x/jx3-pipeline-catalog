@@ -20,14 +20,16 @@ spec:
               optional: true
           name: ""
           resources:
+            limits: {}
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.308
+          name: jx-variables
+          resources:
+            # set requests for the pod here
             requests:
               cpu: "1"
               memory: 1Gi
-          workingDir: /workspace/source
-        steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.295
-          name: jx-variables
-          resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
@@ -65,7 +67,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.199
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.202
           name: promote-jx-preview
           resources: {}
           script: |

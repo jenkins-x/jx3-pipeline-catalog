@@ -14,9 +14,8 @@ spec:
         stepTemplate:
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 600Mi
+            # override limits for all containers here
+            limits: {}
           workingDir: /workspace/source
         steps:
         - image: ghcr.io/jenkins-x/jx-release-version:2.5.1
@@ -36,9 +35,13 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.295
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.308
           name: jx-variables
-          resources: {}
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 600Mi
           script: |
             #!/usr/bin/env sh
             jx gitops variables

@@ -22,28 +22,30 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           volumeMounts:
           - mountPath: /tekton/home/npm
             name: npmrc
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.295
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.308
           name: jx-variables
-          resources: {}
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
           script: |
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
             npm install
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-test
           resources: {}
           script: |
@@ -60,7 +62,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.199
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.202
           name: promote-jx-preview
           resources: {}
           script: |

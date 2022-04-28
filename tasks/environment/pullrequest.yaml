@@ -20,9 +20,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           workingDir: /workspace/source
         steps:
         - args:
@@ -33,9 +31,12 @@ spec:
           - secretRef:
               name: jx-boot-job-env-vars
               optional: true
-          image: ghcr.io/jenkins-x/jx-boot:3.2.295
+          image: ghcr.io/jenkins-x/jx-boot:3.2.308
           name: make-pr
-          resources: {}
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/kubetest/environment.yaml@versionStream
           name: ""
           resources: {}
