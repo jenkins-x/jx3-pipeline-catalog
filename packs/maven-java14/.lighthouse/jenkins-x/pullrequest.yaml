@@ -21,9 +21,8 @@ spec:
           image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-java14/pullrequest.yaml@versionStream
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            # override limits for all containers here
+            limits: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
@@ -33,7 +32,11 @@ spec:
           name: ""
           resources: {}
         - name: jx-variables
-          resources: {}
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
         - name: build-set-version
           resources: {}
         - name: build-mvn-install

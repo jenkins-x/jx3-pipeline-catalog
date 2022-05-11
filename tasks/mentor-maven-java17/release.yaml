@@ -53,7 +53,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.225
           name: jx-variables
           resources: {}
           script: |
@@ -127,7 +127,7 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.225
           name: promote-helm-release
           resources: {}
           script: |
@@ -151,5 +151,5 @@ spec:
             secretName: jenkins-release-gpg
   podTemplate: {}
   serviceAccountName: tekton-bot
-  timeout: 12h0m0s
+  timeout: 1h0m0s
 status: {}

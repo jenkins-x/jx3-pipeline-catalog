@@ -17,9 +17,7 @@ spec:
           image: uses:jenkins-x/jx3-pipeline-catalog/tasks/javascript/release.yaml@versionStream
           name: ""
           resources:
-            requests:
-              cpu: 0.1
-              memory: 128Mi
+            # override limits for all containers here
             limits:
               cpu: 400m
               memory: 512Mi
@@ -34,7 +32,11 @@ spec:
         - name: next-version
           resources: {}
         - name: jx-variables
-          resources: {}
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 0.1
+              memory: 128Mi
         - name: build-npm-install
           resources: {}
         - name: build-npm-test
