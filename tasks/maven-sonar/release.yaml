@@ -36,29 +36,6 @@ spec:
             name: release-gpg
           workingDir: /workspace/source
         steps:
-        - env:
-          - name: GIT_TOKEN
-            valueFrom:
-              secretKeyRef:
-                key: password
-                name: tekton-git
-          - name: GIT_USER
-            valueFrom:
-              secretKeyRef:
-                key: username
-                name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.4.13
-          name: next-version
-          resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
-          name: jx-variables
-          resources: {}
-          script: |
-            #!/usr/bin/env sh
-            jx gitops variables
         - name: sonarscan
           image: maven:3.8.2-openjdk-17
           resources: {}
@@ -71,7 +48,6 @@ spec:
 
             echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME}"
             mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
-
 
         volumes:
         - name: maven-settings
