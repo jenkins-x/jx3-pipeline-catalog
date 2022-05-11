@@ -23,9 +23,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            requests: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
