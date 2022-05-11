@@ -23,6 +23,7 @@ spec:
               optional: true
           name: ""
           resources:
+            requests: {}
             limits: {}
           volumeMounts:
           - mountPath: /root/.m2/

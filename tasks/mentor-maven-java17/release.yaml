@@ -27,7 +27,8 @@ spec:
               name: jx-boot-job-env-vars
               optional: true
           name: ""
-          resources: {}
+          resources:
+            requests: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings

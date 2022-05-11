@@ -1,0 +1,163 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: SONAR_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: sonarlogin
+                key: sonarlogin
+
+          - name: MAVEN_OPTS
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
+              -Dmaven.wagon.http.retryHandler.count=3
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.196
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+            jx gitops pr variables
+        - name: sonarscan
+          image: maven:3.8.2-openjdk-17
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME}"
+            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${GIT_BRANCH} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
+        - name: sonar-quality-gate
+          image: ubuntu:latest
+          workingDir: /workspace/source
+          resources: {}
+          script:  |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+            apt update
+            apt install -y jq
+            apt install -y curl
+
+            # Begin Standard 'imports'
+            set -e
+            set -o pipefail
+
+            gray="\\e[37m"
+            blue="\\e[36m"
+            red="\\e[31m"
+            yellow="\\e[33m"
+            green="\\e[32m"
+            reset="\\e[0m"
+
+            info() { echo -e "${blue}INFO: $*${reset}"; }
+            error() { echo -e "${red}ERROR: $*${reset}"; }
+            debug() {
+                if [[ "${DEBUG}" == "true" ]]; then
+                    echo -e "${gray}DEBUG: $*${reset}";
+                fi
+            }
+
+            success() { echo -e "${green}✔ $*${reset}"; }
+            warn() { echo -e "${yellow}✖ $*${reset}"; exit 1; }
+            fail() { echo -e "${red}✖ $*${reset}"; exit 1; }
+
+            ## Enable debug mode.
+            enable_debug() {
+              if [[ "${DEBUG}" == "true" ]]; then
+                info "Enabling debug mode."
+                set -x
+              fi
+            }
+
+            # Execute a command, saving its output and exit status code, and echoing its output upon completion.
+            # Globals set:
+            #   status: Exit status of the command that was executed.
+            #   output: Output generated from the command.
+            #
+            run() {
+              echo "$@"
+              set +e
+              output=$("$@" 2>&1)
+              status=$?
+              set -e
+              echo "${output}"
+            }
+
+            # End standard 'imports'
+            #source "$(dirname "$0")/common.sh"
+
+            if [[ -z "${SONAR_TOKEN}" ]]; then
+              echo "Set the SONAR_TOKEN env variable."
+              exit 1
+            fi
+            SONAR_TOKEN=$(echo $SONAR_TOKEN | xargs)
+            metadataFile=/workspace/source/target/sonar/report-task.txt
+
+            if [[ ! -f "$metadataFile" ]]; then
+              echo "$metadataFile does not exist."
+              exit 1
+            fi
+
+            serverUrl="$(sed -n 's/serverUrl=\(.*\)/\1/p' "${metadataFile}")"
+            ceTaskUrl="$(sed -n 's/ceTaskUrl=\(.*\)/\1/p' "${metadataFile}")"
+            if [ -z "${serverUrl}" ] || [ -z "${ceTaskUrl}" ]; then
+              echo "Invalid report metadata file."
+              exit 1
+            fi
+            task="$(curl --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
+            status="$(jq -r '.task.status' <<< "$task")"
+
+            until [[ ${status} != "PENDING" && ${status} != "IN_PROGRESS" ]]; do
+                printf '.'
+                sleep 5s
+                task="$(curl --silent --fail --show-error --user "${SONAR_TOKEN}": "${ceTaskUrl}")"
+                status="$(jq -r '.task.status' <<< "$task")"
+            done
+
+            analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
+            qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
+            qualityGateStatus="$(curl --silent --fail --show-error --user "${SONAR_TOKEN}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
+
+            if [[ ${qualityGateStatus} == "OK" ]];then
+              success "Quality Gate has PASSED."
+            elif [[ ${qualityGateStatus} == "WARN" ]];then
+              warn "Warnings on Quality Gate."
+            elif [[ ${qualityGateStatus} == "ERROR" ]];then
+              fail "Quality Gate has FAILED."
+            else
+              fail "Quality Gate not set for the project. Please configure the Quality Gate in SonarQube or remove sonarqube-quality-gate action from the workflow."
+            fi
+
+        volumes:
+        - name: maven-settings
+          secret:
+            secretName: jenkins-maven-settings
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
