@@ -51,7 +51,7 @@ spec:
           script:  |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            apt update
+            apt -qq update
             apt -qq install -y jq
             apt -qq install -y curl
 
