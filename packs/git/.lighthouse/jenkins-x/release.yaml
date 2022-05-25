@@ -18,7 +18,7 @@ spec:
             limits: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-release-version:2.5.1
+        - image: ghcr.io/jenkins-x/jx-release-version:2.5.2
           name: next-version
           resources: {}
           script: |
