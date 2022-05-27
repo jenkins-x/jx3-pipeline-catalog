@@ -26,10 +26,7 @@ spec:
               name: jx-boot-job-env-vars
               optional: true
           name: ""
-          resources:
-            limits:
-              cpu: "12"
-              memory: "8Gi"
+          resources: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
