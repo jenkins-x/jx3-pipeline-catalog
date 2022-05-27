@@ -27,9 +27,8 @@ spec:
               optional: true
           name: ""
           resources:
-            limits:
-              cpu: "12"
-              memory: "8Gi"
+            # override limits for all containers here
+            limits: {}
           volumeMounts:
           - mountPath: /root/.m2/
             name: maven-settings
