@@ -34,13 +34,13 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.5.1
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.2
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.338
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -81,7 +81,7 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.338
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
           name: promote-helm-release
           resources: {}
           script: |
