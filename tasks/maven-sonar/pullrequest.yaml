@@ -42,9 +42,6 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-
-            echo "Pr args ${PR_HEAD_REF}"
-            env
             echo "sonar args:    -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME}  "
             mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
         - name: sonar-quality-gate
