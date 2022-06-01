@@ -41,7 +41,6 @@ spec:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            jx gitops pr variables
             source .jx/variables.sh
 
             echo "Pr args ${PR_HEAD_REF}"
