@@ -20,9 +20,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           workingDir: /workspace/source
         steps:
         - env:
@@ -36,19 +34,23 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.5.1
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.2
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.235
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
           name: jx-variables
-          resources: {}
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/jx-changelog:0.1.3
+        - image: ghcr.io/jenkins-x/jx-changelog:0.1.4
           name: promote-changelog
           resources: {}
           script: |
@@ -65,14 +67,14 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.235
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.1.1
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.9
           name: promote-jx-promote
           resources: {}
           script: |
