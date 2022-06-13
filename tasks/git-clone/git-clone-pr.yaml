@@ -13,7 +13,8 @@ spec:
         name: jx-boot-job-env-vars
         optional: true
     name: ""
-    resources: {}
+    resources:
+      limits: {}
   steps:
   - envFrom:
     - secretRef:
