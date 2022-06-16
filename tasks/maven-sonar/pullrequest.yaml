@@ -43,7 +43,7 @@ spec:
             #!/usr/bin/env bash
             source .jx/variables.sh
             echo "sonar args:    -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME}  "
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io -Dsonar.scm.provider=git
+            mvn  -e --no-transfer-progress -B org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report   org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io -Dsonar.scm.provider=git
         - name: sonar-quality-gate
           image: ubuntu:latest
           workingDir: /workspace/source
