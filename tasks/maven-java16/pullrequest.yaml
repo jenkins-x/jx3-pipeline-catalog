@@ -29,7 +29,7 @@ spec:
             name: maven-settings
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.364
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -53,7 +53,7 @@ spec:
             #!/usr/bin/env bash
             source .jx/variables.sh
             mvn --no-transfer-progress install
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.6
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.6.0-debug
@@ -64,7 +64,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.206
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.207
           name: promote-jx-preview
           resources: {}
           script: |

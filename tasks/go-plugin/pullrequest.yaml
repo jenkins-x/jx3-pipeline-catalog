@@ -23,7 +23,7 @@ spec:
             limits: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.339
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.364
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -52,7 +52,7 @@ spec:
           script: |
             #!/bin/sh
             make test
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.6
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.6.0-debug
