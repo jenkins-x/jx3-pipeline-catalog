@@ -40,7 +40,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-            jx gitops pr variables  --comments 
+            jx gitops pr variables
         - image: maven:3.8.2-openjdk-17
           name: build-set-version
           resources: {}
