@@ -59,18 +59,6 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - name: sonarscan
-          image: maven:3.8.2-openjdk-17
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-               # modify the pom.xml
-            echo "upgrading the pom to version $VERSION"
-            mvn versions:set -DnewVersion=$VERSION
-
-            echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME}"
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
 
         - image: maven:3.8.2-openjdk-17
           name: build-mvn-deploy

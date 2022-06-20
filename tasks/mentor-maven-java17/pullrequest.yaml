@@ -49,7 +49,7 @@ spec:
             echo "not changing version for SNAPSHOT"
         - image: maven:3.8.2-openjdk-17
           name: build-mvn-install
-          resources: 
+          resources:
             requests:
               cpu: 400m
               memory: 512Mi
@@ -58,14 +58,6 @@ spec:
             #!/usr/bin/env bash
             source .jx/variables.sh
             mvn --no-transfer-progress install
-        - name: sonarscan
-          image: maven:3.8.2-openjdk-17
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-            echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME}"
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${GIT_BRANCH} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io
 
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
