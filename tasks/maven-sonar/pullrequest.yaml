@@ -42,16 +42,15 @@ spec:
           script: |
             #!/usr/bin/env bash
             source .jx/variables.sh
-            echo "sonar args: DEBUG   -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME}  "
-            echo "mvn  -e --no-transfer-progress -B org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report   org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io -Dsonar.scm.provider=git -Dsonar.verbose=true -Dsonar.log.level=debug"
-            mvn  -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io -Dsonar.scm.provider=git -Dsonar.verbose=true -Dsonar.log.level=debug -e --no-transfer-progress -B org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report   org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+            echo "sonar args:    -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME}  "
+            mvn -Dsonar.qualitygate.wait=true -Dsonar.pullrequest.key=${PULL_NUMBER} -Dsonar.pullrequest.branch=${PR_HEAD_REF} -Dsonar.pullrequest.base=${PULL_BASE_REF} -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.host.url=https://sonarcloud.io -Dsonar.scm.provider=git -Dsonar.verbose=true -Dsonar.log.level=debug -e --no-transfer-progress -B org.jacoco:jacoco-maven-plugin:prepare-agent verify org.jacoco:jacoco-maven-plugin:report   org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
         - name: sonar-quality-gate
           image: ubuntu:latest
           workingDir: /workspace/source
           resources: {}
           script:  |
             #!/usr/bin/env bash
-            # Temporary solution installing jq and curl. This must be turned into a ready to use container. 
+            # Temporary solution installing jq and curl. This must be turned into a ready to use container.
             source .jx/variables.sh
             apt -qq update
             apt -qq install -y jq
