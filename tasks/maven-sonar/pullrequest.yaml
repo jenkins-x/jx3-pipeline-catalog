@@ -50,6 +50,7 @@ spec:
           resources: {}
           script:  |
             #!/usr/bin/env bash
+            # Temporary solution installing jq and curl. This must be turned into a ready to use container. 
             source .jx/variables.sh
             apt -qq update
             apt -qq install -y jq
