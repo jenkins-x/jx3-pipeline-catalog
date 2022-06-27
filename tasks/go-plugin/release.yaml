@@ -113,7 +113,7 @@ spec:
             export REV=$(git rev-parse HEAD)
             export GOVERSION="1.17.9"
             export ROOTPACKAGE="github.com/$REPO_OWNER/$REPO_NAME"
-            goreleaser release --timeout 1h
+            goreleaser release --timeout 2h
         - command:
           - jx-updatebot
           - pr
