@@ -40,12 +40,12 @@ spec:
           script: |
             #!/bin/sh
             make linux
-        - image: golangci/golangci-lint:v1.42.1-alpine
+        - image: golangci/golangci-lint:v1.46.2-alpine
           name: make-lint
           resources: {}
           script: |
             #!/bin/sh
-            golangci-lint run --verbose --deadline 30m0s
+            golangci-lint run --deadline 30m0s
         - image: golang:1.17.9
           name: build-make-test
           resources: {}
