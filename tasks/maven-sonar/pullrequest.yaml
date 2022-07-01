@@ -136,7 +136,6 @@ spec:
             analysisId="$(jq -r '.task.analysisId' <<< "${task}")"
             qualityGateUrl="${serverUrl}/api/qualitygates/project_status?analysisId=${analysisId}"
             qualityGateStatus="$(curl --silent --fail --show-error --user "${SONAR_TOKEN}": "${qualityGateUrl}" | jq -r '.projectStatus.status')"
-            jx gitops pr comment -c "Quality Gate at ${qualityGateUrl}"
             if [[ ${qualityGateStatus} == "OK" ]];then
               success "Quality Gate has PASSED."
             elif [[ ${qualityGateStatus} == "WARN" ]];then
