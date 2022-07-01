@@ -34,12 +34,12 @@ spec:
       #!/bin/sh
       mkdir -p ~/.cache/trivy/db
       mv /trivydb/* ~/.cache/trivy/db/
-  - image: aquasec/trivy:0.20.2
+  - image: aquasec/trivy:0.28.0
     name: vulnscan
     resources: {}
     script: |
       trivy image --skip-update --input /workspace/source/image.tar > /workspace/source/scanresults.txt
-  - image: ghcr.io/jenkins-x/jx-boot:3.2.364
+  - image: ghcr.io/jenkins-x/jx-boot:3.2.402
     name: analyze
     resources: {}
     script: |
