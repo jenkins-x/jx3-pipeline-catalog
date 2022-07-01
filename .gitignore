@@ -16,4 +16,7 @@
 
 # IntelliJ IDEs
 .idea/
+
+.vscode 
+
 *.orig
