@@ -14,10 +14,10 @@ spec:
           env:
           - name: HOME
             value: /tekton/home
-          envFrom:
-          - secretRef:
-              name: jx-boot-job-env-vars
-              optional: true
+          #envFrom:
+          #- secretRef:
+              #name: jx-boot-job-env-vars
+              #optional: true
           name: ""
           resources:
             requests:
@@ -26,7 +26,7 @@ spec:
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
+          name: "git-clone"
           resources: {}
         - image: ghcr.io/jenkins-x/jx-boot:3.2.250
           name: jx-variables
