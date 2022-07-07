@@ -54,15 +54,18 @@ spec:
       else
       echo "No vulnerabilities found."
       fi
-  - image: gcr.io/go-containerregistry/crane/debug:f1fa40b162a1601a863364e8a2f63bbb9e4ff36e
+  - image: gcr.io/go-containerregistry/crane:debug
     name: push-container
     resources: {}
     script: |
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      mkdir -p ~/.docker/
+      mkdir -p ~/.docker
+      ls -lah
+      cat /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson 
       cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+      crane ls $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -v
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
