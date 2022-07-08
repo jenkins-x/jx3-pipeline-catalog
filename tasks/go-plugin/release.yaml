@@ -45,7 +45,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.17.9
+        - image: golang:1.17.11
           name: release-binary
           resources: {}
           script: |
