@@ -8,6 +8,12 @@ spec:
     env:
     - name: HOME
       value: /tekton/home
+    - name: AWS_SDK_LOAD_CONFIG
+      value: "true"
+    - name: AWS_EC2_METADATA_DISABLED
+      value: "true"
+    - name: AWS_ECR_DISABLE_CACHE
+      value: "true"        
     envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
@@ -16,7 +22,7 @@ spec:
     resources: {}
     workingDir: /workspace/source
   steps:
-  - image: gcr.io/kaniko-project/executor:v1.8.0-debug
+  - image: gcr.io/kaniko-project/executor:v1.8.1-debug
     name: build-container
     resources: {}
     script: |
