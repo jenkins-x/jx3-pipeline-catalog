@@ -13,7 +13,7 @@ spec:
     - name: AWS_EC2_METADATA_DISABLED
       value: "true"
     - name: AWS_ECR_DISABLE_CACHE
-      value: "true"        
+      value: "true"
     envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
@@ -30,10 +30,9 @@ spec:
       source .jx/variables.sh
       cat .jx/variables.sh
       cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-      echo " /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar"
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
       cp /kaniko/docker-credential-gcr /workspace/source
-      cp /kaniko/docker-credential-ecr-login /workspace/source
+      # cp /kaniko/docker-credential-ecr-login /workspace/source
       cp /kaniko/docker-credential-acr-env /workspace/source
   - image: ghcr.io/jenkins-x/trivydb:latest
     name: copy-vulns-db
@@ -69,7 +68,9 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson .docker/config.json
+      #cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson .docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+
       crane ls $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -v
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
