@@ -68,11 +68,7 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      #cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson .docker/config.json
-      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
-
-      crane ls $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -v
-      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --docker-config /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
     resources: {}
