@@ -101,6 +101,11 @@ spec:
             echo "version is"
             echo ${VERSION}
             jx promote -b --env qa06 --timeout 1h --no-poll
+        volumes:
+        - name: npmrc
+          secret:
+            optional: true
+            secretName: npmrc
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
