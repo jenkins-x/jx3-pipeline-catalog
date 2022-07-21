@@ -30,6 +30,8 @@ spec:
             name: npmrc
           workingDir: /workspace/source
         steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: git-clone
         - image: ghcr.io/jenkins-x/jx-boot:3.2.250
           name: jx-variables
           resources: {}
