@@ -29,10 +29,9 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       cat .jx/variables.sh
-      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
       cp /kaniko/docker-credential-gcr /workspace/source
-      # cp /kaniko/docker-credential-ecr-login /workspace/source
+      cp /kaniko/docker-credential-ecr-login /workspace/source
       cp /kaniko/docker-credential-acr-env /workspace/source
   - image: ghcr.io/jenkins-x/trivydb:latest
     name: copy-vulns-db
@@ -68,7 +67,9 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --docker-config /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson
+      mkdir -p ~/.docker
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION 
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
     resources: {}
