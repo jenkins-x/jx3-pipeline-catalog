@@ -85,3 +85,6 @@ spec:
   - description: Build, scan and push to the registry
     mountPath: /workspace
     name: output
+    podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
