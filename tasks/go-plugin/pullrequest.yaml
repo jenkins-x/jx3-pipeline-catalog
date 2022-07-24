@@ -34,7 +34,7 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: golang:1.17.11
+        - image: golang:1.18.4
           name: build-make-linux
           resources: {}
           script: |
@@ -46,7 +46,7 @@ spec:
           script: |
             #!/bin/sh
             golangci-lint run --deadline 30m0s
-        - image: golang:1.17.11
+        - image: golang:1.18.4
           name: build-make-test
           resources: {}
           script: |
