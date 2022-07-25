@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: PACT_BROKER_BASE_URL
+            value: "https://mentormedier.pactflow.io"
+          - name: PACT_BROKER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: pactToken
+                name: pactbroker
+          - name: CONSUMER_APP
+            value: consumer
+          - name: PROVIDER_APP
+            value: provider-manager
+
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            limits: {}
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          workingDir: /workspace/source
+        steps:
+        - name: can-i-deploy
+          image: 523883733847.dkr.ecr.eu-west-1.amazonaws.com/mentor-medier/pipeline-build-tools:0.0.2
+          workingDir: /workspace/source
+          resources: {}
+          script:  |
+            #!/usr/bin/env bash
+            source .jx/variables.sh
+             CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  charts/mentoz-userpack-v3/requirements.yaml)
+             PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  charts/mentoz-userpack-v3/requirements.yaml)
+             echo "Versions found: camp: $PROVIDER_VERSION subs: $CONSUMER_VERSION"
+            /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
