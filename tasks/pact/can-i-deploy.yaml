@@ -12,6 +12,8 @@ spec:
         metadata: {}
         stepTemplate:
           env:
+          - name: REQUIREMENTS_YAML
+            value: "charts/something/requirements.yaml"
           - name: PACT_BROKER_BASE_URL
             value: "https://mentormedier.pactflow.io"
           - name: PACT_BROKER_TOKEN
@@ -19,6 +21,7 @@ spec:
               secretKeyRef:
                 key: pactToken
                 name: pactbroker
+                
           - name: CONSUMER_APP
             value: consumer
           - name: PROVIDER_APP
@@ -37,7 +40,7 @@ spec:
           script:  |
             #!/usr/bin/env bash
             source .jx/variables.sh
-             CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  charts/mentoz-userpack-v3/requirements.yaml)
-             PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  charts/mentoz-userpack-v3/requirements.yaml)
+             CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
+             PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
              echo "Versions found: camp: $PROVIDER_VERSION subs: $CONSUMER_VERSION"
             /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
