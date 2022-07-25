@@ -43,7 +43,6 @@ spec:
              CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
              PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
              if [[ -z "$PROVIDER_VERSION" || -z "$CONSUMER_VERSION" ]]; then
-             then
                  echo "Versions not foud for consumer ${CONSUMER_APP} or provider ${PROVIDER_APP} "
                  exit 1
              else
