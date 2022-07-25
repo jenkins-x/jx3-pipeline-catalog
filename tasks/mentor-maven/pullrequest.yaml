@@ -23,7 +23,7 @@ spec:
         - name: build-set-version
         - name: build-mvn-install
         - name: check-registry
-        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
           name: ""
           resources: {}
         - name: promote-jx-preview
