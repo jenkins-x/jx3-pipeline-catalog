@@ -42,5 +42,11 @@ spec:
             source .jx/variables.sh
              CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
              PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
-             echo "Versions found: camp: $PROVIDER_VERSION subs: $CONSUMER_VERSION"
-            /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
+             if [[ -z "$PROVIDER_VERSION" || -z "$CONSUMER_VERSION" ]]; then
+             then
+                 echo "Versions not foud for consumer ${CONSUMER_APP} or provider ${PROVIDER_APP} "
+                 exit 1
+             else
+                 echo "Versions found: ${PROVIDER_APP}: $PROVIDER_VERSION ${CONSUMER_APP} : $CONSUMER_VERSION"
+                 /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
+             fi
