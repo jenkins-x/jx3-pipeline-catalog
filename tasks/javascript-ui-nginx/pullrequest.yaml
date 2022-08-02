@@ -20,40 +20,42 @@ spec:
               optional: true
           name: ""
           resources:
+            limits: {}
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.4.3
+          name: jx-variables
+          resources:
+            # set requests for the pod here
             requests:
               cpu: 400m
               memory: 512Mi
-          workingDir: /workspace/source
-        steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.180
-          name: jx-variables
-          resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
             npm install
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-npm-test
           resources: {}
           script: |
             #!/bin/sh
             CI=true DISPLAY=:99 npm test
-        - image: node:12-slim
+        - image: node:14-slim
           name: build-ui-build
           resources: {}
           script: |
             #!/bin/sh
             npm run build
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.7
           name: check-registry
           resources: {}
-        - image: gcr.io/kaniko-project/executor:debug-v1.3.0
+        - image: gcr.io/kaniko-project/executor:v1.6.0-debug
           name: build-container-build
           resources: {}
           script: |
@@ -61,7 +63,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.186
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.220
           name: promote-jx-preview
           resources: {}
           script: |

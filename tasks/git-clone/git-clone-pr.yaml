@@ -13,13 +13,14 @@ spec:
         name: jx-boot-job-env-vars
         optional: true
     name: ""
-    resources: {}
+    resources:
+      limits: {}
   steps:
   - envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
         optional: true
-    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.19.0
+    image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.27.0
     name: git-clone
     resources: {}
     script: |
@@ -40,7 +41,7 @@ spec:
     - secretRef:
         name: jx-boot-job-env-vars
         optional: true
-    image: ghcr.io/jenkins-x/jx-boot:3.2.180
+    image: ghcr.io/jenkins-x/jx-boot:3.4.3
     name: git-merge
     resources: {}
     script: |

@@ -65,7 +65,7 @@ service:
   name: REPLACE_ME_APP_NAME
   type: ClusterIP
   externalPort: 80
-  internalPort: 8080
+  internalPort: 80
   annotations: {}
   # Add labels to the service
   labels: {}

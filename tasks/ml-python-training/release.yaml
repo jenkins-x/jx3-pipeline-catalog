@@ -20,9 +20,7 @@ spec:
               optional: true
           name: ""
           resources:
-            requests:
-              cpu: "2"
-              memory: 4Gi
+            limits: {}
           workingDir: /workspace/source
         steps:
         - env:
@@ -36,15 +34,19 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.4.13
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.2
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.180
+        - image: ghcr.io/jenkins-x/jx-boot:3.4.3
           name: jx-variables
-          resources: {}
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: "2"
+              memory: 4Gi
           script: |
             #!/usr/bin/env sh
             jx gitops variables
@@ -74,7 +76,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-boot:3.2.180
+          image: ghcr.io/jenkins-x/jx-boot:3.4.3
           name: build-export-model
           resources: {}
           script: |+

@@ -1,0 +1,2 @@
+this chart merely runs a post-install/upgrade hook to curl the looker deploy webhook
+kubectl get pods --namespace {{ .Release.Namespace }}
