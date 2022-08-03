@@ -101,6 +101,7 @@ spec:
           script: |
             #!/bin/bash
             source .jx/variables.sh
+            export PATH=$PATH:/workspace/source/bin
 
             git add * || true
             git add * || true
