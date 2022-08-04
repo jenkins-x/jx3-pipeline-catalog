@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: supply-chain-security
+spec:
+  steps:
+  - name: download-syft
+    image: alpine:3.16
+    resources: {}
+    script: |
+      #!/bin/sh
+      apk add --no-cache curl unzip
+      curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
+      sh -s -- -b /workspace/source/bin v0.52.0
+      chmod +x /workspace/source/bin/syft
