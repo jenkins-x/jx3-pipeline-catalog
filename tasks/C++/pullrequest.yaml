@@ -22,7 +22,7 @@ spec:
           resources: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.4.5
+        - image: ghcr.io/jenkins-x/jx-boot:3.4.12
           name: jx-variables
           resources: {}
           script: |
@@ -41,7 +41,7 @@ spec:
           script: |
             #!/bin/sh
             make
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.7
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.8
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.6.0-debug
