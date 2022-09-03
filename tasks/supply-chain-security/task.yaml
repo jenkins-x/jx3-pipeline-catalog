@@ -28,9 +28,9 @@ spec:
     image:  ghcr.io/oras-project/oras:v0.13.0
     resources: {}
     script: |
-    #!/bin/bash
-    source .jx/variables.sh
-    syft /workspace/source/image.tar --scope all-layers -o spdx-json > /workspace/source/sbom.json
-    echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION-sbom /workspace/source/sbom.json
-    echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:latest-sbom /workspace/source/sbom.json
+      #!/bin/bash
+      source .jx/variables.sh
+      syft /workspace/source/image.tar --scope all-layers -o spdx-json > /workspace/source/sbom.json
+      echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION-sbom /workspace/source/sbom.json
+      echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:latest-sbom /workspace/source/sbom.json
 
