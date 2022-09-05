@@ -5,16 +5,6 @@ metadata:
   name: supply-chain-security
 spec:
   steps:
-  - name: GIT_TOKEN
-    valueFrom:
-      secretKeyRef:
-        key:  password
-        name: tekton-git
-  - name: GIT_USER
-    valueFrom:
-      secretKeyRef:
-        key:  username
-        name: tekton-git
   - name: download-syft
     image: alpine:3.16
     resources: {}
@@ -26,6 +16,17 @@ spec:
       chmod +x /workspace/source/bin/syft
   - name: build-and-push-sbom
     image:  ghcr.io/oras-project/oras:v0.13.0
+    env:
+    - name: GIT_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key:  password
+          name: tekton-git
+    - name: GIT_USER
+      valueFrom:
+        secretKeyRef:
+          key:  username
+          name: tekton-git
     resources: {}
     script: |
       #!/bin/bash
