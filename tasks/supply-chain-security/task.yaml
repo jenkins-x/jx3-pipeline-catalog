@@ -14,7 +14,6 @@ spec:
       curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
       sh -s -- -b /workspace/source/bin v0.52.0
       chmod +x /workspace/source/bin/syft
-      echo "export PATH=$PATH:/go/bin:/usr/local/go/bin:/workspace/source/bin" >> .jx/variables.sh
   - name: build-and-push-sbom
     image:  ghcr.io/oras-project/oras:v0.13.0
     env:
@@ -32,6 +31,7 @@ spec:
     script: |
       #!/bin/bash
       source .jx/variables.sh
+      export PATH=$PATH:/workspace/source/bin
       syft /workspace/source/image.tar --scope all-layers -o spdx-json > /workspace/source/sbom.json
       echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION-sbom /workspace/source/sbom.json
       echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:latest-sbom /workspace/source/sbom.json
