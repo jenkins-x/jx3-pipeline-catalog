@@ -14,6 +14,7 @@ spec:
       curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
       sh -s -- -b /workspace/source/bin v0.52.0
       chmod +x /workspace/source/bin/syft
+      echo "export PATH=$PATH:/go/bin:/usr/local/go/bin:/workspace/source/bin" >> .jx/variables.sh
   - name: build-and-push-sbom
     image:  ghcr.io/oras-project/oras:v0.13.0
     env:
