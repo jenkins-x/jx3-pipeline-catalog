@@ -102,7 +102,6 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             export PATH=$PATH:/workspace/source/bin
-
             git add * || true
             git add * || true
             git commit -a -m "chore: release $VERSION" --allow-empty
