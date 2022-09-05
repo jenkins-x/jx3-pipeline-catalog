@@ -29,7 +29,7 @@ spec:
           name: tekton-git
     resources: {}
     script: |
-      #!/bin/bash
+      #!/bin/sh
       source .jx/variables.sh
       export PATH=$PATH:/workspace/source/bin
       syft /workspace/source/image.tar --scope all-layers -o spdx-json > /workspace/source/sbom.json
