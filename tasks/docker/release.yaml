@@ -40,7 +40,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.4.12
+        - image: ghcr.io/jenkins-x/jx-boot:3.4.19
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -61,7 +61,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-changelog:0.2.3
+        - image: ghcr.io/jenkins-x/jx-changelog:0.3.0
           name: promote-changelog
           resources: {}
           script: |
