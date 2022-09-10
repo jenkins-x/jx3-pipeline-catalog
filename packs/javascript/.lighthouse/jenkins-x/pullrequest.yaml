@@ -15,9 +15,7 @@ spec:
           name: ""
           resources:
             # override limits for all containers here
-            limits:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           workingDir: /workspace/source
         steps:
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
