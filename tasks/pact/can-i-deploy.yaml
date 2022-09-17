@@ -1,51 +1,45 @@
 apiVersion: tekton.dev/v1beta1
-kind: PipelineRun
+kind: Task
 metadata:
   creationTimestamp: null
-  name: pullrequest
+  name: pact-can-i-deploy
 spec:
-  pipelineSpec:
-    tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          env:
-          - name: REQUIREMENTS_YAML
-            value: "charts/something/requirements.yaml"
-          - name: PACT_BROKER_BASE_URL
-            value: "https://mentormedier.pactflow.io"
-          - name: PACT_BROKER_TOKEN
-            valueFrom:
-              secretKeyRef:
-                key: pactToken
-                name: pactbroker
-                
-          - name: CONSUMER_APP
-            value: consumer
-          - name: PROVIDER_APP
-            value: provider-manager
-          - name: HOME
-            value: /tekton/home
-          name: ""
-          resources:
-            limits: {}
-          workingDir: /workspace/source
-        steps:
-        - name: can-i-deploy
-          image: 523883733847.dkr.ecr.eu-west-1.amazonaws.com/mentor-medier/pipeline-build-tools:0.0.2
-          workingDir: /workspace/source
-          resources: {}
-          script:  |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-             CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
-             PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
-              if [[ -z "$PROVIDER_VERSION" || -z "$CONSUMER_VERSION" ]]; then
-                 echo "Versions not found for consumer '${CONSUMER_APP}':'$CONSUMER_VERSION' or provider '${PROVIDER_APP}': '$PROVIDER_VERSION' "
-                 exit 1
-              else
-                 echo "Versions found: Provider:${PROVIDER_APP}: $PROVIDER_VERSION , Consumer:${CONSUMER_APP} : $CONSUMER_VERSION"
-                 /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
-              fi
+  stepTemplate:
+    env:
+    - name: REQUIREMENTS_YAML
+      value: "charts/something/requirements.yaml"
+    - name: PACT_BROKER_BASE_URL
+      value: "https://mentormedier.pactflow.io"
+    - name: PACT_BROKER_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: pactToken
+          name: pactbroker
+          
+    - name: CONSUMER_APP
+      value: consumer
+    - name: PROVIDER_APP
+      value: provider-manager
+    - name: HOME
+      value: /tekton/home
+    name: ""
+    resources:
+      limits: {}
+    workingDir: /workspace/source
+  steps:
+  - name: can-i-deploy
+    image: 523883733847.dkr.ecr.eu-west-1.amazonaws.com/mentor-medier/pipeline-build-tools:0.0.2
+    workingDir: /workspace/source
+    resources: {}
+    script:  |
+      #!/usr/bin/env bash
+      source .jx/variables.sh
+        CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
+        PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
+        if [[ -z "$PROVIDER_VERSION" || -z "$CONSUMER_VERSION" ]]; then
+            echo "Versions not found for consumer '${CONSUMER_APP}':'$CONSUMER_VERSION' or provider '${PROVIDER_APP}': '$PROVIDER_VERSION' "
+            exit 1
+        else
+            echo "Versions found: Provider:${PROVIDER_APP}: $PROVIDER_VERSION , Consumer:${CONSUMER_APP} : $CONSUMER_VERSION"
+            /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
+        fi
