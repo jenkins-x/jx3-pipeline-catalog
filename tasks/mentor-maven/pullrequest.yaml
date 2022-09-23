@@ -20,6 +20,7 @@ spec:
           workingDir: /workspace/source
         steps:
         - name: jx-variables
+        - name: git-clone
         - name: build-set-version
         - name: build-mvn-install
         - name: check-registry
