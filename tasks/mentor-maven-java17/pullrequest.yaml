@@ -42,7 +42,7 @@ spec:
             jx gitops variables
             jx gitops pr variables
         - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
+          name: git-clone
           resources: {}
         - image: maven:3.8.2-openjdk-17
           name: build-set-version
