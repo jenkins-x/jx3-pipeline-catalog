@@ -19,8 +19,8 @@ spec:
             name: maven-settings
           workingDir: /workspace/source
         steps:
-        - name: jx-variables
         - name: git-clone
+        - name: jx-variables
         - name: build-set-version
         - name: build-mvn-install
         - name: check-registry
