@@ -77,7 +77,7 @@ spec:
           name: ""
           resources: {}
 
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.220
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.223
           name: promote-jx-preview
           resources: {}
           script: |
