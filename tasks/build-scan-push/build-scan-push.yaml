@@ -52,7 +52,7 @@ spec:
       #!/bin/bash
       source .jx/variables.sh
       cat /workspace/source/scanresults.txt
-      jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
+      jx gitops pr --pr $PULL_NUMBER comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
       if egrep -ri 'CRITICAL' /workspace/source/scanresults.txt | grep -v 'Total'
       then
       echo "Vulnerabilities found!"
@@ -69,7 +69,7 @@ spec:
       export PATH=/workspace/source:$PATH
       mkdir -p ~/.docker
       cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
-      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION 
+      crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
     resources: {}
