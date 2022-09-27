@@ -35,11 +35,20 @@ spec:
       #!/usr/bin/env bash
       source .jx/variables.sh
         CONSUMER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${CONSUMER_APP}'").version'  ${REQUIREMENTS_YAML})
-        PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${PROVIDER_APP}'").version'  ${REQUIREMENTS_YAML})
-        if [[ -z "$PROVIDER_VERSION" || -z "$CONSUMER_VERSION" ]]; then
-            echo "Versions not found for consumer '${CONSUMER_APP}':'$CONSUMER_VERSION' or provider '${PROVIDER_APP}': '$PROVIDER_VERSION' "
+      
+        PROVIDER_STRING=''
+        array=("${PROVIDER_APP}")
+        for i in ${array[@]};
+        do
+          PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${i}'").version'  ${REQUIREMENTS_YAML})
+          PROVIDER_NAME="${i}"
+          PROVIDER_STRING+="--pacticipant=${PROVIDER_NAME} --version=${PROVIDER_VERSION} "
+        done
+        
+        if [[ -z "PROVIDER_STRING" || -z "$CONSUMER_VERSION" ]]; then
+            echo "Versions not found for consumer '${CONSUMER_APP}':'$CONSUMER_VERSION' or provider(s) '${PROVIDER_STRING}' "
             exit 1
         else
-            echo "Versions found: Provider:${PROVIDER_APP}: $PROVIDER_VERSION , Consumer:${CONSUMER_APP} : $CONSUMER_VERSION"
-            /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION --pacticipant=$PROVIDER_APP --version=$PROVIDER_VERSION --to-environment=production
+            echo "Versions found: Provider(s):${PROVIDER_STRING} , Consumer:${CONSUMER_APP} : $CONSUMER_VERSION"
+            /pact/bin/pact-broker can-i-deploy --pacticipant=$CONSUMER_APP --version=$CONSUMER_VERSION $PROVIDER_STRING --to-environment=production
         fi
