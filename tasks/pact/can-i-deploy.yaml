@@ -38,7 +38,7 @@ spec:
       
         PROVIDER_STRING=''
         array=("${PROVIDER_APP}")
-        for i in ${array[@]}
+        for i in ${array[@]};
         do
           PROVIDER_VERSION=$(yq eval '.dependencies[] | select(.name=="'${i}'").version'  ${REQUIREMENTS_YAML})
           PROVIDER_NAME="${i}"
