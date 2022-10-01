@@ -52,7 +52,7 @@ spec:
       #!/bin/bash
       source .jx/variables.sh
       cat /workspace/source/scanresults.txt
-      jx gitops pr --pr $PULL_NUMBER comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
+      jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
       if egrep -ri 'CRITICAL' /workspace/source/scanresults.txt | grep -v 'Total'
       then
       echo "Vulnerabilities found!"
