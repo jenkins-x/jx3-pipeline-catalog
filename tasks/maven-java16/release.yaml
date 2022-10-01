@@ -70,7 +70,7 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             mvn --no-transfer-progress clean deploy
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.9
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.10
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.6.0-debug
