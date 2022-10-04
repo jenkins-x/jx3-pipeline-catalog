@@ -39,7 +39,6 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            npm install -g node-gyp
             npm install
         - image: node:16-slim
           name: build-npm-test
