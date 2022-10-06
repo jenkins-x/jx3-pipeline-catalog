@@ -34,13 +34,13 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: nikolaik/python-nodejs:python3.10-nodejs16-slim
+        - image: node:16-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
-            npm install
-        - image: nikolaik/python-nodejs:python3.10-nodejs16-slim
+            npm install --python=python3.8
+        - image: node:16-slim
           name: build-npm-test
           resources: {}
           script: |
