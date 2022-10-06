@@ -39,7 +39,6 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            npm install -D node-gyp@9.1.0 make gcc-min
             npm install
         - image: node:16-slim
           name: build-npm-test
