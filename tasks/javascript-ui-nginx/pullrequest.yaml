@@ -39,7 +39,8 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            npm install --python=python3.10
+            npm install node-gyp
+            npm install
         - image: node:16-slim
           name: build-npm-test
           resources: {}
