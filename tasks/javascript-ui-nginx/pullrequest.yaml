@@ -39,7 +39,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            npm install --python=python3.8
+            npm install --python=python3.10
         - image: node:16-slim
           name: build-npm-test
           resources: {}
