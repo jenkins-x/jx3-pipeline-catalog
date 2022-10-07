@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: supply-chain-security
+spec:
+  steps:
+  - name: download-syft
+    image: alpine:3.16
+    resources: {}
+    script: |
+      #!/bin/sh
+      apk add --no-cache curl unzip
+      curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | \
+      sh -s -- -b /workspace/source/bin v0.52.0
+      chmod +x /workspace/source/bin/syft
+  - name: build-and-push-sbom
+    image:  ghcr.io/oras-project/oras:v0.13.0
+    env:
+    - name: GIT_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key:  password
+          name: tekton-git
+    - name: GIT_USER
+      valueFrom:
+        secretKeyRef:
+          key:  username
+          name: tekton-git
+    resources: {}
+    script: |
+      #!/bin/sh
+      source .jx/variables.sh
+      export PATH=$PATH:/workspace/source/bin
+      syft /workspace/source/image.tar --scope all-layers -o spdx-json > /workspace/source/sbom.json
+      echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:$VERSION-sbom /workspace/source/sbom.json
+      echo $GIT_TOKEN | oras push -u $GIT_USER --password-stdin ghcr.io/$DOCKER_REGISTRY_ORG/$REPO_NAME:latest-sbom /workspace/source/sbom.json
+      rm -f /workspace/source/image.tar
+  - name: install-grype
+    image: alpine:3.16
+    resources: {}
+    script: |
+      #!/bin/sh
+      apk add --no-cache curl
+      curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | \
+      sh -s -- -b /workspace/source/bin
+      chmod +x /workspace/source/bin/grype
+  - name: scan-sbom
+    image:  alpine:3.16
+    resources: {}
+    script: |
+      #!/bin/sh
+      source .jx/variables.sh
+      cat /workspace/source/sbom.json | /workspace/source/bin/grype > vulnerabilities.txt

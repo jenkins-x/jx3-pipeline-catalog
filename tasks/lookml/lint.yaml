@@ -32,7 +32,7 @@ spec:
             limits: {}
           workingDir: $(workspaces.output.path)/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.405
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.8
           name: jx-variables
           resources:
             # set requests for the pod here

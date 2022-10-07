@@ -18,9 +18,7 @@ spec:
           name: ""
           resources:
             # override limits for all containers here
-            limits:
-              cpu: 400m
-              memory: 512Mi
+            limits: {}
           volumeMounts:
           - mountPath: /tekton/home/npm
             name: npmrc
@@ -35,8 +33,8 @@ spec:
           resources:
             # override requests for the pod here
             requests:
-              cpu: 0.1
-              memory: 128Mi
+              cpu: 400m
+              memory: 512Mi
         - name: build-npm-install
           resources: {}
         - name: build-npm-test
