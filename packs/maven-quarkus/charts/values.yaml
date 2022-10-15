@@ -102,6 +102,8 @@ ingress:
   classAnnotation: ""
   # Add labels to the ingress
   labels: {}
+  # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
+  host: ""
 
   # ingress path type
   pathType: ImplementationSpecific
