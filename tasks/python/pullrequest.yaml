@@ -55,7 +55,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.327
+        - image: gcr.io/prodoscore-clusters/jx-gitops:0.0.0-PR-3-2-SNAPSHOT
           name: promote-helm-release
           resources: {}
           script: |
@@ -64,7 +64,8 @@ spec:
             echo $VERSION > VERSION
             echo "version is"
             echo ${VERSION}
-
+            gcloud auth configure-docker us-docker.pkg.dev --quiet 
+            export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
             
             if [ -d "charts/$REPO_NAME" ]; then
             jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
@@ -72,7 +73,7 @@ spec:
             jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
             jx gitops yset -p 'image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
-            jx gitops helm release
+            jx gitops helm release --no-oci-login --oci
         - image: ghcr.io/jenkins-x/jx-boot:3.2.327
           name: comment-version
           resources: {}
