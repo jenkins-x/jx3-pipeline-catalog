@@ -25,6 +25,9 @@ spec:
               memory: 600Mi
           workingDir: /workspace/source
         steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: git-clone
+          resources: {}
         - image: ghcr.io/jenkins-x/jx-boot:3.2.250
           name: jx-variables
           resources: {}
@@ -32,18 +35,21 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
+            export SHA=$(git rev-parse --short HEAD)
+            export VERSION=0.0.0-${SHA}
+            echo "export VERSION=0.0.0-${SHA}" >> .jx/variables.sh
         - image: golang:1.15
           name: build-make-linux
           resources: {}
           script: |
             #!/bin/sh
             make linux
-        - image: golangci/golangci-lint:v1.42.1-alpine
-          name: make-lint
+        - image: golang:1.15
+          name: build-make-test
           resources: {}
           script: |
             #!/bin/sh
-            golangci-lint run --verbose --deadline 15m0s
+            make test
         - image: ghcr.io/jenkins-x/jx-registry:0.1.1
           name: check-registry
           resources: {}
@@ -55,13 +61,44 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.192
-          name: promote-jx-preview
+        - image: gcr.io/prodoscore-clusters/jx-gitops:0.0.0-PR-3-2-SNAPSHOT
+          name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx preview create
+            gcloud auth configure-docker us-docker.pkg.dev --quiet 
+            export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
+            echo $VERSION > VERSION
+            echo "version is"
+            echo ${VERSION}
+
+            
+            if [ -d "charts/$REPO_NAME" ]; then
+            jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
+            jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
+            jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
+            jx gitops yset -p 'image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
+            else echo no charts; fi
+            jx gitops helm release --no-oci-login --oci
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.327
+          name: comment-version
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            echo "version is"
+            echo ${VERSION}
+            jx gitops pr comment -c "docker image tag: $VERSION"
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.9
+          name: promote-jx-promote
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            echo "version is"
+            echo ${VERSION}
+            jx promote -b --env qa06 --timeout 1h --no-poll
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
