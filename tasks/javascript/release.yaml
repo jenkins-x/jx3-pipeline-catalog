@@ -96,13 +96,15 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.2.250
+        - image: gcr.io/prodoscore-clusters/jx-gitops:0.0.0-PR-3-2-SNAPSHOT
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx gitops helm release
+            gcloud auth configure-docker us-docker.pkg.dev --quiet 
+            export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
+            jx gitops helm release --no-oci-login --oci
         - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.0
           name: promote-jx-promote
           resources: {}
