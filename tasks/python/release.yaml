@@ -93,7 +93,7 @@ spec:
             source .jx/variables.sh
             gcloud auth configure-docker us-docker.pkg.dev --quiet 
             export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
-            jx gitops helm release
+            jx gitops helm release --no-oci-login --oci
         - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.0
           name: promote-jx-promote
           resources: {}
