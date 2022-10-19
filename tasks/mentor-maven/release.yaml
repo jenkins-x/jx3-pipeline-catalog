@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/mentor-maven-java17/release.yaml@HEAD
+          name: ""
+          resources: {}
+          volumeMounts:
+          - mountPath: /root/.m2/
+            name: maven-settings
+          workingDir: /workspace/source
+        steps:
+        - name: next-version
+        - name: jx-variables
+        - name: build-mvn-install
+        - name: check-registry
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
+          name: ""
+          resources: {}
+        - name: promote-changelog
+        - name: promote-helm-release-oci
+        - name: promote-jx-promote
+
+
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
