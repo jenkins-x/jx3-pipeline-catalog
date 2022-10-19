@@ -122,7 +122,7 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: uses:../helm/release.yaml
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/helm/release.yaml@HEAD
           name: promote-helm-release-oci
 
         - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.5
