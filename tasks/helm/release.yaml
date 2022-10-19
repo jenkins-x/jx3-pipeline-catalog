@@ -40,7 +40,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.8
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -70,7 +70,7 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.8
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
           name: promote-helm-release
           resources: {}
           script: |
@@ -80,7 +80,17 @@ spec:
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /workspace/source/.config/helm/registry/config.json
 
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.5
+
+        - image: babadofar/jx-boot:3.7.8f
+          name: promote-helm-release-oci
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            export PATH=/root/.jx/plugins/bin/:$PATH
+            jx gitops helm release --no-oci-login --use-helm-plugin --oci --repo-url oci://523883733847.dkr.ecr.eu-west-1.amazonaws.com
+
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.6
           name: promote-jx-promote
           resources: {}
           script: |
