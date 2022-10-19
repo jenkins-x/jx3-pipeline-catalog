@@ -49,7 +49,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.8
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -114,24 +114,18 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.8
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: babadofar/jx-boot:3.7.8f
+
+
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/helm/release.yaml
           name: promote-helm-release-oci
-          resources: {}
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-            export PATH=/root/.jx/plugins/bin/:$PATH
-            jx gitops helm release --no-oci-login --use-helm-plugin --oci --repo-url oci://523883733847.dkr.ecr.eu-west-1.amazonaws.com
-
-
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.5
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.6
           name: promote-jx-promote
           resources: {}
           script: |
