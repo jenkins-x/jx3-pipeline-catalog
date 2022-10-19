@@ -22,7 +22,8 @@ spec:
         - name: git-clone
         - name: jx-variables
         - name: build-set-version
-        - name: build-mvn-install
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-sonar/pullrequest.yaml@HEAD
+          name: sonarscan
         - name: check-registry
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
           name: ""
