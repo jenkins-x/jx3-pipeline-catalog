@@ -41,7 +41,7 @@ spec:
     - secretRef:
         name: jx-boot-job-env-vars
         optional: true
-    image: ghcr.io/jenkins-x/jx-boot:3.7.9
+    image: ghcr.io/jenkins-x/jx-boot:3.7.10
     name: git-merge
     resources: {}
     script: |
