@@ -45,7 +45,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.12
+        - image: ghcr.io/jenkins-x/jx-boot:3.7.13
           name: jx-variables
           resources:
             # set requests for the pod here
