@@ -56,7 +56,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: tekton-git
-          image: goreleaser/goreleaser:v1.8.3
+          image: ghcr.io/jenkins-x/jx-goreleaser-image:0.0.1@sha256:75dde8a5d24f9e7ec58c8d52beed30af3763ed65071610486eabb424abbe5150
           name: upload-binaries
           resources: {}
           script: |
@@ -72,7 +72,7 @@ spec:
             export BRANCH=$(git rev-parse --abbrev-ref HEAD)
             export BUILDDATE=$(date)
             export REV=$(git rev-parse HEAD)
-            export GOVERSION="1.17.9"
+            export GOVERSION="$(go version | sed -e 's/^[^0-9.]*\([0-9.]*\).*/\1/')"
             export ROOTPACKAGE="github.com/$REPO_OWNER/$REPO_NAME"
             goreleaser release
         - image: ghcr.io/jenkins-x/jx-registry:0.1.10
