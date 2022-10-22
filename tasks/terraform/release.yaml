@@ -74,7 +74,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: ghcr.io/jenkins-x/jx-updatebot:0.3.12
+          image: ghcr.io/jenkins-x/jx-updatebot:0.3.13
           name: promote
           resources: {}
   podTemplate: {}
