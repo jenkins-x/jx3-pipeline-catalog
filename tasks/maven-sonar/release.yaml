@@ -47,7 +47,7 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             echo "SONARCLOUD_REPO_NAME ${REPO_OWNER}_${REPO_NAME} GIT BRANCH ${GIT_BRANCH}"
-            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier  -Dsonar.host.url=https://sonarcloud.io
+            mvn  -e --no-transfer-progress  verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${REPO_OWNER}_${REPO_NAME} -Dsonar.login=$SONAR_TOKEN -Dsonar.organization=mentor-medier -Dsonar.branch.name=$GIT_BRANCH -Dsonar.host.url=https://sonarcloud.io
 
         volumes:
         - name: maven-settings

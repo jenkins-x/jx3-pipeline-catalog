@@ -21,8 +21,7 @@ spec:
         steps:
         - name: next-version
         - name: jx-variables
-        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-sonar/pullrequest.yaml@HEAD
-          name: sonarscan
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-sonar/release.yaml@HEAD
         - name: check-registry
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
           name: ""
