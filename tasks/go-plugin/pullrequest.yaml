@@ -52,6 +52,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
+            apk add --no-cache make
             make test
         - image: ghcr.io/jenkins-x/jx-registry:0.1.10
           name: check-registry
