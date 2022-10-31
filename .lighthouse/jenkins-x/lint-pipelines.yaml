@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: lint-pipelines
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/pullrequest.yaml@versionStream
+          name: ""
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - name: promote-jx-preview:lint-pipelines
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            . .jx/variables.sh
+
+            echo 'linting pipelines in the packs and .lighthouse folder:'
+            jx pipeline lint -r --out=pipelines-packs.tap
+            echo ""
+            cat pipelines-packs.tap
+
+            echo 'linting pipelines in the tasks folder:'
+            jx pipeline lint -a -d tasks --out=pipelines-tasks.tap
+            echo ""
+            cat pipelines-tasks.tap
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/lint/lint.yaml@versionStream
+          name: pr-comment
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx-tap run
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}

@@ -2,6 +2,20 @@ apiVersion: config.lighthouse.jenkins-x.io/v1alpha1
 kind: TriggerConfig
 spec:
   presubmits:
+  - name: lint-pipelines
+    context: "lint-pipelines"
+    always_run: true
+    optional: false
+    trigger: (?m)^/test( all| lint-pipelines.*),?(s+|$)
+    rerun_command: /test lint-pipelines
+    source: "lint-pipelines.yaml"
+  - name: lint-helm
+    context: "lint-helm"
+    always_run: true
+    optional: false
+    trigger: (?m)^/test( all| lint-helm.*),?(s+|$)
+    rerun_command: /test lint-helm
+    source: "lint-helm.yaml"
   - name: godemo
     context: "godemo"
     always_run: false
