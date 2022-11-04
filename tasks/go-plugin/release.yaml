@@ -39,17 +39,17 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.10
           name: jx-variables
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.18.6
+        - image: golang:1.19.3@sha256:7ffa70183b7596e6bc1b78c132dbba9a6e05a26cd30eaa9832fecad64b83f029
           name: release-binary
           resources: {}
           script: |
-            #!/usr/bin/env bash
+            #!/usr/bin/env sh
             source .jx/variables.sh
             make release
         - image: gcr.io/kaniko-project/executor:v1.6.0-debug
@@ -67,7 +67,7 @@ spec:
             #!/bin/ash
             if [ -d "charts/$REPO_NAME" ]; then cd charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: ghcr.io/jenkins-x/jx-changelog:0.3.4
+        - image: ghcr.io/jenkins-x/jx-changelog:0.4.0
           name: changelog
           resources: {}
           script: |
@@ -82,7 +82,7 @@ spec:
             else echo no charts; fi
 
             jx changelog create --verbose --header-file=hack/changelog-header.md --version=$VERSION --rev=$PULL_BASE_SHA --output-markdown=changelog.md --update-release=true
-        - image: ghcr.io/jenkins-x/jx-boot:3.7.9
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.10
           name: release-chart
           resources: {}
           script: |
@@ -95,7 +95,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: tekton-git
-          image: goreleaser/goreleaser:v1.8.3
+          image: ghcr.io/jenkins-x/jx-goreleaser-image:0.1.0@sha256:4ac5aeb4ce850761aeffc585446ea47bbcfa680d096fdd8c5d00c5a8c5adbcc0
           name: upload-binaries
           resources: {}
           script: |
@@ -117,7 +117,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: ghcr.io/jenkins-x/jx-updatebot:0.3.12
+          image: ghcr.io/jenkins-x/jx-updatebot:0.3.13
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
