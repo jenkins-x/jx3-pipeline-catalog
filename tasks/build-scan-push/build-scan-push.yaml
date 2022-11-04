@@ -22,14 +22,14 @@ spec:
     resources: {}
     workingDir: /workspace/source
   steps:
-  - image: gcr.io/kaniko-project/executor:v1.8.1-debug
+  - image: gcr.io/kaniko-project/executor:v1.9.1-debug
     name: build-container
     resources: {}
     script: |
       #!/busybox/sh
       source .jx/variables.sh
       cat .jx/variables.sh
-      /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
+      /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar --image-fs-extract-retry 3
       cp /kaniko/docker-credential-gcr /workspace/source
       cp /kaniko/docker-credential-ecr-login /workspace/source
       cp /kaniko/docker-credential-acr-env /workspace/source
