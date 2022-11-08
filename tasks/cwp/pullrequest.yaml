@@ -58,7 +58,7 @@ spec:
         - image: ghcr.io/jenkins-x/jx-registry:0.1.10
           name: check-registry
           resources: {}
-        - image: gcr.io/kaniko-project/executor:v1.6.0-debug
+        - image: gcr.io/kaniko-project/executor:v1.9.1-debug
           name: build-container-build
           resources: {}
           script: |
