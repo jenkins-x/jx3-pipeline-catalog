@@ -48,7 +48,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.10
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.12
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -89,7 +89,7 @@ spec:
           - name: MAVEN_OPTS
             value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
               -Dmaven.wagon.http.retryHandler.count=3
-          image: gcr.io/kaniko-project/executor:v1.6.0-debug
+          image: gcr.io/kaniko-project/executor:v1.9.1-debug
           name: build-container-build
           resources: {}
           script: |
@@ -117,14 +117,14 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION}
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.10
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.12
           name: promote-step6
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.10
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.12
           name: promote-jx
           resources: {}
           script: |
