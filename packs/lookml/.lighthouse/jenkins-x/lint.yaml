@@ -46,6 +46,7 @@ spec:
       taskSpec:
         workspaces:
           - name: output
+            mountPath: /workspace
         metadata: {}
         stepTemplate:
           env:
