@@ -48,6 +48,7 @@ spec:
                 pip install pipenv
                 pipenv install gunicorn wheel --skip-lock
                 pipenv sync --dev
+                echo "------------------------------ Running Tests -----------------------------------"
                 pipenv run pytest
             - image: ghcr.io/jenkins-x/jx-registry:0.1.1
               name: check-registry
