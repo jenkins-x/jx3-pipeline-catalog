@@ -45,10 +45,10 @@ spec:
                 #!/bin/sh
                 PYTHONUNBUFFERED=1
 
-                pip install pipenv
+                pipenv install pipenv
                 pipenv install gunicorn wheel --skip-lock
                 pipenv sync --dev
-                pytest
+                pipenv run pytest
             - image: ghcr.io/jenkins-x/jx-registry:0.1.1
               name: check-registry
               resources: {}
