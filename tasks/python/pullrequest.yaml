@@ -45,7 +45,7 @@ spec:
                 #!/bin/sh
                 PYTHONUNBUFFERED=1
 
-                pipenv install pipenv
+                pip install pipenv
                 pipenv install gunicorn wheel --skip-lock
                 pipenv sync --dev
                 pipenv run pytest
