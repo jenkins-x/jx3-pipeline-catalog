@@ -28,6 +28,7 @@ spec:
           resources: {}
         - name: promote-changelog
         - name: promote-helm-release
+        - name: check-registry-oci
         - name: promote-helm-release-oci
         - name: promote-jx-promote
 
