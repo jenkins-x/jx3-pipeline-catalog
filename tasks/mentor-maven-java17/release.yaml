@@ -122,6 +122,12 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.10
+          name: check-registry-oci
+          env:
+           - name: DOCKER_REGISTRY_ORG
+             value: ""
+
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/helm/release.yaml@HEAD
           name: promote-helm-release-oci
 
