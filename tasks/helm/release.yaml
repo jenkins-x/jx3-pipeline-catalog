@@ -79,7 +79,7 @@ spec:
             mkdir -p /workspace/source/.config/helm/registry
             cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /workspace/source/.config/helm/registry/config.json
 
-            jx gitops helm release
+            jx gitops helm release --no-oci-login --use-helm-plugin
 
         - image: babadofar/jx-boot:3.7.8f
           name: promote-helm-release-oci
