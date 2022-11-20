@@ -68,7 +68,8 @@ spec:
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
       mkdir -p ~/.docker
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
@@ -77,7 +78,9 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       mkdir -p ~/.docker/
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+
       cosign sign --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       cosign verify --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       rm /workspace/source/image.tar /workspace/source/scanresults.txt /workspace/source/docker-credential-gcr /workspace/source/docker-credential-ecr-login /workspace/source/docker-credential-acr-env
