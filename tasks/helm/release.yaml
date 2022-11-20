@@ -77,7 +77,7 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
             mkdir -p /workspace/source/.config/helm/registry
-            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /workspace/source/.config/helm/registry/config.json
+            cp /tekton/creds/.docker/config.json /workspace/source/.config/helm/registry/config.json
 
             jx gitops helm release --no-oci-login --use-helm-plugin
 

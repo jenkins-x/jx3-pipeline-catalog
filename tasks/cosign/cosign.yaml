@@ -16,7 +16,7 @@ spec:
             #!/busybox/sh
             source .jx/variables.sh
 
-            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
+            cp /tekton/creds/.docker/config.json ~/.docker/config.json
             cosign sign -key /cosign/cosign.key $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
           env:
           - name: COSIGN_PASSWORD

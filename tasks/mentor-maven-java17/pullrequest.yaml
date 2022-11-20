@@ -71,7 +71,7 @@ spec:
           script: |
             #!/busybox/sh
             source .jx/variables.sh
-            cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson /kaniko/.docker/config.json
+            cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
           name: ""
