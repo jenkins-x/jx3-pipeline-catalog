@@ -74,7 +74,7 @@ spec:
           name: promote-helm-release
           resources: {}
           script: |
-            #!/usr/bin/env sh
+            #!/usr/bin/env bash
             source .jx/variables.sh
             mkdir -p /workspace/source/.config/helm/registry
             cp /tekton/creds/.docker/config.json /workspace/source/.config/helm/registry/config.json
@@ -85,7 +85,7 @@ spec:
           name: promote-helm-release-oci
           resources: {}
           script: |
-            #!/usr/bin/env sh
+            #!/usr/bin/env bash
             source .jx/variables.sh
             export PATH=/root/.jx/plugins/bin/:$PATH
             jx-gitops helm build --use-helm-plugin --oci --no-oci-login --version $VERSION
