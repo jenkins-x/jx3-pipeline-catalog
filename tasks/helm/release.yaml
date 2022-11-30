@@ -81,7 +81,7 @@ spec:
 
             jx gitops helm release --no-oci-login --use-helm-plugin
 
-        - image: babadofar/jx-boot:3.8
+        - image: babadofar/jx-gitops:0.0.7
           name: promote-helm-release-oci
           resources: {}
           script: |
