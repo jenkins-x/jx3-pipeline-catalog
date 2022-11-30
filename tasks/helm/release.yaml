@@ -81,14 +81,15 @@ spec:
 
             jx gitops helm release --no-oci-login --use-helm-plugin
 
-        - image: babadofar/jx-boot:3.7.8f
+        - image: babadofar/jx-boot:3.8
           name: promote-helm-release-oci
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             export PATH=/root/.jx/plugins/bin/:$PATH
-            jx gitops helm release --no-oci-login --use-helm-plugin --oci --repo-url oci://523883733847.dkr.ecr.eu-west-1.amazonaws.com
+            jx-gitops helm build --use-helm-plugin --oci --no-oci-login --version $VERSION
+            jx-gitops helm release --use-helm-plugin --oci --no-oci-login --version $VERSION --repo-url $DOCKER_REGISTRY
 
         - image: ghcr.io/jenkins-x-plugins/jx-promote:0.4.6
           name: promote-jx-promote
