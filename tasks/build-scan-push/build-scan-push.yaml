@@ -22,7 +22,6 @@ spec:
     script: |
       #!/busybox/sh
       source .jx/variables.sh
-      cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
       cp /kaniko/docker-credential-gcr /workspace/source
       cp /kaniko/docker-credential-ecr-login /workspace/source
@@ -64,7 +63,7 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
@@ -72,7 +71,7 @@ spec:
     script: |
       #!/busybox/sh
       source .jx/variables.sh
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       cosign sign --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       cosign verify --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       rm /workspace/source/image.tar /workspace/source/scanresults.txt /workspace/source/docker-credential-gcr /workspace/source/docker-credential-ecr-login /workspace/source/docker-credential-acr-env
