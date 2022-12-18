@@ -67,7 +67,7 @@ spec:
             #!/bin/ash
             if [ -d "charts/$REPO_NAME" ]; then cd charts/$REPO_NAME
             helm-docs; else echo no charts; fi
-        - image: ghcr.io/jenkins-x/jx-changelog:0.5.0
+        - image: ghcr.io/jenkins-x/jx-changelog:0.5.1
           name: changelog
           resources: {}
           script: |
