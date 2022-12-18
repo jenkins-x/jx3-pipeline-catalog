@@ -22,7 +22,6 @@ spec:
     script: |
       #!/busybox/sh
       source .jx/variables.sh
-      cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar
       cp /kaniko/docker-credential-gcr /workspace/source
       cp /kaniko/docker-credential-ecr-login /workspace/source
@@ -34,7 +33,7 @@ spec:
       #!/bin/sh
       mkdir -p ~/.cache/trivy/db
       mv /trivydb/* ~/.cache/trivy/db/
-  - image: aquasec/trivy:0.28.0
+  - image: aquasec/trivy:0.35.0
     name: vulnscan
     resources: {}
     script: |
@@ -46,13 +45,16 @@ spec:
       #!/bin/bash
       source .jx/variables.sh
       cat /workspace/source/scanresults.txt
-      jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
-      if egrep -ri 'HIGH|CRITICAL' /workspace/source/scanresults.txt | grep -v 'Total'
+      if [[ -n "$PULL_NUMBER" ]]
       then
-      echo "Vulnerabilities found!"
-      exit 1
+        jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
+      fi
+      if egrep -i "${SCAN_VULNERABILITY_REGEXP:-HIGH|CRITICAL}" /workspace/source/scanresults.txt | grep -qv Total
+      then
+        echo "Vulnerabilities found!"
+        exit 1
       else
-      echo "No vulnerabilities found."
+        echo "No vulnerabilities found."
       fi
   - image: gcr.io/go-containerregistry/crane/debug:59b5c06eb64f0b6500bd94d71b473adf6079e444
     name: push-container
@@ -61,7 +63,7 @@ spec:
       #!/busybox/sh
       source .jx/variables.sh
       export PATH=/workspace/source:$PATH
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       crane push /workspace/source/image.tar $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
   - image: ghcr.io/jenkins-x/cosign:v0.3.1-0.0.3
     name: sign-and-push-signature-and-cleanup
@@ -69,7 +71,7 @@ spec:
     script: |
       #!/busybox/sh
       source .jx/variables.sh
-      cp /tekton/creds/.docker/config.json ~/.docker/config.json
+      cp /tekton/creds-secrets/tekton-container-registry-auth/.dockerconfigjson ~/.docker/config.json
       cosign sign --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       cosign verify --key k8s://jx/cosign $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
       rm /workspace/source/image.tar /workspace/source/scanresults.txt /workspace/source/docker-credential-gcr /workspace/source/docker-credential-ecr-login /workspace/source/docker-credential-acr-env
