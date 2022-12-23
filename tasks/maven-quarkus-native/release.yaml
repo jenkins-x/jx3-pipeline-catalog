@@ -98,7 +98,7 @@ spec:
             jx gitops yset -p 'image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
             else echo no charts; fi
 
-            jx changelog create --version v${VERSION}
+            jx changelog create --version v${VERSION} --output-markdown ../changelog.md
 
             git add * || true
             git commit -a -m "chore: release $VERSION" --allow-empty
@@ -117,7 +117,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
-            jx promote -b --all --timeout 1h --no-poll
+            jx promote -b --all --timeout 1h --no-poll --add-changelog ../changelog.md
         volumes:
         - name: maven-settings
           secret:
