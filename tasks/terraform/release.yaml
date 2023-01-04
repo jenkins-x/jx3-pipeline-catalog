@@ -58,7 +58,7 @@ spec:
             terraform init
             terraform version
             terraform validate
-        - image: ghcr.io/jenkins-x/jx-changelog:0.7.1
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.30
           name: changelog
           resources: {}
           script: |
