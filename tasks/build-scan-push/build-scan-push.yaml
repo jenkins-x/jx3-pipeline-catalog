@@ -44,7 +44,7 @@ spec:
     name: vulnscan
     resources: {}
     script: |
-      trivy image --security-checks vuln --skip-update --debug --input /workspace/source/image.tar > /workspace/source/scanresults.txt
+      trivy image --skip-update --debug --input /workspace/source/image.tar > /workspace/source/scanresults.txt
   - image: ghcr.io/jenkins-x/jx-boot:3.10.12
     name: analyze
     resources: {}
