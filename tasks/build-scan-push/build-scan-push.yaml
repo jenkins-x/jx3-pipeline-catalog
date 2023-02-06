@@ -13,6 +13,8 @@ spec:
       value: "true"
     - name: AWS_ECR_DISABLE_CACHE
       value: "true"
+    - name: SCAN_VULNERABILITY_REGEXP
+      value: "CRITICAL"
     envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
