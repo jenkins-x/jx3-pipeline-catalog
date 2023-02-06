@@ -1,7 +1,6 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  creationTimestamp: null
   name: build-scan-push
 spec:
   stepTemplate:
@@ -14,6 +13,8 @@ spec:
       value: "true"
     - name: AWS_ECR_DISABLE_CACHE
       value: "true"
+    - name: SCAN_VULNERABILITY_REGEXP
+      value: "CRITICAL"
     envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
@@ -28,7 +29,6 @@ spec:
     script: |
       #!/busybox/sh
       source .jx/variables.sh
-      cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
       /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION --no-push --tarPath image.tar --image-fs-extract-retry 3
       cp /kaniko/docker-credential-gcr /workspace/source
       cp /kaniko/docker-credential-ecr-login /workspace/source
@@ -40,25 +40,28 @@ spec:
       #!/bin/sh
       mkdir -p ~/.cache/trivy/db
       mv /trivydb/* ~/.cache/trivy/db/
-  - image: aquasec/trivy:0.32.1
+  - image: aquasec/trivy:0.37.1
     name: vulnscan
     resources: {}
     script: |
-      trivy image --offline-scan --skip-update --debug --input /workspace/source/image.tar > /workspace/source/scanresults.txt
-  - image: ghcr.io/jenkins-x/jx-boot:3.10.12
+      trivy image --skip-update --input /workspace/source/image.tar > /workspace/source/scanresults.txt
+  - image: ghcr.io/jenkins-x/jx-boot:3.10.45
     name: analyze
     resources: {}
     script: |
       #!/bin/bash
       source .jx/variables.sh
       cat /workspace/source/scanresults.txt
-      jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
-      if egrep -r 'CRITICAL' /workspace/source/scanresults.txt | grep -v 'Total'
+      if [[ -n "$PULL_NUMBER" ]]
       then
-      echo "Vulnerabilities found!"
-      exit 1
+        jx gitops pr comment -c "\`\`\`  $(< /workspace/source/scanresults.txt)  \`\`\`"
+      fi
+      if egrep -i "${SCAN_VULNERABILITY_REGEXP:-HIGH|CRITICAL}" /workspace/source/scanresults.txt | grep -qv Total
+      then
+        echo "Vulnerabilities found!"
+        exit 1
       else
-      echo "No vulnerabilities found."
+        echo "No vulnerabilities found."
       fi
   - image: gcr.io/go-containerregistry/crane/debug:59b5c06eb64f0b6500bd94d71b473adf6079e444
     name: push-container
