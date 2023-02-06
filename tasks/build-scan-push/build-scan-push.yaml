@@ -1,7 +1,6 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  creationTimestamp: null
   name: build-scan-push
 spec:
   stepTemplate:

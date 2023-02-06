@@ -24,6 +24,9 @@ spec:
         - name: build-set-version
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-sonar/pullrequest.yaml@HEAD
           name: sonarscan
+
+        - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/maven-sonar/pullrequest.yaml@HEAD
+          name: sonar-quality-gate
         - name: check-registry
         - image: uses:Mentor-Medier/jx3-pipeline-catalog/tasks/build-scan-push/build-scan-push.yaml@HEAD
           name: ""
