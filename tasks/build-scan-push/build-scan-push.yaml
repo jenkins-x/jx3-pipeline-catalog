@@ -13,6 +13,8 @@ spec:
       value: "true"
     - name: AWS_ECR_DISABLE_CACHE
       value: "true"
+    - name: SCAN_VULNERABILITY_REGEXP
+      value: "CRITICAL"
     envFrom:
     - secretRef:
         name: jx-boot-job-env-vars
@@ -41,8 +43,7 @@ spec:
 
       mkdir -p ~/.cache/trivy/db
       mv /trivydb/* ~/.cache/trivy/db/
-
-  - image: aquasec/trivy:0.35.0
+  - image: aquasec/trivy:0.37.1
     name: vulnscan
     resources: {}
     script: |
