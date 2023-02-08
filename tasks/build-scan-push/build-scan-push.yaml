@@ -31,13 +31,17 @@ spec:
       cp /kaniko/docker-credential-gcr /workspace/source
       cp /kaniko/docker-credential-ecr-login /workspace/source
       cp /kaniko/docker-credential-acr-env /workspace/source
-  - image: ghcr.io/jenkins-x/trivydb:latest
+  - image: babadofar/trivy-db:1
     name: copy-vulns-db
     resources: {}
     script: |
       #!/bin/sh
+      mkdir -p ~/.cache/trivy/java-db
+      mv /trivydb/java-db/* ~/.cache/trivy/java-db/
+
       mkdir -p ~/.cache/trivy/db
       mv /trivydb/* ~/.cache/trivy/db/
+
   - image: aquasec/trivy:0.35.0
     name: vulnscan
     resources: {}
