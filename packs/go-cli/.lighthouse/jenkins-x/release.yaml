@@ -29,7 +29,7 @@ spec:
             requests:
               cpu: 400m
               memory: 600Mi
-        - name: build-make-build
+        - name: upload-binaries
           resources: {}
         - name: check-registry
           resources: {}
