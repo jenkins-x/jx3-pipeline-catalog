@@ -119,7 +119,7 @@ spec:
           - pr
           - --add-changelog
           - changelog.md
-          image: ghcr.io/jenkins-x/jx-updatebot:0.4.1
+          image: ghcr.io/jenkins-x/jx-updatebot:0.4.5
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
