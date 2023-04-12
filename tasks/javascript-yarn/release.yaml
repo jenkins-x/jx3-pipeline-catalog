@@ -56,17 +56,17 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
         - image: node:14-slim
-          name: build-npm-install
+          name: build-yarn-install
           resources: {}
           script: |
             #!/bin/sh
-            npm install
+            yarn install
         - image: node:14-slim
-          name: build-npm-test
+          name: build-yarn-test
           resources: {}
           script: |
             #!/bin/sh
-            CI=true DISPLAY=:99 npm test
+            CI=true DISPLAY=:99 yarn test
         - image: ghcr.io/jenkins-x/jx-registry:0.1.10
           name: check-registry
           resources: {}
