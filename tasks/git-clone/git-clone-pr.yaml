@@ -30,7 +30,7 @@ spec:
       git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
       git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}
       git config --global credential.helper store
-      git clone --depth 1 $REPO_URL $SUBDIR
+      git clone $REPO_URL $SUBDIR
       cd $SUBDIR
       git fetch origin $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
       git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
