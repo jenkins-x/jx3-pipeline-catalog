@@ -1,0 +1,80 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: pullrequest
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: NPM_CONFIG_USERCONFIG
+            value: /tekton/home/npm/.npmrc
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            limits: {}
+          volumeMounts:
+          - mountPath: /tekton/home/npm
+            name: npmrc
+          workingDir: /workspace/source
+        steps:
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.83
+          name: jx-variables
+          resources:
+            # set requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+            jx gitops pr variables
+        - image: node:14-slim
+          name: build-yarn-install
+          resources: {}
+          script: |
+            #!/bin/sh
+            yarn install
+        - image: node:14-slim
+          name: build-yarn-test
+          resources: {}
+          script: |
+            #!/bin/sh
+            CI=true DISPLAY=:99 yarn test
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.10
+          name: check-registry
+          resources: {}
+        - image: gcr.io/kaniko-project/executor:v1.9.1-debug
+          name: build-container-build
+          resources: {}
+          script: |
+            #!/busybox/sh
+            source .jx/variables.sh
+            cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
+            /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+        - image: ghcr.io/jenkins-x-plugins/jx-preview:0.0.240
+          name: promote-jx-preview
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx preview create
+        volumes:
+        - name: npmrc
+          secret:
+            optional: true
+            secretName: npmrc
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
