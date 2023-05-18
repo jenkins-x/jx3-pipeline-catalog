@@ -1,0 +1,134 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  creationTimestamp: null
+  name: release
+spec:
+  pipelineSpec:
+    tasks:
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: HOME
+            value: /tekton/home
+          envFrom:
+          - secretRef:
+              name: jx-boot-job-env-vars
+              optional: true
+          name: ""
+          resources:
+            requests:
+              cpu: 400m
+              memory: 600Mi
+          workingDir: /workspace/source
+        steps:
+        - env:
+          - name: GIT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: tekton-git
+          - name: GIT_USER
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: tekton-git
+          image: ghcr.io/jenkins-x/jx-release-version:2.5.1
+          name: next-version
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx-release-version --tag > VERSION
+        - image: ghcr.io/jenkins-x/jx-boot:3.2.250
+          name: jx-variables
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            jx gitops variables
+        - image: golang:1.15
+          name: build-make-build
+          resources: {}
+          script: |
+            #!/bin/sh
+            make build
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.1
+          name: check-registry
+          resources: {}
+        - image: gcr.io/cloud-builders/gcloud
+          name: build-container-build
+          resources: {}
+          script: |
+            #!/bin/bash
+
+            source .jx/variables.sh
+            ROOT_DIR="Dockerfiles"
+            source_folders=("pkg" "cmd")
+            source_files=("go.mod" "go.sum")
+
+            for SERVICE_DIR in "$ROOT_DIR"/*/
+            do
+                APP_NAME=$(basename "$SERVICE_DIR")
+                DOCKERFILE_PATH="${SERVICE_DIR}Dockerfile"
+
+                for folder in "${source_folders[@]}"; do
+                    cp -r "$folder" $SERVICE_DIR
+                done
+                for file in "${source_files[@]}"; do
+                    cp "$file" $SERVICE_DIR
+                done
+                sleep 5
+
+                echo $SERVICE_DIR
+                PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
+                sleep 10                
+                for folder in "${source_folders[@]}"; do
+                    rm -rf "$SERVICE_DIR/$folder"
+                done
+                for file in "${source_files[@]}"; do
+                    rm "$SERVICE_DIR/$file"
+                done
+            done
+
+        - image: ghcr.io/jenkins-x/jx-changelog:0.1.3
+          name: promote-changelog
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+
+            if [ -d "charts/$REPO_NAME" ]; then
+            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^version:.*$/version: $VERSION/"
+            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^appVersion:.*$/appVersion: $VERSION/"
+            jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
+            find * -type f -name 'values.yaml' | xargs sed -i "s/^  tag:.*$/  tag: $VERSION/"
+            else echo no charts; fi
+
+            git add * || true
+            git commit -a -m "chore: release $VERSION" --allow-empty
+            git tag -fa v$VERSION -m "Release version $VERSION"
+            git push --force origin v$VERSION
+
+            jx changelog create --version v${VERSION}
+        - image: gcr.io/prodoscore-clusters/jx-gitops:0.0.0-PR-3-2-SNAPSHOT
+          name: promote-helm-release
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            gcloud auth configure-docker us-docker.pkg.dev --quiet 
+            export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
+            jx gitops helm release --no-oci-login --oci
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.2.0
+          name: promote-jx-promote
+          resources: {}
+          script: |
+            #!/usr/bin/env sh
+            source .jx/variables.sh
+            jx promote -b --all --timeout 1h --no-poll
+  podTemplate: {}
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
+status: {}
