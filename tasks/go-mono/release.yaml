@@ -65,14 +65,33 @@ spec:
 
             source .jx/variables.sh
             ROOT_DIR="Dockerfiles"
+            source_folders=("pkg" "cmd")
+            source_files=("go.mod" "go.sum")
 
             for SERVICE_DIR in "$ROOT_DIR"/*/
             do
-              APP_NAME=$(basename "$SERVICE_DIR")
-              DOCKERFILE_PATH="${SERVICE_DIR}Dockerfile"
+                APP_NAME=$(basename "$SERVICE_DIR")
+                DOCKERFILE_PATH="${SERVICE_DIR}Dockerfile"
 
-              PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
+                for folder in "${source_folders[@]}"; do
+                    cp -r "$folder" $SERVICE_DIR
+                done
+                for file in "${source_files[@]}"; do
+                    cp "$file" $SERVICE_DIR
+                done
+                sleep 5
+
+                echo $SERVICE_DIR
+                PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
+                sleep 10                
+                for folder in "${source_folders[@]}"; do
+                    rm -rf "$SERVICE_DIR/$folder"
+                done
+                for file in "${source_files[@]}"; do
+                    rm "$SERVICE_DIR/$file"
+                done
             done
+
         - image: ghcr.io/jenkins-x/jx-changelog:0.1.3
           name: promote-changelog
           resources: {}
@@ -81,10 +100,10 @@ spec:
             source .jx/variables.sh
 
             if [ -d "charts/$REPO_NAME" ]; then
-            jx gitops yset -p version -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
-            jx gitops yset -p appVersion -v "$VERSION" -f ./charts/$REPO_NAME/Chart.yaml
+            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^version:.*$/version: $VERSION/"
+            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^appVersion:.*$/appVersion: $VERSION/"
             jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
-            jx gitops yset -p 'image.tag' -v "$VERSION" -f ./charts/$REPO_NAME/values.yaml;
+            find * -type f -name 'values.yaml' | xargs sed -i "s/^  tag:.*$/  tag: $VERSION/"
             else echo no charts; fi
 
             git add * || true

@@ -58,8 +58,35 @@ spec:
           resources: {}
           script: |
             #!/bin/bash
+
             source .jx/variables.sh
-            PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
+            ROOT_DIR="Dockerfiles"
+            source_folders=("pkg" "cmd")
+            source_files=("go.mod" "go.sum")
+
+            for SERVICE_DIR in "$ROOT_DIR"/*/
+            do
+                APP_NAME=$(basename "$SERVICE_DIR")
+                DOCKERFILE_PATH="${SERVICE_DIR}Dockerfile"
+
+                for folder in "${source_folders[@]}"; do
+                    cp -r "$folder" $SERVICE_DIR
+                done
+                for file in "${source_files[@]}"; do
+                    cp "$file" $SERVICE_DIR
+                done
+                sleep 5
+
+                echo $SERVICE_DIR
+                PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
+                sleep 10                
+                for folder in "${source_folders[@]}"; do
+                    rm -rf "$SERVICE_DIR/$folder"
+                done
+                for file in "${source_files[@]}"; do
+                    rm "$SERVICE_DIR/$file"
+                done
+            done
         - image: gcr.io/prodoscore-clusters/jx-gitops:0.0.0-PR-3-2-SNAPSHOT
           name: promote-helm-release
           resources: {}
