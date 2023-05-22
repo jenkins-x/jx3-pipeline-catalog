@@ -81,7 +81,6 @@ spec:
                 done
                 sleep 5
 
-                echo $SERVICE_DIR
                 PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
                 sleep 10                
                 for folder in "${source_folders[@]}"; do
@@ -91,7 +90,6 @@ spec:
                     rm "$SERVICE_DIR/$file"
                 done
             done
-
         - image: ghcr.io/jenkins-x/jx-changelog:0.1.3
           name: promote-changelog
           resources: {}
@@ -99,12 +97,31 @@ spec:
             #!/usr/bin/env sh
             source .jx/variables.sh
 
-            if [ -d "charts/$REPO_NAME" ]; then
-            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^version:.*$/version: $VERSION/"
-            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^appVersion:.*$/appVersion: $VERSION/"
-            jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
-            find * -type f -name 'values.yaml' | xargs sed -i "s/^  tag:.*$/  tag: $VERSION/"
-            else echo no charts; fi
+            ROOT_DIR="Dockerfiles"
+
+            for SERVICE_DIR in "$ROOT_DIR"/*/
+            do
+                APP_NAME=$(basename "$SERVICE_DIR")
+
+                # Take all app names to array
+                APP_NAMES+=("$APP_NAME")
+            done
+
+            for APP_NAME in "${APP_NAMES[@]}"; do
+                if [ -d "charts/$APP_NAME" ]; then
+                    cd "charts/$APP_NAME"
+                    echo "Updating chart for $APP_NAME"
+
+                    jx gitops yset -p version -v "$VERSION" -f ./Chart.yaml
+                    jx gitops yset -p appVersion -v "$VERSION" -f ./Chart.yaml
+                    jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./values.yaml
+                    jx gitops yset -p 'image.tag' -v "$VERSION" -f ./values.yaml;
+
+                    cd ../..
+                else
+                    echo "No charts for $APP_NAME"
+                fi
+            done
 
             git add * || true
             git commit -a -m "chore: release $VERSION" --allow-empty

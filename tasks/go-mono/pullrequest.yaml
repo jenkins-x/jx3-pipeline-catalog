@@ -77,7 +77,6 @@ spec:
                 done
                 sleep 5
 
-                echo $SERVICE_DIR
                 PYTHONUNBUFFERED=1 gcloud builds submit --region=us-central1 --tag $PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION "$SERVICE_DIR"
                 sleep 10                
                 for folder in "${source_folders[@]}"; do
@@ -91,21 +90,42 @@ spec:
           name: promote-helm-release
           resources: {}
           script: |
-            #!/usr/bin/env sh
+            #!/bin/bash
+
             source .jx/variables.sh
             gcloud auth configure-docker us-docker.pkg.dev --quiet 
             export HELM_REGISTRY_CONFIG=/tekton/home/.docker/config.json
             echo $VERSION > VERSION
-            echo "version is"
+            echo "version of new relese is"
+            echo "repo is- " ${REPO_NAME}
             echo ${VERSION}
 
-            
-            if [ -d "charts/$REPO_NAME" ]; then
-            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^version:.*$/version: $VERSION/"
-            find * -type f -name 'Chart.yaml' | xargs sed -i "s/^appVersion:.*$/appVersion: $VERSION/"
-            jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./charts/$REPO_NAME/values.yaml
-            find * -type f -name 'values.yaml' | xargs sed -i "s/^  tag:.*$/  tag: $VERSION/"
-            else echo no charts; fi
+            ROOT_DIR="Dockerfiles"
+
+            for SERVICE_DIR in "$ROOT_DIR"/*/
+            do
+                APP_NAME=$(basename "$SERVICE_DIR")
+
+                # Take all app names to array
+                APP_NAMES+=("$APP_NAME")
+            done
+
+            for APP_NAME in "${APP_NAMES[@]}"; do
+                if [ -d "charts/$APP_NAME" ]; then
+                    cd "charts/$APP_NAME"
+                    echo "Updating chart for $APP_NAME"
+
+                    jx gitops yset -p version -v "$VERSION" -f ./Chart.yaml
+                    jx gitops yset -p appVersion -v "$VERSION" -f ./Chart.yaml
+                    jx gitops yset -p 'image.repository' -v $DOCKER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME -f ./values.yaml
+                    jx gitops yset -p 'image.tag' -v "$VERSION" -f ./values.yaml;
+
+                    cd ../..
+                else
+                    echo "No charts for $APP_NAME"
+                fi
+            done
+
             jx gitops helm release --no-oci-login --oci
         - image: ghcr.io/jenkins-x/jx-boot:3.2.327
           name: comment-version
