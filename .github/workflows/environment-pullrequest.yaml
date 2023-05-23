@@ -6,6 +6,10 @@ on:
         type: string
       service_account:
         type: string
+      cluster_name:
+        type: string
+      cluster_location:
+        type: string
 env:
   GIT_AUTHOR_NAME: ${{ github.actor }}
   PULL_BASE_REF: ${{ github.base_ref }}
@@ -81,8 +85,8 @@ jobs:
       - id: "get-credentials"
         uses: "google-github-actions/get-gke-credentials@v1"
         with:
-          cluster_name: "development"
-          location: "us-central1"
+          cluster_name: ${{ inputs.cluster_name }}
+          location: ${{ inputs.cluster_location }}
           use_connect_gateway: "true"
       - uses: "docker/login-action@v1"
         with:
