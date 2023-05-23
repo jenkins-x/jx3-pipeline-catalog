@@ -1,0 +1,105 @@
+name: Verify Pipeline
+on:
+  workflow_call:
+    inputs:
+      workload_identity_provider:
+        type: string
+      service_account:
+        type: string
+env:
+  GIT_AUTHOR_NAME: ${{ github.actor }}
+  PULL_BASE_REF: ${{ github.base_ref }}
+  PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+  PULL_NUMBER: ${{ github.event.pull_request.number }}
+  PULL_PULL_REF: refs/pull/${{ github.event.pull_request.number }}/head
+  PULL_PULL_SHA: ${{ github.event.pull_request.head.sha }}
+  PULL_REFS: ${{ github.base_ref }}:${{ github.event.pull_request.base.sha }},${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.sha }}:refs/pull/${{ github.event.pull_request.number }}/head
+  JOB_NAME: "verify"
+  JOB_SPEC: "type:presubmit"
+  JOB_TYPE: "presubmit"
+  REPO_NAME: ${{ github.event.repository.name }}
+  REPO_OWNER: ${{ github.repository_owner }}
+  REPO_URL: https://github.com/${{ github.repository }}.git
+  JX_KUBERNETES: true
+  SOURCE_DIR: "${{ github.workspace }}/source"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Installing dependencies
+        run: |
+          curl -L https://github.com/rochana-atapattu/helmfile/releases/download/v0.1001.0/helmfile_0.1001.0_linux_amd64.tar.gz | tar xzv
+          chmod +x helmfile 
+          mv helmfile /usr/local/bin/helmfile
+
+          curl -L https://github.com/jenkins-x/jx/releases/download/v3.7.7/jx-linux-amd64.tar.gz | tar xzv
+          chmod +x jx 
+          mv jx /usr/local/bin
+      - uses: actions/checkout@v3
+        with:
+          path: "${{ github.workspace }}/source"
+      - run: |
+          git config --global --add safe.directory '*'
+      - name: git-clone
+        working-directory: "${{ github.workspace }}/source"
+        run: |
+          export SUBDIR="$PWD"
+          echo "git cloning url: $REPO_URL version $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
+          git fetch origin $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+          git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+          git reset --hard $PULL_PULL_SHA
+          echo "checked out revision: $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
+      - name: git-merge
+        working-directory: "${{ github.workspace }}/source"
+        run: |
+          counter=0
+          until [ "$counter" -eq 3 ]; do
+            # lets avoid git rebase/merge conflicts on promotions
+            jx gitops git merge --rebase --merge-arg "-Xtheirs" && exit 0
+            counter=$((counter+1))
+            git rebase --abort
+            if git log -1 --pretty=%B | grep -i regenerate; then
+              git reset --hard HEAD~1
+            fi
+          done
+          exit 1
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+      - id: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v1"
+        with:
+          cluster_name: "development"
+          location: "us-central1"
+          use_connect_gateway: "true"
+      - uses: "docker/login-action@v1"
+        with:
+          registry: "us-docker.pkg.dev" # or
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+      - uses: actions/cache@v3
+        with:
+          path: "${{ github.workspace }}/.cache"
+          key: ${{ runner.os }}-helmfile-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-helmfile-
+      - name: make-pr
+        if: github.event_name == 'pull_request'
+        working-directory: "${{ github.workspace }}/source"
+        run: make pr
+        env:
+          HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}

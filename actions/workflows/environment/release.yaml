@@ -1,0 +1,68 @@
+name: Apply Pipeline
+on:
+  workflow_call:
+    inputs:
+      workload_identity_provider:
+        type: string
+      service_account:
+        type: string
+env:
+  JX_KUBERNETES: true
+  SOURCE_DIR: "${{ github.workspace }}/source"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Installing dependencies
+        run: |
+          curl -L https://github.com/rochana-atapattu/helmfile/releases/download/v0.1001.0/helmfile_0.1001.0_linux_amd64.tar.gz | tar xzv
+          chmod +x helmfile 
+          mv helmfile /usr/local/bin/helmfile
+
+          curl -L https://github.com/jenkins-x/jx/releases/download/v3.7.7/jx-linux-amd64.tar.gz | tar xzv
+          chmod +x jx 
+          mv jx /usr/local/bin
+      - uses: actions/checkout@v3
+        with:
+          path: "${{ github.workspace }}/source"
+      - run: |
+          git config --global --add safe.directory '*'
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+      - id: "get-credentials"
+        uses: "google-github-actions/get-gke-credentials@v1"
+        with:
+          cluster_name: "development"
+          location: "us-central1"
+          use_connect_gateway: "true"
+      - uses: "docker/login-action@v1"
+        with:
+          registry: "us-docker.pkg.dev" # or REGION-docker.pkg.dev
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+      - uses: actions/cache@v3
+        with:
+          path: "${{ github.workspace }}/.cache"
+          key: ${{ runner.os }}-helmfile-${{ github.run_id }}
+          restore-keys: |
+            ${{ runner.os }}-helmfile-
+      - name: make-apply
+        working-directory: "${{ github.workspace }}/source"
+        run: make apply
+        env:
+          HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
