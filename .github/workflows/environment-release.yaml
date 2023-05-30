@@ -10,6 +10,12 @@ on:
         type: string
       cluster_location:
         type: string
+      bot_user:
+        type: string
+    secrets:
+      BOT_TOKEN:
+        description: "Bot token"
+        required: true
 env:
   JX_KUBERNETES: true
   SOURCE_DIR: "${{ github.workspace }}/source"
@@ -68,5 +74,5 @@ jobs:
         run: make apply
         env:
           HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_ACTOR: ${{ inputs.bot_user }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
