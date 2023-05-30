@@ -10,14 +10,14 @@ on:
         type: string
       cluster_location:
         type: string
-      bot_user:
+      BOT_USER:
         type: string
     secrets:
       BOT_TOKEN:
         description: "Bot token"
         required: true
 env:
-  GIT_AUTHOR_NAME: ${{ inputs.bot_user }}
+  GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
   PULL_BASE_REF: ${{ github.base_ref }}
   PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
   PULL_NUMBER: ${{ github.event.pull_request.number }}
@@ -111,5 +111,5 @@ jobs:
         run: make pr
         env:
           HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
-          GITHUB_ACTOR: ${{ inputs.bot_user }}
+          GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
