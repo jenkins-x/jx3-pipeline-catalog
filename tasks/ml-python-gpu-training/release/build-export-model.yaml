@@ -1,0 +1,125 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: build-export-model
+spec:
+  params:
+  - description: The unique build number
+    name: BUILD_ID
+    type: string
+  - description: The fileName of the job which is the trigger context fileName
+    name: JOB_NAME
+    type: string
+  - description: The specification of the job
+    name: JOB_SPEC
+    type: string
+  - description: 'The kind of the job: postsubmit or presubmit'
+    name: JOB_TYPE
+    type: string
+  - description: The base git reference of the pull request
+    name: PULL_BASE_REF
+    type: string
+  - description: The git sha of the base of the pull request
+    name: PULL_BASE_SHA
+    type: string
+  - default: ""
+    description: The git pull request number
+    name: PULL_NUMBER
+    type: string
+  - default: ""
+    description: The git pull request ref in the form 'refs/pull/$PULL_NUMBER/head'
+    name: PULL_PULL_REF
+    type: string
+  - description: The git pull reference strings of base and latest in the form 'master:$PULL_BASE_SHA,$PULL_NUMBER:$PULL_PULL_SHA:refs/pull/$PULL_NUMBER/head'
+    name: PULL_PULL_SHA
+    type: string
+  - description: The git pull reference strings of base and latest in the form 'master:$PULL_BASE_SHA,$PULL_NUMBER:$PULL_PULL_SHA:refs/pull/$PULL_NUMBER/head'
+    name: PULL_REFS
+    type: string
+  - description: The git repository fileName
+    name: REPO_NAME
+    type: string
+  - description: The git repository owner (user or organisation)
+    name: REPO_OWNER
+    type: string
+  - description: The URL of the git repo to clone
+    name: REPO_URL
+    type: string
+  stepTemplate:
+    env:
+    - name: BUILD_ID
+      value: $(params.BUILD_ID)
+    - name: JOB_NAME
+      value: $(params.JOB_NAME)
+    - name: JOB_SPEC
+      value: $(params.JOB_SPEC)
+    - name: JOB_TYPE
+      value: $(params.JOB_TYPE)
+    - name: PULL_BASE_REF
+      value: $(params.PULL_BASE_REF)
+    - name: PULL_BASE_SHA
+      value: $(params.PULL_BASE_SHA)
+    - name: PULL_NUMBER
+      value: $(params.PULL_NUMBER)
+    - name: PULL_PULL_REF
+      value: $(params.PULL_PULL_REF)
+    - name: PULL_PULL_SHA
+      value: $(params.PULL_PULL_SHA)
+    - name: PULL_REFS
+      value: $(params.PULL_REFS)
+    - name: REPO_NAME
+      value: $(params.REPO_NAME)
+    - name: REPO_OWNER
+      value: $(params.REPO_OWNER)
+    - name: REPO_URL
+      value: $(params.REPO_URL)
+    - name: HOME
+      value: /workspace
+    envFrom:
+    - secretRef:
+        name: jx-boot-job-env-vars
+        optional: true
+    name: ""
+    resources: {}
+    workingDir: /workspace/source
+  steps:
+  - env:
+    - name: GIT_TOKEN
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: tekton-git
+    - name: GIT_USER
+      valueFrom:
+        secretKeyRef:
+          key: username
+          name: tekton-git
+    image: ghcr.io/jenkins-x/jx-boot:3.10.87
+    name: build-export-model
+    resources: {}
+    script: |+
+      #!/usr/bin/env sh
+      source .jx/variables.sh
+      export TARGET_SERVICE=`echo $REPO_NAME | sed -Ee s/-training$/-service/`
+      export GIT_PROVIDER=`echo $REPO_URL | grep -oE '(^https?:\/\/[a-zA-Z\d\-\.]+)'`
+      export TARGET_SERVICE_REPO=`echo $GIT_PROVIDER/$REPO_OWNER/$TARGET_SERVICE`
+      export TARGET_BRANCH=`echo sync-$VERSION`
+      echo "Deploying model to ${TARGET_SERVICE_REPO}"
+      git clone $TARGET_SERVICE_REPO
+      cd $TARGET_SERVICE
+      git checkout $TARGET_BRANCH || git checkout -b $TARGET_BRANCH
+      git lfs install
+      git lfs track '*.onnx'
+      \cp ../*.onnx .
+      git add *.onnx
+      git commit -m "New model trained from ${GIT_PROVIDER}/${REPO_OWNER}/${REPO_NAME}/commit/${PULL_BASE_SHA}"
+      git push --set-upstream origin $TARGET_BRANCH
+      { jx project pullrequest --title 'New model trained' --body "Exported from training version ${GIT_PROVIDER}/${REPO_OWNER}/${REPO_NAME}/commit/${PULL_BASE_SHA}" || echo 'Using previous PR'; }
+      sha1sum *.onnx >&2
+
+  workspaces:
+  - description: The workspace used to store the cloned git repository and the generated
+      files
+    mountPath: /workspace
+    name: output

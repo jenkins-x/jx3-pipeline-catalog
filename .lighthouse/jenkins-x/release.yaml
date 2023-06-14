@@ -6,31 +6,75 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
-      resources: {}
+    - name: git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: next-version
+      runAfter:
+      - git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/release/next-version.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - next-version
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/release/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-changelog
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/release/promote-changelog.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-pullrequest
+      runAfter:
+      - promote-changelog
       taskSpec:
         metadata: {}
+        spec: null
         stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@versionStream
           name: ""
-          resources:
-            # override limits for all containers here
-            limits: {}
+          resources: {}
           workingDir: /workspace/source
         steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: next-version
-          resources: {}
-        - name: jx-variables
-          resources:
-            # override requests for the pod here
-            requests:
-              cpu: 400m
-              memory: 600Mi
-        - name: promote-changelog
-          resources: {}
         - image: ghcr.io/jenkins-x/jx-boot:3.10.87
           name: promote-pullrequest
           resources: {}
@@ -45,7 +89,25 @@ spec:
             git add * || true
             git commit -a -m "chore: upgrade environment pull request to $PULL_BASE_SHA" --allow-empty
             git push
-  podTemplate: {}
+        workspaces:
+        - description: The workspace used to store the cloned git repository and the
+            generated files
+          mountPath: /workspace
+          name: output
+    workspaces:
+    - name: pipeline-ws
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
+  workspaces:
+  - name: pipeline-ws
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 328761Ki
+      status: {}
 status: {}
