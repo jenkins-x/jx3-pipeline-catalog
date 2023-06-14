@@ -6,24 +6,63 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/charts/pullrequest.yaml@versionStream
-          name: ""
-          resources: {}
-          workingDir: /workspace/source
-        steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: jx-variables
-          resources: {}
-        - name: build-build
-          resources: {}
-  podTemplate: {}
+    - name: git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone-pr.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/charts/pullrequest/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-build
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/charts/pullrequest/build-build.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    workspaces:
+    - name: pipeline-ws
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
+  workspaces:
+  - name: pipeline-ws
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 328761Ki
+      status: {}
 status: {}

@@ -4,65 +4,65 @@ metadata:
   creationTimestamp: null
   name: lint
 spec:
+  pipelineSpec:
+    tasks:
+    - name: git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone-pr.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/lookml/lint/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-lookml-lint
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/lookml/lint/build-lookml-lint.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    workspaces:
+    - name: pipeline-ws
+  serviceAccountName: tekton-bot
+  timeout: 12h0m0s
   workspaces:
-  - name: output
+  - name: pipeline-ws
     volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
       spec:
         accessModes:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
-  pipelineSpec:
-    tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/lookml/lint.yaml@versionStream
-          name: ""
-          resources:
-            # override limits for all containers here
-            limits: {}
-          workingDir: $(workspaces.output.path)/source
-        steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: jx-variables
-          resources:
-            # override requests for the pod here
-            requests:
-              cpu: 400m
-              memory: 512Mi
-        - name: build-lookml-lint
-          resources: {}
-    finally:
-    - name: lookml-lint-pr-comment
-      workspaces:
-      - name: output
-        workspace: output
-      taskSpec:
-        workspaces:
-          - name: output
-            mountPath: /workspace
-        metadata: {}
-        stepTemplate:
-          env:
-          - name: HOME
-            value: /tekton/home
-          name: ""
-          workingDir: $(workspaces.output.path)/source
-        steps:
-        - name: lookml-lint-pr-comment
-          image: ghcr.io/jenkins-x/jx-gitops:0.3.1
-          script: |
-            #!/bin/sh
-            set -x
-            . .jx/variables.sh
-            jx gitops pr comment -c "$(cat issues.md)"
-  podTemplate: {}
-  serviceAccountName: tekton-bot
-  timeout: 12h0m0s
+            storage: 328761Ki
+      status: {}
 status: {}

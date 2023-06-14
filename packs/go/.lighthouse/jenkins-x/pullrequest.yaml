@@ -6,36 +6,108 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/pullrequest.yaml@versionStream
-          name: ""
-          resources:
-            # override limits for all containers here
-            limits: {}
-          workingDir: /workspace/source
-        steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: jx-variables
-          resources:
-            # override requests for the pod here
-            requests:
-              cpu: 400m
-              memory: 600Mi
-        - name: build-make-linux
-          resources: {}
-        - name: check-registry
-          resources: {}
-        - name: build-container-build
-          resources: {}
-        - name: promote-jx-preview
-          resources: {}
-  podTemplate: {}
+    - name: git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone-pr.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - git-clone-pr
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/pullrequest/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-make-linux
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/pullrequest/build-make-linux.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: check-registry
+      runAfter:
+      - build-make-linux
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/pullrequest/check-registry.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-container-build
+      runAfter:
+      - check-registry
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/pullrequest/build-container-build.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-jx-preview
+      runAfter:
+      - build-container-build
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/go/pullrequest/promote-jx-preview.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    workspaces:
+    - name: pipeline-ws
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
+  workspaces:
+  - name: pipeline-ws
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 328761Ki
+      status: {}
 status: {}

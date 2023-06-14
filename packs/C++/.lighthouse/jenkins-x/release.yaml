@@ -6,38 +6,168 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/C++/release.yaml@versionStream
-          name: ""
-          resources: {}
-          workingDir: /workspace/source
-        steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: next-version
-          resources: {}
-        - name: jx-variables
-          resources: {}
-        - name: build-cmake
-          resources: {}
-        - name: build-make
-          resources: {}
-        - name: check-registry
-          resources: {}
-        - name: build-container-build
-          resources: {}
-        - name: promote-changelog
-          resources: {}
-        - name: promote-helm-release
-          resources: {}
-        - name: promote-jx-promote
-          resources: {}
-  podTemplate: {}
+    - name: git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: next-version
+      runAfter:
+      - git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/next-version.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - next-version
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-cmake
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/build-cmake.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-make
+      runAfter:
+      - build-cmake
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/build-make.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: check-registry
+      runAfter:
+      - build-make
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/check-registry.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: build-container-build
+      runAfter:
+      - check-registry
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/build-container-build.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-changelog
+      runAfter:
+      - build-container-build
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/promote-changelog.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-helm-release
+      runAfter:
+      - promote-changelog
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/promote-helm-release.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote-jx-promote
+      runAfter:
+      - promote-helm-release
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/C++/release/promote-jx-promote.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    workspaces:
+    - name: pipeline-ws
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
+  workspaces:
+  - name: pipeline-ws
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 328761Ki
+      status: {}
 status: {}

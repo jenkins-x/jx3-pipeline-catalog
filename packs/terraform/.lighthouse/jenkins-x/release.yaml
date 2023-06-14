@@ -6,36 +6,108 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: from-build-pack
-      resources: {}
-      taskSpec:
-        metadata: {}
-        stepTemplate:
-          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/terraform/release.yaml@versionStream
-          name: ""
-          resources:
-            # override limits for all containers here
-            limits: {}
-          workingDir: /workspace/source
-        steps:
-        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
-          name: ""
-          resources: {}
-        - name: next-version
-          resources: {}
-        - name: jx-variables
-          resources:
-            # override requests for the pod here
-            requests:
-              cpu: 400m
-              memory: 600Mi
-        - name: lint
-          resources: {}
-        - name: changelog
-          resources: {}
-        - name: promote
-          resources: {}
-  podTemplate: {}
+    - name: git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/git-clone/git-clone.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: next-version
+      runAfter:
+      - git-clone
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/terraform/release/next-version.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: jx-variables
+      runAfter:
+      - next-version
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/terraform/release/jx-variables.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: lint
+      runAfter:
+      - jx-variables
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/terraform/release/lint.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: changelog
+      runAfter:
+      - lint
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/terraform/release/changelog.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    - name: promote
+      runAfter:
+      - changelog
+      taskRef:
+        params:
+        - name: url
+          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+        - name: revision
+          value: versionStream
+        - name: pathInRepo
+          value: tasks/terraform/release/promote.yaml
+        resolver: git
+      workspaces:
+      - name: output
+        workspace: pipeline-ws
+    workspaces:
+    - name: pipeline-ws
   serviceAccountName: tekton-bot
   timeout: 240h0m0s
+  workspaces:
+  - name: pipeline-ws
+    volumeClaimTemplate:
+      metadata:
+        creationTimestamp: null
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 328761Ki
+      status: {}
 status: {}
