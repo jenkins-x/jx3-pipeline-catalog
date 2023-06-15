@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   creationTimestamp: null
-  name: environment
+  name: kubetest-environment
 spec:
   params:
   - description: The unique build number
