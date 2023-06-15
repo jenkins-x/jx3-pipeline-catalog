@@ -98,11 +98,13 @@ spec:
         secretKeyRef:
           key: password
           name: tekton-git
-    - name: GIT_USER
+    - name: GIT_NAME
       valueFrom:
         secretKeyRef:
           key: username
           name: tekton-git
+    - name: GIT_EMAIL
+      value: jenkins-x@googlegroups.com
     image: ghcr.io/oras-project/oras:v0.13.0
     name: build-and-push-sbom
     resources: {}
