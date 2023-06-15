@@ -168,6 +168,6 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 328761Ki
+            storage: 1Gi
       status: {}
 status: {}
