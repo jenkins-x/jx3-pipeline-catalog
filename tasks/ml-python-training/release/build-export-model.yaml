@@ -95,7 +95,7 @@ spec:
         secretKeyRef:
           key: username
           name: tekton-git
-    image: ghcr.io/jenkins-x/jx-boot:3.10.87
+    image: ghcr.io/jenkins-x/jx-boot:3.10.88
     name: build-export-model
     resources: {}
     script: |+
