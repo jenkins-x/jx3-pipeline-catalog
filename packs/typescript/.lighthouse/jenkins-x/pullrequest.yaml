@@ -6,123 +6,38 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/git-clone/git-clone-pr.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: jx-variables
-      runAfter:
-      - git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/jx-variables.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-npm-install
-      runAfter:
-      - jx-variables
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/build-npm-install.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-npm-test
-      runAfter:
-      - build-npm-install
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/build-npm-test.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: check-registry
-      runAfter:
-      - build-npm-test
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/check-registry.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-container-build
-      runAfter:
-      - check-registry
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/build-container-build.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: promote-jx-preview
-      runAfter:
-      - build-container-build
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/typescript/pullrequest/promote-jx-preview.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    workspaces:
-    - name: pipeline-ws
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/typescript/pullrequest.yaml@versionStream
+          name: ""
+          resources:
+            # override limits for all containers here
+            limits: {}
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
+        - name: build-npm-install
+          resources: {}
+        - name: build-npm-test
+          resources: {}
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+        - name: promote-jx-preview
+          resources: {}
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
-  workspaces:
-  - name: pipeline-ws
-    volumeClaimTemplate:
-      metadata:
-        creationTimestamp: null
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 328761Ki
-      status: {}
 status: {}

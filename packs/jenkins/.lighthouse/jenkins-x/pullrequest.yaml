@@ -6,78 +6,40 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/git-clone/git-clone-pr.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: jx-variables
-      runAfter:
-      - git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/jenkins/pullrequest/jx-variables.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: check-registry
-      runAfter:
-      - jx-variables
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/jenkins/pullrequest/check-registry.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-container-build
-      runAfter:
-      - check-registry
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/jenkins/pullrequest/build-container-build.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    workspaces:
-    - name: pipeline-ws
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: _JAVA_OPTIONS
+            value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+              -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5
+              -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+              -Xms10m -Xmx192m
+          - name: MAVEN_OPTS
+            value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25 -Dmaven.wagon.http.retryHandler.count=3
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/jenkins/pullrequest.yaml@versionStream
+          name: ""
+          resources:
+            # override limits for all containers here
+            limits: {}
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: jx-variables
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
+        - name: check-registry
+          resources: {}
+        - name: build-container-build
+          resources: {}
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
-  workspaces:
-  - name: pipeline-ws
-    volumeClaimTemplate:
-      metadata:
-        creationTimestamp: null
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 328761Ki
-      status: {}
 status: {}

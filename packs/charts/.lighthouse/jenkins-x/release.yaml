@@ -6,108 +6,30 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: git-clone
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/git-clone/git-clone.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: next-version
-      runAfter:
-      - git-clone
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/charts/release/next-version.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: jx-variables
-      runAfter:
-      - next-version
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/charts/release/jx-variables.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-basic-auth-username
-      runAfter:
-      - jx-variables
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/charts/release/build-basic-auth-username.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-basic-auth-password
-      runAfter:
-      - build-basic-auth-username
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/charts/release/build-basic-auth-password.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build-release
-      runAfter:
-      - build-basic-auth-password
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/charts/release/build-release.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    workspaces:
-    - name: pipeline-ws
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/charts/release.yaml@versionStream
+          name: ""
+          resources: {}
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: next-version
+          resources: {}
+        - name: jx-variables
+          resources: {}
+        - name: build-basic-auth-username
+          resources: {}
+        - name: build-basic-auth-password
+          resources: {}
+        - name: build-release
+          resources: {}
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
-  workspaces:
-  - name: pipeline-ws
-    volumeClaimTemplate:
-      metadata:
-        creationTimestamp: null
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 328761Ki
-      status: {}
 status: {}

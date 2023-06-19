@@ -6,60 +6,29 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/git-clone/git-clone-pr.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: next-version
-      runAfter:
-      - git-clone-pr
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: a5ab19ebc5a074e0402c5016b11bc11b32cc5c83
-        - name: pathInRepo
-          value: tasks/go/release/next-version.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: jx-variables
-      runAfter:
-      - next-version
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: a5ab19ebc5a074e0402c5016b11bc11b32cc5c83
-        - name: pathInRepo
-          value: tasks/go/release/jx-variables.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: runci
-      runAfter:
-      - jx-variables
+    - name: from-build-pack
+      resources: {}
       taskSpec:
         metadata: {}
-        spec: null
         stepTemplate:
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@a5ab19ebc5a074e0402c5016b11bc11b32cc5c83
           name: ""
-          resources: {}
+          resources:
+            # override limits for all containers here
+            limits: {}
           workingDir: /workspace/source
         steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone-pr.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: next-version
+          resources: {}
+        - name: jx-variables
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 600Mi
         - env:
           - name: GH_ACCESS_TOKEN
             valueFrom:
@@ -76,25 +45,7 @@ spec:
             cd /workspace/source/.lighthouse/jenkins-x/tests
             go mod download
             make test
-        workspaces:
-        - description: The workspace used to store the cloned git repository and the
-            generated files
-          mountPath: /workspace
-          name: output
-    workspaces:
-    - name: pipeline-ws
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
-  workspaces:
-  - name: pipeline-ws
-    volumeClaimTemplate:
-      metadata:
-        creationTimestamp: null
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 328761Ki
-      status: {}
 status: {}

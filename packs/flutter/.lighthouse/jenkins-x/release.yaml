@@ -6,93 +6,45 @@ metadata:
 spec:
   pipelineSpec:
     tasks:
-    - name: git-clone
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/git-clone/git-clone.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: next-version
-      runAfter:
-      - git-clone
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/flutter/release/next-version.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: jx-variables
-      runAfter:
-      - next-version
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/flutter/release/jx-variables.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: build
-      runAfter:
-      - jx-variables
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/flutter/release/build.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    - name: promote-release
-      runAfter:
-      - build
-      taskRef:
-        params:
-        - name: url
-          value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
-        - name: revision
-          value: versionStream
-        - name: pathInRepo
-          value: tasks/flutter/release/promote-release.yaml
-        resolver: git
-      workspaces:
-      - name: output
-        workspace: pipeline-ws
-    workspaces:
-    - name: pipeline-ws
+    - name: from-build-pack
+      resources: {}
+      taskSpec:
+        metadata: {}
+        stepTemplate:
+          env:
+          - name: NPM_CONFIG_USERCONFIG
+            value: /tekton/home/npm/.npmrc
+          image: uses:jenkins-x/jx3-pipeline-catalog/tasks/flutter/release.yaml@versionStream
+          name: ""
+          resources:
+            # override limits for all containers here
+            limits: {}
+          volumeMounts:
+          - mountPath: /tekton/home/npm
+            name: npmrc
+          workingDir: /workspace/source
+        steps:
+        - image: uses:jenkins-x/jx3-pipeline-catalog/tasks/git-clone/git-clone.yaml@versionStream
+          name: ""
+          resources: {}
+        - name: next-version
+          resources: {}
+        - name: jx-variables
+          resources:
+            # override requests for the pod here
+            requests:
+              cpu: 400m
+              memory: 512Mi
+        - name: build
+          resources: {}
+        - name: promote-release
+          resources: {}
+        volumes:
+        - name: npmrc
+          secret:
+            optional: true
+            secretName: npmrc
+  podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s
-  workspaces:
-  - name: pipeline-ws
-    volumeClaimTemplate:
-      metadata:
-        creationTimestamp: null
-      spec:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 328761Ki
-      status: {}
 status: {}
