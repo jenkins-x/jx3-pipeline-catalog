@@ -90,13 +90,11 @@ spec:
         secretKeyRef:
           key: password
           name: tekton-git
-    - name: GIT_NAME
+    - name: GIT_USER
       valueFrom:
         secretKeyRef:
           key: username
           name: tekton-git
-    - name: GIT_EMAIL
-      value: jenkins-x@googlegroups.com
     image: ghcr.io/jenkins-x/jx-release-version:2.6.10
     name: next-version
     resources: {}
