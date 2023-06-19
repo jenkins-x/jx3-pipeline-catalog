@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
   creationTimestamp: null
-  name: release
+  name: pullrequest
 spec:
   pipelineSpec:
     tasks:
@@ -95,6 +95,6 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 328761Ki
+            storage: 1Gi
       status: {}
 status: {}

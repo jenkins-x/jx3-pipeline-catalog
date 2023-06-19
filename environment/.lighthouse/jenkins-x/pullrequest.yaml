@@ -34,6 +34,21 @@ spec:
       workspaces:
       - name: output
         workspace: pipeline-ws
+    - name: kubetest
+      runAfter:
+        - make-pr
+      taskRef:
+        params:
+          - name: url
+            value: https://github.com/jenkins-x/jx3-pipeline-catalog.git
+          - name: revision
+            value: versionStream
+          - name: pathInRepo
+            value: tasks/kubetest/environment.yaml
+        resolver: git
+      workspaces:
+        - name: output
+          workspace: pipeline-ws
     workspaces:
     - name: pipeline-ws
   serviceAccountName: tekton-bot
@@ -48,6 +63,6 @@ spec:
         - ReadWriteOnce
         resources:
           requests:
-            storage: 328761Ki
+            storage: 1Gi
       status: {}
 status: {}
