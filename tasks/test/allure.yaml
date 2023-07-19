@@ -13,6 +13,7 @@ spec:
     type: string
   - name: feature
     type: string
+    default: ""
   - name: maven-options
     type: string
   stepTemplate:
