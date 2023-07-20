@@ -46,8 +46,7 @@ spec:
       mvn --no-snapshot-updates --no-transfer-progress -Dmaven.test.failure.ignore=false \
           -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -Dparallel=classes \
           -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true \
-          -DskipUnitTests=true -Dticket.env=${ENV} -Dgit.branch=${FEATURE} \
-          -Dbrowser=remote verify
+          -DskipUnitTests=true -Dbrowser=remote verify
   - image: public.ecr.aws/bitnami/aws-cli:2
     securityContext:
       runAsUser: 0
