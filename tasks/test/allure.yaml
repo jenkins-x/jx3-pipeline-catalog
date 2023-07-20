@@ -10,19 +10,19 @@ spec:
       limits: {}
     workingDir: /workspace/source
   steps:
-  - image: maven:3.8-eclipse-temurin-8
+  - image: maven:3.9-eclipse-temurin-8
     name: integration-test
     resources: {}
     onError: continue
     env:
     - name: _JAVA_OPTIONS
-      value: -XX:+UnlockExperimentalVMOptions -XX:+Dsun
-        -UseCGroupMemoryLimitForHeap.zip.disableMemoryMapping=true
+      value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+        -Dsun.zip.disableMemoryMapping=true
         -DLog4jContextSelector=org.apache.logging.log4j.core.selector.ClassLoaderContextSelector
-        -Djdk.net.URLClassPath.disableClassPathURLCheck=true -Dmaven.repo.local=/stash/.mvnrepository
+        -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+        -Dmaven.repo.local=/stash/.mvnrepository
     - name: MAVEN_OPTS
-      value: -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=25
-        -Dmaven.wagon.http.retryHandler.count=3 -Duser.timezone=Europe/Stockholm
+      value: -Duser.timezone=Europe/Stockholm
     - name: TZ
       value: Europe/Stockholm
     volumeMounts:
@@ -72,7 +72,7 @@ spec:
       # Set links to previous builds in report. Work around for lack of https://github.com/allure-framework/allure-maven/issues/220
       cat << end >> $TEST_RESULT_DIR/executor.json
       {
-        "name": "Jenkins-X",
+        "name": "Jenkins X",
         "type": "jenkins-x",
         "url": "https://www.ticket.se",
         "buildOrder": $BUILD_NUMBER,
