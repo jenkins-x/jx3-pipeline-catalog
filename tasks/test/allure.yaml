@@ -33,7 +33,7 @@ spec:
       set -ex
       . .jx/variables.sh
 
-      cp ../cacerts $JAVA_HOME/jre/lib/security/cacerts
+      cp /workspace/stash/cacerts $JAVA_HOME/jre/lib/security/cacerts
 
       # FIXME: The whole project needs to be built since the workspace of this task doesn't have the snapshot jars from
       # pullrequest pipeline. So any changes in the dependencies in the project of issi-ticket-test wouldn't be picked up otherwise. It
