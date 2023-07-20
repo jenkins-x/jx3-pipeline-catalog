@@ -93,7 +93,7 @@ spec:
       set -ex
       source .jx/variables.sh
       cd $REPORT_DIR
-      aws s3 cp --recursive --only-show-errors . ${STORAGE}/${BUILD_NUMBER}
+      aws s3 cp --recursive --only-show-errors . ${STORAGE}/${SUBPATH}
       aws s3 cp --recursive --only-show-errors history ${STORAGE}/history
       cat << end > index.html
       <!DOCTYPE html>
