@@ -128,3 +128,7 @@ spec:
   - name: src
     description: The folder where we expect the source to be chacked out in the direcory source
     mountPath: /workspace
+  - name: stash
+    description: The folder where we expect the stash to be exploded
+    optional: true
+    mountPath: /stash
