@@ -20,7 +20,7 @@ spec:
         -Dsun.zip.disableMemoryMapping=true
         -DLog4jContextSelector=org.apache.logging.log4j.core.selector.ClassLoaderContextSelector
         -Djdk.net.URLClassPath.disableClassPathURLCheck=true
-        -Dmaven.repo.local=/stash/.mvnrepository
+        -Dmaven.repo.local=/workspace/stash/.mvnrepository
     - name: MAVEN_OPTS
       value: -Duser.timezone=Europe/Stockholm
     - name: TZ
@@ -128,7 +128,3 @@ spec:
   - name: src
     description: The folder where we expect the source to be chacked out in the direcory source
     mountPath: /workspace
-  - name: stash
-    description: The folder where we expect the stash to be exploded
-    optional: true
-    mountPath: /stash
