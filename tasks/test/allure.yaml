@@ -43,10 +43,8 @@ spec:
       # don't get old snapshots in the case when incremental build stops building a module for the PR.
       # https://github.com/seahen/maven-s3-wagon
 
-      mvn --no-snapshot-updates --no-transfer-progress -Dmaven.test.failure.ignore=false \
-          -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -Dparallel=classes \
-          -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true \
-          -DskipUnitTests=true -Dbrowser=remote verify
+      mvn --no-snapshot-updates --no-transfer-progress -Dmaven.test.failure.ignore=false -DskipUnitTests=true -Dbrowser=remote \
+         -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true verify
   - image: public.ecr.aws/bitnami/aws-cli:2
     securityContext:
       runAsUser: 0
