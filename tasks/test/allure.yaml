@@ -103,6 +103,19 @@ spec:
       </html>
       end
       aws s3 cp index.html ${STORAGE}/index.html
+      cat << end > prometheus_scrape.json
+      [
+          {
+              "targets": ["${SITE_HOST}:80"],
+              "labels": {
+                  "__metrics_path__": "${SITEPATH}/${SUBPATH}/export/prometheusData.txt",
+                  "test_name": "${NAME}",
+                  "test_build": "${SUBPATH}"
+              }
+          }
+      ]
+      end
+      aws s3 cp prometheus_scrape.json ${STORAGE}/prometheus_scrape.json
   - image: ghcr.io/jenkins-x/jx-boot:3.10.75
     name: add-link
     resources: {}
