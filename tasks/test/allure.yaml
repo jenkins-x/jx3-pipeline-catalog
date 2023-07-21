@@ -122,6 +122,6 @@ spec:
     secret:
       secretName: issi-ticket-maven-settings
   workspaces:
-  - name: src
+  - name: output
     description: The folder where we expect the source to be chacked out in the direcory source
     mountPath: /workspace
