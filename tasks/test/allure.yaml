@@ -31,6 +31,16 @@ spec:
     script: |
       #!/usr/bin/env sh
       set -ex
+      cat  << 'end' >> .jx/variables.sh
+      # The standard reports bucket url can be fetched with: kubectl get env dev -o go-template='{{range .spec.teamSettings.storageLocations}}{{if eq .classifier "reports"}}{{.bucketUrl}}{{end}}{{end}}'
+      BUCKET=reports-test-ticket
+      STORAGE=s3://${BUCKET}${SITEPATH}
+      SITE_HOST=${BUCKET}.s3-website.eu-north-1.amazonaws.com
+      SITE=http://${SITE_HOST}${SITEPATH}/${SUBPATH}/
+      TEST_RESULT_DIR=issi-ticket-test/target/allure-results
+      REPORT_DIR=issi-ticket-test/target/site/allure
+      end
+
       . .jx/variables.sh
 
       cp /workspace/stash/cacerts $JAVA_HOME/jre/lib/security/cacerts
