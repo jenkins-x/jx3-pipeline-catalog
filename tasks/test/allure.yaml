@@ -120,6 +120,7 @@ spec:
               "labels": {
                   "__metrics_path__": "${SITEPATH}/${SUBPATH}/export/prometheusData.txt",
                   "test_name": "${NAME}",
+                  "test_path": "${SITEPATH}",
                   "test_build": "${SUBPATH}"
               }
           }
