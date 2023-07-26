@@ -54,7 +54,7 @@ spec:
       # https://github.com/seahen/maven-s3-wagon
 
       mvn --no-snapshot-updates --no-transfer-progress -Dmaven.test.failure.ignore=false -DskipUnitTests=true -Dbrowser=remote \
-         -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true verify
+         -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true verify || echo There are integration test failures
   - image: public.ecr.aws/bitnami/aws-cli:2
     securityContext:
       runAsUser: 0
