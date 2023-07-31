@@ -136,7 +136,7 @@ spec:
       source .jx/variables.sh
       if [ -n "$PULL_NUMBER" ]
       then
-        jx gitops pr comment -c "Integration test report available at $SITE"
+        jx gitops pr comment -c "$NAME report available at $SITE"
       fi
       # Exit with result from integration test
       # Skipping for now so not every developer need permissions to /override
