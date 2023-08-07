@@ -45,7 +45,7 @@ spec:
           resources: {}
           script: |
             #!/bin/sh
-            golangci-lint run --deadline 30m0s
+            golangci-lint run --deadline 1h
         - image: ghcr.io/jenkins-x/jx-registry:0.1.10
           name: check-registry
           resources: {}
