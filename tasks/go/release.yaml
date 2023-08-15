@@ -34,7 +34,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.6.10
+          image: ghcr.io/jenkins-x/jx-release-version:2.7.0
           name: next-version
           resources:
             # set requests for the pod here
