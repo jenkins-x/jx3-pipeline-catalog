@@ -42,8 +42,6 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
-        push: true
-        context: .
         tags: us-central1-docker.pkg.dev/prodoscore-artifactory/dev-images/${{ github.event.repository.name }}:${{ steps.vars.outputs.version }}
     - name: Run Snyk to check Docker image for vulnerabilities
       uses: snyk/actions/docker@master
