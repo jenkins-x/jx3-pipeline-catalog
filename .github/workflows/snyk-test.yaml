@@ -49,9 +49,9 @@ jobs:
       uses: snyk/actions/docker@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        SNYK_REGISTRY_USERNAME: "oauth2accesstoken"
+        SNYK_REGISTRY_PASSWORD: "${{ steps.auth.outputs.access_token }}"
       with:
         image: us-central1-docker.pkg.dev/prodoscore-artifactory/dev-images/${{ github.event.repository.name }}:${{ steps.vars.outputs.version }}
         args: --file=Dockerfile
-      env:
-        SNYK_REGISTRY_USERNAME: "oauth2accesstoken"
-        SNYK_REGISTRY_PASSWORD: "${{ steps.auth.outputs.access_token }}"
+        
