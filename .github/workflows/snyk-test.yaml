@@ -51,4 +51,7 @@ jobs:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
         image: us-central1-docker.pkg.dev/prodoscore-artifactory/dev-images/${{ github.event.repository.name }}:${{ steps.vars.outputs.version }}
-        args: --file=Dockerfile --username="oauth2accesstoken" --password="${{ steps.auth.outputs.access_token }}"
+        args: --file=Dockerfile
+      env:
+        SNYK_REGISTRY_USERNAME: "oauth2accesstoken"
+        SNYK_REGISTRY_PASSWORD: "${{ steps.auth.outputs.access_token }}"
