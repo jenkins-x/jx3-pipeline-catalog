@@ -43,7 +43,7 @@ jobs:
         SNYK_REGISTRY_PASSWORD: "${{ steps.auth.outputs.access_token }}"
       with:
         image: localhost:5000/${{ github.event.repository.name }}:latest
-        args: --file=Dockerfile
+        args: --file=Dockerfile --sarif-file-output=snyk.sarif
     - name: Upload result to GitHub Code Scanning
       uses: github/codeql-action/upload-sarif@v2
       with:
