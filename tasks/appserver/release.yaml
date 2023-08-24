@@ -59,11 +59,17 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
         - image: maven:3.6-openjdk-8
+          name: build-mvn-install
+          resources: {}
+          script: |
+            #!/bin/sh
+            mvn --no-transfer-progress install
+        - image: maven:3.6-openjdk-8
           name: build-mvn-deploy
           resources: {}
           script: |
             #!/bin/sh
-            mvn --no-transfer-progress clean deploy
+            mvn --no-transfer-progress deploy
         - image: ghcr.io/jenkins-x/jx-registry:0.1.11
           name: check-registry
           resources: {}
