@@ -82,18 +82,6 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             mvn --no-transfer-progress deploy
-        - image: maven:3.8.2-openjdk-17
-          name: build-mvn-install
-          resources: {}
-          script: |
-            #!/usr/bin/env bash
-            source .jx/variables.sh
-
-            # modify the pom.xml
-            echo "upgrading the pom to version $VERSION"
-            mvn versions:set -DnewVersion=$VERSION
-
-            mvn --no-transfer-progress install
         - image: ghcr.io/jenkins-x/jx-registry:0.1.11
           name: check-registry
           resources: {}
