@@ -144,7 +144,7 @@ spec:
   volumes:
   - name: maven-settings
     secret:
-      secretName: issi-ticket-maven-settings
+      secretName: jenkins-maven-settings
   workspaces:
   - name: output
     description: The folder where we expect the source to be chacked out in the direcory source
