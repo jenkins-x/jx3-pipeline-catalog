@@ -48,6 +48,11 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
+            jx gitops pr variables
+            source .jx/variables.sh
+            echo $VERSION > VERSION
+            echo "version is"
+            echo ${VERSION}
         - image: python:3.6.12-alpine
           name: build-python-unittest
           resources: {}
