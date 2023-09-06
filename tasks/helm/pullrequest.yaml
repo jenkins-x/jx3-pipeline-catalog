@@ -32,6 +32,10 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
+            source .jx/variables.sh
+            echo $VERSION > VERSION
+            echo "version is"
+            echo ${VERSION}
         - image: ghcr.io/jenkins-x/jx-boot:3.2.250
           name: build-helm-build
           resources: {}
