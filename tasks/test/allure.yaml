@@ -14,6 +14,9 @@ spec:
     name: integration-test
     resources: {}
     onError: continue
+    envFrom:
+    - secretRef:
+        name: sales-credentials
     env:
     - name: _JAVA_OPTIONS
       value: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
@@ -145,6 +148,9 @@ spec:
   - name: maven-settings
     secret:
       secretName: jenkins-maven-settings
+  - name: credentials
+    secret:
+      secretName: sales-credentials
   workspaces:
   - name: output
     description: The folder where we expect the source to be chacked out in the direcory source
