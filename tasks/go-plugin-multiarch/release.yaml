@@ -49,8 +49,8 @@ spec:
           name: release-binary
           resources: {}
           script: |
-            #!/usr/bin/env sh
-            . .jx/variables.sh
+            #!/bin/bash
+            source .jx/variables.sh
             make release
         - image: gcr.io/kaniko-project/executor:v1.9.1-debug
           name: build-and-push-image

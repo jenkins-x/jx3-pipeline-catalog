@@ -50,7 +50,8 @@ spec:
           name: build-make-test
           resources: {}
           script: |
-            #!/bin/sh
+            #!/bin/bash
+            source .jx/variables.sh
             make test
         - image: ghcr.io/jenkins-x/jx-registry:0.1.11
           name: check-registry
