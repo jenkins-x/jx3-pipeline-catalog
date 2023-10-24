@@ -38,7 +38,8 @@ spec:
           name: build-make-linux
           resources: {}
           script: |
-            #!/bin/sh
+            #!/bin/bash
+            source .jx/variables.sh
             make linux
         - image: ghcr.io/jenkins-x/jx-registry:0.1.11
           name: check-registry
