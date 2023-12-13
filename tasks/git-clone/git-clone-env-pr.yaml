@@ -45,17 +45,11 @@ spec:
     resources: {}
     script: |
       #!/usr/bin/env sh
-      counter=0
-      until [ "$counter" -eq 3 ]; do
-        # lets avoid git rebase/merge conflicts on promotions
-        jx gitops git merge --rebase --merge-arg "-Xtheirs" && exit 0
-        counter=$((counter+1))
-        git rebase --abort
-        if git log -1 --pretty=%B | grep -i regenerate; then
-          git reset --hard HEAD~1
-        fi
-      done
-      exit 1
+
+      # '-r' to avoid unexpected conflicts (e.g. rename/rename) when trying to rebase commits sharing the same base commit.
+      # Preserving the merge commits thus ensures commits are always applied on top of their original base branch before being
+      # merged back into the rebased branch.
+      jx gitops git merge --rebase --merge-arg "-Xtheirs -r"
     workingDir: /workspace/source
   workspaces:
   - description: The git repo will be cloned onto the volume backing this workspace
