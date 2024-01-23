@@ -16,6 +16,7 @@ metadata:
 {{- end }}
   name: {{ .Values.service.name }}
 {{- if .Values.ingress.labels }}
+  labels:
 {{ toYaml .Values.ingress.labels | indent 4 }}
 {{- end }}
 spec:
