@@ -46,6 +46,12 @@ spec:
     script: |
       #!/usr/bin/env sh
 
+      # To ensure idempotency, reset the branch to its initial state since a previous
+      # rebase can change the branch's initial state before the regeneration commit.
+      if git log -1 --pretty=%B | grep -i regenerate; then
+        git reset --hard HEAD~1
+      fi
+
       # '-r' to avoid unexpected conflicts (e.g. rename/rename) when trying to rebase commits sharing the same base commit.
       # Preserving the merge commits thus ensures commits are always applied on top of their original base branch before being
       # merged back into the rebased branch.
