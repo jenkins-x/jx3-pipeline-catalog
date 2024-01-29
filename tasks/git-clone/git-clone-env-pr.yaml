@@ -45,11 +45,23 @@ spec:
     resources: {}
     script: |
       #!/usr/bin/env sh
-
-      # '-r' to avoid unexpected conflicts (e.g. rename/rename) when trying to rebase commits sharing the same base commit.
-      # Preserving the merge commits thus ensures commits are always applied on top of their original base branch before being
-      # merged back into the rebased branch.
-      jx gitops git merge --rebase --merge-arg "-Xtheirs -r"
+      counter=0
+      # Since a previous rebase can change the initial state of the branch, a successive rebase attempt can result in a conflict due to
+      # the previous regeneration commit attempting to be picked ontop of a different initial state of the PR's branch. Thus, this retry
+      # logic attempts to remove the latest regeneration commit and attempt the rebase again upon such conflicts.
+      until [ "$counter" -eq 3 ]; do
+        # lets avoid git rebase/merge conflicts on promotions
+        # '-r' to avoid unexpected conflicts (e.g. rename/rename) when trying to rebase commits sharing the same base commit.
+        # Preserving the merge commits thus ensures commits are always applied on top of their original base branch before being
+        # merged back into the rebased branch.
+        jx gitops git merge --rebase --merge-arg "-Xtheirs -r" && exit 0
+        counter=$((counter+1))
+        git rebase --abort
+        if git log -1 --pretty=%B | grep -i regenerate; then
+          git reset --hard HEAD~1
+        fi
+      done
+      exit 1
     workingDir: /workspace/source
   workspaces:
   - description: The git repo will be cloned onto the volume backing this workspace
