@@ -1,1 +1,1 @@
-# Java 14 application
+# Java 21 application
