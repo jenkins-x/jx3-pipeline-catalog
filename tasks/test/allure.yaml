@@ -39,7 +39,7 @@ spec:
       BUCKET=reports-test.aws.ticket.se
       STORAGE=s3://${BUCKET}${SITEPATH}
       SITE_HOST=${BUCKET}
-      SITE=https://${SITE_HOST}${SITEPATH}/${SUBPATH}
+      SITE=https://${SITE_HOST}${SITEPATH}/${SUBPATH}/index.html
       TEST_RESULT_DIR=issi-ticket-test/target/allure-results
       REPORT_DIR=issi-ticket-test/target/site/allure
       end
