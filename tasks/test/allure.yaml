@@ -70,6 +70,13 @@ spec:
       historyDir=${TEST_RESULT_DIR}/history
       mkdir -p $historyDir
       aws s3 cp --recursive --only-show-errors ${STORAGE}/history $historyDir
+      # Temporary hack to get continuous history between old and new report bucket
+      shopt -s nullglob
+      files=( $historyDir/* )
+      if (( ${#files[@]} == 0 ))
+      then
+            aws s3 cp --recursive --only-show-errors s3://reports-test-ticket${SITEPATH}/history $historyDir || echo 'is old bucket removed?'
+      fi
   - image: klilleby/allure-docker-service:2.20.1-alpine
     name: generate-test-report
     resources: {}
