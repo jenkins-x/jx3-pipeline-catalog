@@ -126,9 +126,10 @@ spec:
       cat << end > prometheus_scrape.json
       [
           {
-              "targets": ["${SITE_HOST}:80"],
+              "targets": ["${SITE_HOST}:443"],
               "labels": {
                   "__metrics_path__": "${SITEPATH}/${SUBPATH}/export/prometheusData.txt",
+                  "__scheme__": "https",
                   "test_name": "${NAME}",
                   "test_path": "${SITEPATH}",
                   "test_build": "${SUBPATH}"
