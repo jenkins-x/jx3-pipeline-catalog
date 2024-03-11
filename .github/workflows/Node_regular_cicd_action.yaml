@@ -32,6 +32,9 @@ env:
   REPO_URL: https://github.com/${{ github.repository }}.git
   JX_KUBERNETES: true
   SOURCE_DIR: "${{ github.workspace }}/source"
+  OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  REGISTRIES: "us-docker.pkg.dev"
+  REPOSITORY: "prodoscore-artifactory"
 
 jobs:
   verify:
