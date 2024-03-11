@@ -182,6 +182,7 @@ jobs:
         with:
           filePath:  comment.txt
           pr_number: ${{ inputs.PR_NUMBER }}
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
 
 
