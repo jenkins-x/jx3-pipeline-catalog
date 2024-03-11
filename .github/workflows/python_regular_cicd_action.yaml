@@ -1,4 +1,4 @@
-name: Python_Regular_Cicd_Action
+name: Node_Regular_Cicd_Action
 on:
   workflow_call:
     inputs:
