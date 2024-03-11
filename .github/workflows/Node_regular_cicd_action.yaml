@@ -71,8 +71,6 @@ jobs:
 
       - name: Docker_Build
         run: |-
-              #!/bin/bash
-              run: |
                     #!/bin/bash
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
@@ -114,6 +112,7 @@ jobs:
                         
                     # done < dockertags.txt
                     # ####
+
 
 
 
