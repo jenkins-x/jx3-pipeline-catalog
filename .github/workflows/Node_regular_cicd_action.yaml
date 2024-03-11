@@ -1,4 +1,4 @@
-name: Node_Regular_Cicd_Action
+name: node_regular_cicd_action
 on:
   workflow_call:
     inputs:
