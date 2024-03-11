@@ -92,6 +92,7 @@ jobs:
 
                         echo "*************************************************************"
 
+                        docker image ls | grep -ai $REGISTRIES
                         docker image ls | grep -ai $REGISTRIES > dockertags.txt
 
                         # Read input from dockertags.txt
