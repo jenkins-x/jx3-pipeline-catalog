@@ -66,13 +66,7 @@ jobs:
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
 
-      - id: "auth"
-        name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1"
-        with:
-          token_format: "access_token"
-          workload_identity_provider: ${{ inputs.workload_identity_provider }}
-          service_account: ${{ inputs.service_account }}
+
 
 
 
