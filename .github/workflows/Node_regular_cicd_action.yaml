@@ -74,44 +74,41 @@ jobs:
                     #!/bin/bash
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
-                    GIT_SHORT_HASH=0.0.0-$(git rev-parse --short HEAD)
+                    GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
                     CHARTS_DIR="${ROOT_DIR}/charts"
-                    
+
                     # Find all subdirectories under the charts directory
                     SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
-                    
+
                     # Package each subdirectory as a Helm chart
                     for SUBDIR in ${SUBDIRS}; do
-                    IMAGE_NAME=${SUBDIR##*/}
-                    echo $IMAGE_NAME
-  
-                    echo "SHA:$GIT_SHORT_HASH"  
-                    echo "Building Docker image ..."                  
-                    # docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
-                    # echo "*************************************************************"
-                          
-                    # docker image ls |grep -ai $REGISTRIES > dockertags.txt
-                    # ####
-                    # # Read input from dockertags.txt
-                    # echo "##### Docker build detailss" >> comment.txt
-                    # echo "IMAGE | TAG | SIZE" >> comment.txt
-                    # echo "------ | ------ | ------ " >> comment.txt
-                    # #echo "............................................................................" >> comment.txt
-                    # while IFS= read -r line; do
-                          
-                    #       # Use '/' as the delimiter and print the text after the 4th '/'
-                    #       OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
-                    #       IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
-                    #       TAG=$(echo "$OUTPUT" | awk '{print $2}')
-                    #       SIZE=$(echo "$OUTPUT" | awk '{print $7}')
-                    #       # Print the result
-                          
-                    #       echo "$IMAGE | $TAG | $SIZE" >> comment.txt
-                        
-                    # done < dockertags.txt
-                    # ####
+                        IMAGE_NAME=${SUBDIR##*/}
+
+                        echo "SHA: $GIT_SHORT_HASH"
+                        echo "Building Docker image ..."
+                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .
+
+                        echo "*************************************************************"
+
+                        docker image ls | grep -ai $REGISTRIES > dockertags.txt
+
+                        # Read input from dockertags.txt
+                        echo "##### Docker build details" >> comment.txt
+                        echo "IMAGE | TAG | SIZE" >> comment.txt
+                        echo "------ | ------ | ------ " >> comment.txt
+
+                        while IFS= read -r line; do
+                            # Use '/' as the delimiter and print the text after the 4th '/'
+                            OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
+                            IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
+                            TAG=$(echo "$OUTPUT" | awk '{print $2}')
+                            SIZE=$(echo "$OUTPUT" | awk '{print $7}')
+                            # Print the result
+                            echo "$IMAGE | $TAG | $SIZE" >> comment.txt
+                        done < dockertags.txt
+                    done
 
 
 
