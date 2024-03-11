@@ -81,39 +81,39 @@ jobs:
                     # Define the charts directory
                     CHARTS_DIR="${ROOT_DIR}/charts"
                     
-                    # Find all subdirectories under the charts directory
-                    SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+                    # # Find all subdirectories under the charts directory
+                    # SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
                     
-                    # Package each subdirectory as a Helm chart
-                    for SUBDIR in ${SUBDIRS}; do
-                    IMAGE_NAME=${SUBDIR##*/}
+                    # # Package each subdirectory as a Helm chart
+                    # for SUBDIR in ${SUBDIRS}; do
+                    # IMAGE_NAME=${SUBDIR##*/}
 
   
-                    echo "SHA:$GIT_SHORT_HASH"  
-                    echo "Building Docker image ..."                  
-                    docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
-                    echo "*************************************************************"
+                    # echo "SHA:$GIT_SHORT_HASH"  
+                    # echo "Building Docker image ..."                  
+                    # docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
+                    # echo "*************************************************************"
                           
-                    docker image ls |grep -ai $REGISTRIES > dockertags.txt
-                    ####
-                    # Read input from dockertags.txt
-                    echo "##### Docker build detailss" >> comment.txt
-                    echo "IMAGE | TAG | SIZE" >> comment.txt
-                    echo "------ | ------ | ------ " >> comment.txt
-                    #echo "............................................................................" >> comment.txt
-                    while IFS= read -r line; do
+                    # docker image ls |grep -ai $REGISTRIES > dockertags.txt
+                    # ####
+                    # # Read input from dockertags.txt
+                    # echo "##### Docker build detailss" >> comment.txt
+                    # echo "IMAGE | TAG | SIZE" >> comment.txt
+                    # echo "------ | ------ | ------ " >> comment.txt
+                    # #echo "............................................................................" >> comment.txt
+                    # while IFS= read -r line; do
                           
-                          # Use '/' as the delimiter and print the text after the 4th '/'
-                          OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
-                          IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
-                          TAG=$(echo "$OUTPUT" | awk '{print $2}')
-                          SIZE=$(echo "$OUTPUT" | awk '{print $7}')
-                          # Print the result
+                    #       # Use '/' as the delimiter and print the text after the 4th '/'
+                    #       OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
+                    #       IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
+                    #       TAG=$(echo "$OUTPUT" | awk '{print $2}')
+                    #       SIZE=$(echo "$OUTPUT" | awk '{print $7}')
+                    #       # Print the result
                           
-                          echo "$IMAGE | $TAG | $SIZE" >> comment.txt
+                    #       echo "$IMAGE | $TAG | $SIZE" >> comment.txt
                         
-                    done < dockertags.txt
-                    ####
+                    # done < dockertags.txt
+                    # ####
 
 
 
