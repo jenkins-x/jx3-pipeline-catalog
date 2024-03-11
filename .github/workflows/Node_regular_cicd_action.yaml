@@ -176,15 +176,8 @@ jobs:
         
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
-        id: hello
         with:
           filePath:  comment.txt
-      - name: Check outputs
-        run: |
-              echo "id : ${{ steps.hello.outputs.id }}"
-              echo "body : ${{ steps.hello.outputs.body }}"
-              echo "html_url : ${{ steps.hello.outputs.html_url }}"
-
 
 
 
