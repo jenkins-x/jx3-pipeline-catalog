@@ -75,7 +75,17 @@ jobs:
                     REPOSITORY="${{env.REPOSITORY}}"
                     GIT_SHORT_HASH=0.0.0-$(git rev-parse --short HEAD)
                     ROOT_DIR="$(pwd)"
-                    IMAGE_NAME=      
+                    # Define the charts directory
+                    CHARTS_DIR="${ROOT_DIR}/charts"
+                    
+                    # Find all subdirectories under the charts directory
+                    SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+                    
+                    # Package each subdirectory as a Helm chart
+                    for SUBDIR in ${SUBDIRS}; do
+                    IMAGE_NAME=${SUBDIR##*/}
+
+  
                     echo "SHA:$GIT_SHORT_HASH"  
                     echo "Building Docker image ..."                  
                     docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
