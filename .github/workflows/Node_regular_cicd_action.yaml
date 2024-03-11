@@ -85,19 +85,19 @@ jobs:
                     # Package each subdirectory as a Helm chart
                     for SUBDIR in ${SUBDIRS}; do
                     IMAGE_NAME=${SUBDIR##*/}
-
+                    echo $IMAGE_NAME
   
                     echo "SHA:$GIT_SHORT_HASH"  
                     echo "Building Docker image ..."                  
-                    docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
-                    echo "*************************************************************"
+                    # docker build -f  "Dockerfile"  -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
+                    # echo "*************************************************************"
                           
-                    docker image ls |grep -ai $REGISTRIES > dockertags.txt
-                    ####
-                    # Read input from dockertags.txt
-                    echo "##### Docker build detailss" >> comment.txt
-                    echo "IMAGE | TAG | SIZE" >> comment.txt
-                    echo "------ | ------ | ------ " >> comment.txt
+                    # docker image ls |grep -ai $REGISTRIES > dockertags.txt
+                    # ####
+                    # # Read input from dockertags.txt
+                    # echo "##### Docker build detailss" >> comment.txt
+                    # echo "IMAGE | TAG | SIZE" >> comment.txt
+                    # echo "------ | ------ | ------ " >> comment.txt
                     # #echo "............................................................................" >> comment.txt
                     # while IFS= read -r line; do
                           
