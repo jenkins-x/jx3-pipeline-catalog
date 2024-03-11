@@ -12,6 +12,8 @@ on:
         type: string
       BOT_USER:
         type: string
+      PR_NUMBER:
+        type: string
     secrets:
       BOT_TOKEN:
         description: "Bot token"
@@ -176,8 +178,10 @@ jobs:
         
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
+        id: hello
         with:
           filePath:  comment.txt
+          pr_number:
 
 
 
