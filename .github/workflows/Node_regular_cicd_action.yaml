@@ -10,14 +10,14 @@ on:
         type: string
       cluster_location:
         type: string
-      BOT_USER:
-        type: string
-      PR_NUMBER:
-        type: string
-    secrets:
-      GITTOKEN:
-        description: "Git token"
-        required: true
+    #   BOT_USER:
+    #     type: string
+    #   PR_NUMBER:
+    #     type: string
+    # secrets:
+    #   GITTOKEN:
+    #     description: "Git token"
+    #     required: true
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
   PULL_BASE_REF: ${{ github.base_ref }}
@@ -204,7 +204,7 @@ jobs:
         with:
           filePath:  comment.txt
           pr_number: ${{ steps.pr_data.outputs.pr_number }}
-          #GITHUB_TOKEN: "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"
+
 
 
 
