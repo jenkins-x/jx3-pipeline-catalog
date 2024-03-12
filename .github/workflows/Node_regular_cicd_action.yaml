@@ -14,10 +14,10 @@ on:
         type: string
       PR_NUMBER:
         type: string
-    secrets:
-      BOT_TOKEN:
-        description: "Bot token"
-        required: true
+    # secrets:
+    #   BOT_TOKEN:
+    #     description: "Bot token"
+    #     required: true
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
   PULL_BASE_REF: ${{ github.base_ref }}
@@ -175,14 +175,19 @@ jobs:
               # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/ "
               ls -ltrh charts 
               echo "Helm charts packaged/indexed/push successfully!"  
-        
+      - name: Helm_Package_And_push
+        run: |
+              #!/bin/bash  
+              echo "${{ inputs.PR_NUMBER }}"
+              echo "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         id: hello
         with:
           filePath:  comment.txt
           pr_number: ${{ inputs.PR_NUMBER }}
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
