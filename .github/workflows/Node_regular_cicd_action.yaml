@@ -175,7 +175,7 @@ jobs:
               # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/ "
               ls -ltrh charts 
               echo "Helm charts packaged/indexed/push successfully!"  
-      - name: Helm_Package_And_push
+      - name: Debug
         run: |
               #!/bin/bash  
               echo "${{ inputs.PR_NUMBER }}"
