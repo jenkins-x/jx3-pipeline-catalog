@@ -201,7 +201,7 @@ jobs:
         with:
           filePath:  comment.txt
           pr_number: "140"
-          GITHUB_TOKEN: "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"
+          #GITHUB_TOKEN: "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"
 
 
 
