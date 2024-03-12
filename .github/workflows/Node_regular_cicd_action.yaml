@@ -14,10 +14,10 @@ on:
         type: string
       PR_NUMBER:
         type: string
-    # secrets:
-    #   BOT_TOKEN:
-    #     description: "Bot token"
-    #     required: true
+    secrets:
+      GITTOKEN:
+        description: "Git token"
+        required: true
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
   PULL_BASE_REF: ${{ github.base_ref }}
@@ -187,7 +187,7 @@ jobs:
         with:
           filePath:  comment.txt
           pr_number: ${{ inputs.PR_NUMBER }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITTOKEN }}
 
 
 
