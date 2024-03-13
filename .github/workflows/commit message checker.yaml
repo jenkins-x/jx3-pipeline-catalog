@@ -1,4 +1,4 @@
-name: commit message checker
+name: commit_message_checker
 on:
   workflow_call:
 
