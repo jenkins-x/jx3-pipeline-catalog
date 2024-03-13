@@ -1,0 +1,26 @@
+name: commit message checker
+on:
+  workflow_call:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: check
+        run: |-
+          #!/bin/bash
+          BUILD_PARAMETER=$(echo $GIT_COMMENT | awk -F':' '{print $1}')
+          echo "BUILD_PARAMETER: $BUILD_PARAMETER"
+          if [[ "$BUILD_PARAMETER" == 'build' ]]; then
+            echo "Commit message contains 'build'. Triggering the workflow."
+          else
+            echo "Commit message does not contain 'build'. Exiting without running the workflow."
+            exit 78
+          fi
+
+
+
+
+
+
+
