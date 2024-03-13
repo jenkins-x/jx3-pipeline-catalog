@@ -1,6 +1,8 @@
 name: commit_message_checker
 on:
   workflow_call:
+env:
+  GIT_COMMENT: ${{ github.event.head_commit.message }}
 
 jobs:
   check:
