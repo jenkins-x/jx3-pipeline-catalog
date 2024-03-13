@@ -1,0 +1,213 @@
+name: node_regular_cicd_action
+on:
+  workflow_call:
+    inputs:
+      workload_identity_provider:
+        type: string
+      service_account:
+        type: string
+      cluster_name:
+        type: string
+      cluster_location:
+        type: string
+    #   BOT_USER:
+    #     type: string
+    #   PR_NUMBER:
+    #     type: string
+    # secrets:
+    #   GITTOKEN:
+    #     description: "Git token"
+    #     required: true
+env:
+  GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
+  PULL_BASE_REF: ${{ github.base_ref }}
+  PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+  PULL_NUMBER: ${{ github.event.pull_request.number }}
+  PULL_PULL_REF: refs/pull/${{ github.event.pull_request.number }}/head
+  PULL_PULL_SHA: ${{ github.event.pull_request.head.sha }}
+  PULL_REFS: ${{ github.base_ref }}:${{ github.event.pull_request.base.sha }},${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.sha }}:refs/pull/${{ github.event.pull_request.number }}/head
+  JOB_NAME: "verify"
+  JOB_SPEC: "type:presubmit"
+  JOB_TYPE: "presubmit"
+  REPO_NAME: ${{ github.event.repository.name }}
+  REPO_OWNER: ${{ github.repository_owner }}
+  REPO_URL: https://github.com/${{ github.repository }}.git
+  JX_KUBERNETES: true
+  SOURCE_DIR: "${{ github.workspace }}/source"
+  OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  REGISTRIES: "us-docker.pkg.dev"
+  REPOSITORY: "prodoscore-artifactory"
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - id: 'Auth'
+        name: 'Authenticate_to_Google_Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+
+      - name: 'Set_Up_Cloud_SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: Docker_Auth
+        run: |-
+              #!/bin/bash
+              gcloud auth configure-docker us-docker.pkg.dev
+
+      - name: Docker_Build
+        run: |-
+                    #!/bin/bash
+                    REGISTRIES="${{env.REGISTRIES}}"
+                    REPOSITORY="${{env.REPOSITORY}}"
+                    GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
+                    ROOT_DIR="$(pwd)"
+                    # Define the charts directory
+                    CHARTS_DIR="${ROOT_DIR}/charts"
+
+                    # Find all subdirectories under the charts directory
+                    SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+
+                    # Package each subdirectory as a Helm chart
+                    for SUBDIR in ${SUBDIRS}; do
+                        IMAGE_NAME=${SUBDIR##*/}
+
+                        echo "SHA: $GIT_SHORT_HASH"
+                        echo "Building Docker image ..."
+                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .
+
+                        echo "*************************************************************"
+
+                        docker image ls | grep -ai $REGISTRIES
+                        docker image ls | grep -ai $REGISTRIES > dockertags.txt
+
+                        # Read input from dockertags.txt
+                        echo "##### Docker build details" >> comment.txt
+                        echo "IMAGE | TAG | SIZE" >> comment.txt
+                        echo "------ | ------ | ------ " >> comment.txt
+
+                        while IFS= read -r line; do
+                            # Use '/' as the delimiter and print the text after the 4th '/'
+                            OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
+                            IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
+                            TAG=$(echo "$OUTPUT" | awk '{print $2}')
+                            SIZE=$(echo "$OUTPUT" | awk '{print $7}')
+                            # Print the result
+                            echo "$IMAGE | $TAG | $SIZE" >> comment.txt
+                        done < dockertags.txt
+                    done
+      - name: Docker_Push
+        run: |
+            #!/bin/bash
+
+            # Set the desired registry
+            REGISTRY="us-docker.pkg.dev"
+
+            # Get the list of images and iterate through them
+            docker image ls | grep -ai $REGISTRY | while read -r line; do
+                # Extract image name, tag, and ID
+                image_name=$(echo $line | awk '{print $1}')
+                image_tag=$(echo $line | awk '{print $2}')
+                image_id=$(echo $line | awk '{print $3}')
+
+                # Push the image to the specified registry
+                echo "Docker Push $image_name"
+                docker tag $image_id $image_name:$image_tag
+                docker push $image_name:$image_tag
+            done
+      - name: Helm_Package_And_push
+        run: |
+              #!/bin/bash
+              helm version
+              GIT_SHORT_HASH=0.0.0-$(git rev-parse --short HEAD)
+              OCI_REGISTRY="${{env.OCI_REGISTRY}}"
+              REGISTRIES="${{env.REGISTRIES}}"
+              REPOSITORY="${{env.REPOSITORY}}"
+
+              ROOT_DIR="$(pwd)"
+
+              # Define the charts directory
+              CHARTS_DIR="${ROOT_DIR}/charts"
+              
+              # Find all subdirectories under the charts directory
+              SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+              
+              # Package each subdirectory as a Helm chart
+              for SUBDIR in ${SUBDIRS}; do
+              IMAGE_NAME=${SUBDIR##*/}
+
+
+                if [ -f "${SUBDIR}/Chart.yaml" ]; then
+                  echo "Packaging Helm chart in ${SUBDIR}"
+                  
+                  #Sed image.repository
+                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
+                  #Sed image.tag
+                  sed -i "s|tag: .*|tag: ${GIT_SHORT_HASH}|" "${SUBDIR}/values.yaml"
+                  ##### 
+                  helm package "${SUBDIR}" --version "${GIT_SHORT_HASH}" -d "${CHARTS_DIR}"   
+                  # Index the charts
+                  helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY}"
+                  helm push "${SUBDIR}-${GIT_SHORT_HASH}.tgz"  "${OCI_REGISTRY}"
+
+                else
+                  echo "Skipping ${SUBDIR} as it does not contain a valid Helm chart"
+                fi
+              done
+              
+              # # Index the charts
+              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/ "
+              ls -ltrh charts 
+              echo "Helm charts packaged/indexed/push successfully!"  
+      - name: Debug
+        run: |
+              #!/bin/bash  
+              echo "${{ inputs.PR_NUMBER }}"
+              echo "${{ secrets.GITHUB_TOKEN }}"
+      - uses: actions/github-script@v7
+        id: get_pr_data
+        with:
+          script: |
+              return (
+                await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  commit_sha: context.sha,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                })
+              ).data[0];
+      - name: Pull Request data
+        id: pr_data
+        run: |
+          echo '${{ fromJson(steps.get_pr_data.outputs.result).number }}'
+          echo '${{ fromJson(steps.get_pr_data.outputs.result).title }}'
+          pr_number='${{ fromJson(steps.get_pr_data.outputs.result).number }}'
+          echo "::set-output name=pr_number::${pr_number}"
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        id: hello
+        with:
+          filePath:  comment.txt
+          pr_number: ${{ steps.pr_data.outputs.pr_number }}
+
+
+
+
+
+
+
