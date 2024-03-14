@@ -54,4 +54,5 @@ jobs:
         with:
           repository: prodoscore/development-cluster
           ref: "main"
+          token: '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'
 
