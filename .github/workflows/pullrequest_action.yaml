@@ -1,15 +1,15 @@
 name: python_regular_cicd_action
 on:
   workflow_call:
-    inputs:
-      workload_identity_provider:
-        type: string
-      service_account:
-        type: string
-      cluster_name:
-        type: string
-      cluster_location:
-        type: string
+    # inputs:
+    #   workload_identity_provider:
+    #     type: string
+    #   service_account:
+    #     type: string
+    #   cluster_name:
+    #     type: string
+    #   cluster_location:
+    #     type: string
     #   BOT_USER:
     #     type: string
     #   PR_NUMBER:
