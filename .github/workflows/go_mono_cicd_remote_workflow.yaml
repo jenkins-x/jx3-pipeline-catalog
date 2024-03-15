@@ -96,9 +96,10 @@ jobs:
     
                   # List all subdirectories in the base directory
                   SUBDIRS=$(ls -l "$BASE_DIR" | grep '^d' | awk '{print $9}')
-                  echo $SUBDIRS
+                  echo "Dubugl1"
                   # Build Docker images for each subdirectory
                   for SUBDIR in $SUBDIRS
+                  echo "Dubugl2"
                   do
                   echo $SUBDIRS
                     IMAGE_NAME="$SUBDIR"
@@ -107,7 +108,7 @@ jobs:
                     # Check if Dockerfile exists in the subdirectory
                     if [ -f "$DOCKERFILE" ]; then
                       echo "Building Docker image for $SUBDIR ..."
-                      
+                      echo "Dubugl2"
                       # Navigate to the subdirectory and build the Docker image
                       docker build -f  "$BASE_DIR/$SUBDIR"/Dockerfile --build-arg github_user=${{ vars.GITHUBUSER }} --build-arg github_personal_token=${{ secrets.GITTOKEN }} -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .                     
                       echo "*************************************************************"
