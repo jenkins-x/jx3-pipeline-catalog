@@ -96,7 +96,7 @@ spec:
         "buildName": "$NAME $BUILD_NUMBER",
         "buildUrl": "$JENKINS_X_URL",
         "reportUrl": "$SITE",
-        "reportName": "Preview Integration Tests"
+        "reportName": "Integration Tests"
       }
       end
       allure generate $TEST_RESULT_DIR -o $REPORT_DIR
@@ -132,7 +132,8 @@ spec:
                   "__scheme__": "https",
                   "test_name": "${NAME}",
                   "test_path": "${SITEPATH}",
-                  "test_build": "${SUBPATH}"
+                  "test_build": "${SUBPATH}",
+                  "owner": "${OWNER}"
               }
           }
       ]
