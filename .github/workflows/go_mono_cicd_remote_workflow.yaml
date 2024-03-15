@@ -1,4 +1,4 @@
-name: python_regular_cicd_action
+name: go_mono_cicd_remote_workflow
 on:
   workflow_call:
     inputs:
