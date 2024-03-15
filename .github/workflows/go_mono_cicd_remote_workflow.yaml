@@ -104,7 +104,10 @@ jobs:
                   echo $SUBDIRS
                     IMAGE_NAME="$SUBDIR"
                     DOCKERFILE="$BASE_DIR/$SUBDIR/Dockerfile"
-                    
+                    echo "***************"
+                    echo $DOCKERFILE
+                    pwd
+                    echo "***************"
                     # Check if Dockerfile exists in the subdirectory
                     if [ -f "$DOCKERFILE" ]; then
                       echo "Building Docker image for $SUBDIR ..."
