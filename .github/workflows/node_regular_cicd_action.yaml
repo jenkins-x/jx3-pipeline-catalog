@@ -18,6 +18,10 @@ on:
     #   GITTOKEN:
     #     description: "Git token"
     #     required: true
+    outputs:
+      image_name:
+        value: ${{ jobs.build_job.outputs.image_name }}
+
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
   PULL_BASE_REF: ${{ github.base_ref }}
