@@ -113,6 +113,7 @@ jobs:
                         done < dockertags.txt
                     done
       - name: Docker_Push
+        id: Docker_Push 
         run: |
             #!/bin/bash
 
@@ -130,6 +131,7 @@ jobs:
                 echo "Docker Push $image_name"
                 docker tag $image_id $image_name:$image_tag
                 docker push $image_name:$image_tag
+                echo "::set-output name=image_name::${image_name}"
             done
       - name: Helm_Package_And_push
         run: |

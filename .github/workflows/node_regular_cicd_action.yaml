@@ -41,6 +41,8 @@ env:
 jobs:
   build_job:
     runs-on: ubuntu-latest
+    outputs:
+      Image: "${{ steps.docker_push.outputs.HELLO }}"
     permissions:
       contents: write
       id-token: write
@@ -71,7 +73,7 @@ jobs:
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
 
-      - name: Docker_Build
+      - name: Docker_Build        
         run: |-
                     #!/bin/bash
                     REGISTRIES="${{env.REGISTRIES}}"
@@ -113,6 +115,7 @@ jobs:
                         done < dockertags.txt
                     done
       - name: Docker_Push
+        id: docker_push
         run: |
             #!/bin/bash
 
@@ -130,6 +133,7 @@ jobs:
                 echo "Docker Push $image_name"
                 docker tag $image_id $image_name:$image_tag
                 docker push $image_name:$image_tag
+                echo "::set-output name=image_name::${image_name}"
             done
       - name: Helm_Package_And_push
         run: |
