@@ -140,7 +140,9 @@ jobs:
                 echo "Docker Push $image_name"
                 docker tag $image_id $image_name:$image_tag
                 docker push $image_name:$image_tag
-                echo "image_name=world" >> "$GITHUB_OUTPUT"
+                #echo "image_name=world" >> "$GITHUB_OUTPUT"
+                # Output the image name and tag
+                echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
                 echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
                 
             done
