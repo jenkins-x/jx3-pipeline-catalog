@@ -42,7 +42,7 @@ jobs:
   build_job:
     runs-on: ubuntu-latest
     outputs:
-      Image: "${{ steps.docker_push.outputs.HELLO }}"
+      image_name: "${{ steps.docker_push.outputs.image_name }}"
     permissions:
       contents: write
       id-token: write
@@ -134,6 +134,8 @@ jobs:
                 docker tag $image_id $image_name:$image_tag
                 docker push $image_name:$image_tag
                 echo "::set-output name=image_name::${image_name}"
+                #echo "{image_name}={value}" >> $GITHUB_STATE
+                #echo "out2=Your output2" >> $GITHUB_OUTPUT
             done
       - name: Helm_Package_And_push
         run: |
