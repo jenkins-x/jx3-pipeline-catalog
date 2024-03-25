@@ -21,6 +21,8 @@ on:
     outputs:
       image_name:
         value: ${{ jobs.build_job.outputs.image_name }}
+      image_tag: 
+        value: ${{ jobs.build_job.outputs.image_tag }}
 
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
@@ -47,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_name: "${{ steps.docker_push.outputs.image_name }}"
+      image_tag: "${{ steps.docker_push.outputs.image_tag }}"
     permissions:
       contents: write
       id-token: write
@@ -138,6 +141,7 @@ jobs:
                 docker tag $image_id $image_name:$image_tag
                 docker push $image_name:$image_tag
                 echo "image_name=world" >> "$GITHUB_OUTPUT"
+                echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
                 
             done
       - name: Helm_Package_And_push
