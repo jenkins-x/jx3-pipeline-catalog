@@ -13,7 +13,7 @@ jobs:
     outputs:
       build_env: ${{ steps.check.outputs.BUILD_ENV }}
     steps:
-      - name: check
+      - name: Check
         id: check
         run: |-
           #!/bin/bash
