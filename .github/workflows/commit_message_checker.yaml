@@ -15,6 +15,8 @@ jobs:
           echo "BUILD_PARAMETER: $BUILD_PARAMETER"
           if [[ "$BUILD_PARAMETER" == 'build' ]]; then
             echo "Commit message contains 'build'. Triggering the workflow."
+            BUILD_ENV=$(echo $GIT_COMMENT | awk -F':' '{print $2}')
+            echo "BUILD_ENV: $BUILD_ENV"
           else
             echo "Commit message does not contain 'build'. Exiting without running the workflow."
             exit 78
