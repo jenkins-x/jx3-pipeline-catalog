@@ -28,6 +28,8 @@ jobs:
             echo "Commit message does not contain 'build'. Exiting without running the workflow."
             exit 78
           fi
+      - name: Print build_env
+        run: echo "build_env=${{ steps.check.outputs.build_env }}"
 
 
 
