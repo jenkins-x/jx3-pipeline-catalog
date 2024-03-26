@@ -1,14 +1,20 @@
 name: commit_message_checker
 on:
   workflow_call:
+    outputs:
+      build_env:
+        value: ${{ jobs.check.outputs.build_env }}
 env:
   GIT_COMMENT: ${{ github.event.head_commit.message }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    outputs:
+      build_env: ${{ steps.check.outputs.BUILD_ENV }}
     steps:
       - name: check
+        id: check
         run: |-
           #!/bin/bash
           BUILD_PARAMETER=$(echo $GIT_COMMENT | awk -F':' '{print $1}')
@@ -17,6 +23,7 @@ jobs:
             echo "Commit message contains 'build'. Triggering the workflow."
             BUILD_ENV=$(echo $GIT_COMMENT | awk -F':' '{print $2}')
             echo "BUILD_ENV: $BUILD_ENV"
+            echo "BUILD_ENV=${BUILD_ENV}" >> "$GITHUB_OUTPUT"
           else
             echo "Commit message does not contain 'build'. Exiting without running the workflow."
             exit 78
