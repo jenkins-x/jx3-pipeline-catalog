@@ -31,7 +31,7 @@ spec:
               memory: 600Mi
         - name: promote-changelog
           resources: {}
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.138
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.139
           name: promote-pullrequest
           resources: {}
           script: |
