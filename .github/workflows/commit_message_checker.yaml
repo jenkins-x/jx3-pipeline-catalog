@@ -1,35 +1,38 @@
 name: commit_message_checker
+
 on:
   issue_comment:
     types: [created]
 
 env:
-  GIT_COMMENT: ${{ github.event.head_commit.message }}
+  GIT_COMMENT: ${{ github.event.comment.body }}
 
 jobs:
+
   check:
     runs-on: ubuntu-latest
     if: github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')
     outputs:
       build_env: ${{ steps.check.outputs.build_env }}
+
     steps:
-      - name: Check
-        id: check
-        run: |-
-          #!/bin/bash
-          BUILD_PARAMETER=$(echo $GIT_COMMENT | awk -F':' '{print $1}')
-          echo "BUILD_PARAMETER: $BUILD_PARAMETER"
-          if [[ "$BUILD_PARAMETER" == '/deploy' ]]; then
-            echo "Commit message contains 'build'. Triggering the wodeployrkflow."
-            build_env=$(echo $GIT_COMMENT | awk -F' ' '{print $2}')
-            echo "BUILD_ENV: $build_env"
-            echo "build_env=${build_env}" >> "$GITHUB_OUTPUT"
-          else
-            echo "Commit message does not contain 'build'. Exiting without running the workflow."
-            exit 78
-          fi
-      - name: Print build_env
-        run: echo "build_env=${{ steps.check.outputs.build_env }}"
+    - name: Check
+      id: check
+      run: |
+        #!/bin/bash
+        DEPLOY_STRING=$(echo "$GIT_COMMENT" | grep -o '/deploy\s*\w*')
+        if [ -n "$DEPLOY_STRING" ]; then
+          BUILD_ENV=$(echo "$DEPLOY_STRING" | awk '{ print $2 }')
+          echo "Commit message contains '$DEPLOY_STRING'. Triggering the workflow."
+          echo "BUILD_ENV: $BUILD_ENV"
+          echo "build_env=$BUILD_ENV" >> "$GITHUB_OUTPUT"
+        else
+          echo "Commit message does not contain '/deploy <env id>'. Exiting without running the workflow."
+          exit 78
+        fi
+
+    - name: Print build_env
+      run: echo "build_env=${{ steps.check.outputs.build_env }}"
 
 
 
