@@ -1,15 +1,15 @@
 name: commit_message_checker
 on:
-  workflow_call:
-    outputs:
-      build_env:
-        value: ${{ jobs.check.outputs.build_env }}
+  issue_comment:
+    types: [created]
+
 env:
   GIT_COMMENT: ${{ github.event.head_commit.message }}
 
 jobs:
   check:
     runs-on: ubuntu-latest
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')
     outputs:
       build_env: ${{ steps.check.outputs.build_env }}
     steps:
@@ -19,9 +19,9 @@ jobs:
           #!/bin/bash
           BUILD_PARAMETER=$(echo $GIT_COMMENT | awk -F':' '{print $1}')
           echo "BUILD_PARAMETER: $BUILD_PARAMETER"
-          if [[ "$BUILD_PARAMETER" == 'build' ]]; then
-            echo "Commit message contains 'build'. Triggering the workflow."
-            build_env=$(echo $GIT_COMMENT | awk -F':' '{print $2}')
+          if [[ "$BUILD_PARAMETER" == '/deploy' ]]; then
+            echo "Commit message contains 'build'. Triggering the wodeployrkflow."
+            build_env=$(echo $GIT_COMMENT | awk -F' ' '{print $2}')
             echo "BUILD_ENV: $build_env"
             echo "build_env=${build_env}" >> "$GITHUB_OUTPUT"
           else
