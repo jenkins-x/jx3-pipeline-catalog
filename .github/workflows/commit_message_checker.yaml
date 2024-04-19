@@ -1,6 +1,7 @@
 name: commit_message_checker
 
 on:
+  workflow_call:
   issue_comment:
     types: [created]
 
