@@ -2,8 +2,6 @@ name: commit_message_checker
 
 on:
   workflow_call:
-  issue_comment:
-    types: [created]
 
 env:
   GIT_COMMENT: ${{ github.event.comment.body }}
