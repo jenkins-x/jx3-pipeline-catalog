@@ -26,7 +26,7 @@ jobs:
           echo "BUILD_ENV: $BUILD_ENV"
           echo "build_env=$BUILD_ENV" >> "$GITHUB_OUTPUT"
         else
-          echo "Commit message does not contain '/deploy <env id>'. Exiting without running the workflow."
+          echo "Commit message does not contain '/build <env id>'. Exiting without running the workflow."
           exit 78
         fi
 
