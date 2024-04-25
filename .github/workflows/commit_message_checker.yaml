@@ -19,7 +19,7 @@ jobs:
       id: check
       run: |
         #!/bin/bash
-        DEPLOY_STRING=$(echo "$GIT_COMMENT" | grep -o '/deploy\s*\w*')
+        DEPLOY_STRING=$(echo "$GIT_COMMENT" | grep -o '/build\s*\w*')
         if [ -n "$DEPLOY_STRING" ]; then
           BUILD_ENV=$(echo "$DEPLOY_STRING" | awk '{ print $2 }')
           echo "Commit message contains '$DEPLOY_STRING'. Triggering the workflow."
