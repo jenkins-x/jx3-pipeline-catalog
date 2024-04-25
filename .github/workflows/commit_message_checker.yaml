@@ -4,13 +4,13 @@ on:
   workflow_call:
 
 env:
-  GIT_COMMENT: ${{ github.event.comment.body }}
+  GIT_COMMENT: ${{ github.event.comment.body }}"
 
 jobs:
 
   check:
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')
+    #if: github.event.issue.pull_request && contains(github.event.comment.body, '/build')
     outputs:
       build_env: ${{ steps.check.outputs.build_env }}
 
