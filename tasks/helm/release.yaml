@@ -40,7 +40,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.139
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.140
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -50,7 +50,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.139
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.140
           name: promote-changelog
           resources: {}
           script: |
@@ -71,7 +71,7 @@ spec:
             git push --force origin v$VERSION
 
             jx changelog create --version v${VERSION} --output-markdown ../changelog.md
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.139
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.140
           name: promote-helm-release
           resources: {}
           script: |
