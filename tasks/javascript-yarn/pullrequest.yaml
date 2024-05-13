@@ -39,13 +39,13 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: node:14-slim
+        - image: node:21-slim
           name: build-yarn-install
           resources: {}
           script: |
             #!/bin/sh
             yarn install
-        - image: node:14-slim
+        - image: node:21-slim
           name: build-yarn-test
           resources: {}
           script: |
