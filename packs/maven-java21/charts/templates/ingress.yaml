@@ -1,4 +1,5 @@
-{{- if and (.Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
+{{- if and (or .Values.ingress.host .Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
+{{- $host := (.Values.ingress.host | default (printf "%s%s%s" .Values.service.name .Values.jxRequirements.ingress.namespaceSubDomain .Values.jxRequirements.ingress.domain)) | quote }}
 {{- $annotations := dict }}
 {{- $_ := merge $annotations .Values.ingress.annotations .Values.jxRequirements.ingress.annotations  }}
 {{- if not (hasKey $annotations "kubernetes.io/ingress.class") }}
@@ -16,6 +17,7 @@ metadata:
 {{- end }}
   name: {{ .Values.service.name }}
 {{- if .Values.ingress.labels }}
+  labels:
 {{ toYaml .Values.ingress.labels | indent 4 }}
 {{- end }}
 spec:
@@ -30,19 +32,19 @@ spec:
               number: {{ .Values.service.externalPort }}
 {{- if eq "NodePort" .Values.jxRequirements.ingress.serviceType }}
         path: "/{{ .Release.Namespace }}/hook"
-{{- else if .Values.jxRequirements.ingress.domain }}
-    host: {{ .Values.service.name }}{{ .Values.jxRequirements.ingress.namespaceSubDomain }}{{ .Values.jxRequirements.ingress.domain }}
+{{- else if or .Values.ingress.host .Values.jxRequirements.ingress.domain }}
+    host: {{ $host }}
 {{- end }}
 {{- if .Values.jxRequirements.ingress.tls.enabled }}
   tls:
   - hosts:
-    - {{ .Values.service.name }}{{ .Values.jxRequirements.ingress.namespaceSubDomain }}{{ .Values.jxRequirements.ingress.domain }}
+    - {{ $host }}
 {{- if and (hasKey .Values.jxRequirements.ingress.tls "secretName") (.Values.jxRequirements.ingress.tls.secretName) }}
     secretName: "{{ .Values.jxRequirements.ingress.tls.secretName }}"
 {{- else if .Values.jxRequirements.ingress.tls.production }}
-    secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
+    secretName: "tls-{{ .Values.ingress.host | default .Values.jxRequirements.ingress.domain | replace "." "-" }}-p"
 {{- else }}
-    secretName: "tls-{{ .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
+    secretName: "tls-{{ .Values.ingress.host | default .Values.jxRequirements.ingress.domain | replace "." "-" }}-s"
 {{- end }}
 {{- end }}
 {{- end }}
