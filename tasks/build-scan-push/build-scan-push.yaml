@@ -38,7 +38,7 @@ spec:
     resources: {}
     script: |
       trivy image --skip-update --input /workspace/source/image.tar > /workspace/source/scanresults.txt
-  - image: ghcr.io/jenkins-x/jx-boot:3.10.142
+  - image: ghcr.io/jenkins-x/jx-boot:3.10.143
     name: analyze
     resources: {}
     script: |
