@@ -53,7 +53,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.142
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.143
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -98,7 +98,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.142
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.143
           name: promote-changelog
           resources: {}
           script: |
@@ -119,7 +119,7 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.142
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.143
           name: promote-helm-release
           resources: {}
           script: |
