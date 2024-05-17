@@ -83,7 +83,7 @@ spec:
           - pr
           - --add-changelog
           - ../changelog.md
-          image: ghcr.io/jenkins-x/jx-updatebot:0.4.17
+          image: ghcr.io/jenkins-x/jx-updatebot:0.4.21
           name: promote-release
           resources: {}
         volumes:
