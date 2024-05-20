@@ -1,0 +1,134 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  creationTimestamp: null
+  name: build-scan-push
+spec:
+  stepTemplate:
+    name: ""
+    resources:
+      limits: {}
+    workingDir: /workspace/source
+  steps:
+  - image: maven:3.9-eclipse-temurin-11
+    name: integration-test
+    resources: {}
+    onError: continue
+    env:
+    - name: _JAVA_OPTIONS
+      value: -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport
+        -Dsun.zip.disableMemoryMapping=true
+        -DLog4jContextSelector=org.apache.logging.log4j.core.selector.ClassLoaderContextSelector
+        -Djdk.net.URLClassPath.disableClassPathURLCheck=true
+        -Dmaven.repo.local=/stash/.mvnrepository
+    - name: MAVEN_OPTS
+      value: -Duser.timezone=Europe/Stockholm
+    - name: TZ
+      value: Europe/Stockholm
+    volumeMounts:
+    - mountPath: /root/.m2/
+      name: maven-settings
+    script: |
+      #!/usr/bin/env sh
+      set -ex
+      . .jx/variables.sh
+
+      cp /workspace/stash/cacerts $JAVA_HOME/lib/security/cacerts
+
+      # FIXME: The whole project needs to be built since the workspace of this task doesn't have the snapshot jars from
+      # pullrequest pipeline. So any changes in the dependencies in the project of issi-ticket-test wouldn't be picked up otherwise. It
+      # would be nice to somehow stash the snapshot jars from the build pipeline and reuse here. Could be put in S3 bucket with
+      # lifecycle configured to expire after 0 Days, which means by midnight, or maybe a bit longer. Maybe using s3-wagon to
+      # basically have a maven repo for each pull request. Before deploying new snapshots the old ones should be removed so the tests
+      # don't get old snapshots in the case when incremental build stops building a module for the PR.
+      # https://github.com/seahen/maven-s3-wagon
+
+      mvn --no-snapshot-updates --no-transfer-progress -Dmaven.test.failure.ignore=false \
+          -DjenkinsBuild=${BUILD_NUMBER} -DthreadCount=50 -Dparallel=classes \
+          -DparallelTestsTimeoutInSeconds=540 -DreuseForks=true -DquickTest=true \
+          -DskipUnitTests=true -Dticket.env=${ENV} -Dgit.branch=${FEATURE} \
+          -Dbrowser=remote
+  - image: public.ecr.aws/bitnami/aws-cli:2
+    securityContext:
+      runAsUser: 0
+    name: download-test-history
+    resource: {}
+    script: |
+      #!/bin/bash
+      set -ex
+      source .jx/variables.sh
+      historyDir=${TEST_RESULT_DIR}/history
+      mkdir -p $historyDir
+      aws s3 cp --recursive --only-show-errors ${STORAGE}/history $historyDir
+  - image: klilleby/allure-docker-service:2.20.1-alpine
+    name: generate-test-report
+    resources: {}
+    securityContext:
+      runAsUser: 0
+    script: |
+      #!/bin/bash
+      set -ex
+      source .jx/variables.sh
+      # Set links to previous builds in report. Work around for lack of https://github.com/allure-framework/allure-maven/issues/220
+      cat << end >> $TEST_RESULT_DIR/executor.json
+      {
+        "name": "Jenkins X",
+        "type": "jenkins-x",
+        "url": "https://www.ticket.se",
+        "buildOrder": $BUILD_NUMBER,
+        "buildName": "$NAME $BUILD_NUMBER",
+        "buildUrl": "$JENKINS_X_URL",
+        "reportUrl": "$SITE",
+        "reportName": "Preview Integration Tests"
+      }
+      end
+      allure generate $TEST_RESULT_DIR -o $REPORT_DIR
+  - image: public.ecr.aws/bitnami/aws-cli:2
+    securityContext:
+      runAsUser: 0
+    name: upload-report
+    resource: {}
+    script: |
+      #!/bin/bash
+      set -ex
+      source .jx/variables.sh
+      cd $REPORT_DIR
+      aws s3 cp --recursive --only-show-errors . ${STORAGE}/${SUBPATH}
+      aws s3 cp --recursive --only-show-errors history ${STORAGE}/history
+      cat << end > index.html
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <script>
+      window.location.replace("$SITE");
+      </script>
+      </head>
+      </html>
+      end
+      aws s3 cp index.html ${STORAGE}/index.html
+  - image: ghcr.io/jenkins-x/jx-boot:3.10.75
+    name: add-link
+    resources: {}
+    script: |
+      #!/bin/bash
+      set -ex
+      source .jx/variables.sh
+      if [ -n "$PULL_NUMBER" ]
+      then
+        jx gitops pr comment -c "Integration test report available at $SITE"
+      fi
+      # Exit with result from integration test
+      # Skipping for now so not every developer need permissions to /override
+      # exit `cat $(steps.step-integration-test.exitCode.path)`
+  volumes:
+  - name: maven-settings
+    secret:
+      secretName: issi-ticket-maven-settings
+  workspaces:
+  - name: src
+    description: The folder where we expect the source to be chacked out in the direcory source
+    mountPath: /workspace
+  - name: stash
+    description: The folder where we expect the stash to be exploded
+    optional: true
+    mountPath: /stash
