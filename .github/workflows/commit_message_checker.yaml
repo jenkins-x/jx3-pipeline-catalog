@@ -1,0 +1,41 @@
+name: commit_message_checker
+
+on:
+  workflow_call:
+
+env:
+  GIT_COMMENT: ${{ github.event.comment.body }}"
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest
+    #if: github.event.issue.pull_request && contains(github.event.comment.body, '/build')
+    outputs:
+      build_env: ${{ steps.check.outputs.build_env }}
+
+    steps:
+    - name: Check
+      id: check
+      run: |
+        #!/bin/bash
+        DEPLOY_STRING=$(echo "$GIT_COMMENT" | grep -o '/build\s*\w*')
+        if [ -n "$DEPLOY_STRING" ]; then
+          BUILD_ENV=$(echo "$DEPLOY_STRING" | awk '{ print $2 }')
+          echo "Commit message contains '$DEPLOY_STRING'. Triggering the workflow."
+          echo "BUILD_ENV: $BUILD_ENV"
+          echo "build_env=$BUILD_ENV" >> "$GITHUB_OUTPUT"
+        else
+          echo "Commit message does not contain '/build <env id>'. Exiting without running the workflow."
+          exit 78
+        fi
+
+    - name: Print build_env
+      run: echo "build_env=${{ steps.check.outputs.build_env }}"
+
+
+
+
+
+
+
