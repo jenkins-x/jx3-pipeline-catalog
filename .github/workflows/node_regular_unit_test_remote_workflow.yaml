@@ -1,0 +1,97 @@
+name: node_regular_cicd_action
+on:
+  workflow_call:
+    inputs:
+      workload_identity_provider:
+        type: string
+      service_account:
+        type: string
+      cluster_name:
+        type: string
+      cluster_location:
+        type: string
+    #   BOT_USER:
+    #     type: string
+    #   PR_NUMBER:
+    #     type: string
+    # secrets:
+    #   GITTOKEN:
+    #     description: "Git token"
+    #     required: true
+    outputs:
+      image_name:
+        value: ${{ jobs.build_job.outputs.image_name }}
+      image_tag: 
+        value: ${{ jobs.build_job.outputs.image_tag }}
+
+env:
+  GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
+  PULL_BASE_REF: ${{ github.base_ref }}
+  PULL_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+  PULL_NUMBER: ${{ github.event.pull_request.number }}
+  PULL_PULL_REF: refs/pull/${{ github.event.pull_request.number }}/head
+  PULL_PULL_SHA: ${{ github.event.pull_request.head.sha }}
+  PULL_REFS: ${{ github.base_ref }}:${{ github.event.pull_request.base.sha }},${{ github.event.pull_request.number }}:${{ github.event.pull_request.head.sha }}:refs/pull/${{ github.event.pull_request.number }}/head
+  JOB_NAME: "verify"
+  JOB_SPEC: "type:presubmit"
+  JOB_TYPE: "presubmit"
+  REPO_NAME: ${{ github.event.repository.name }}
+  REPO_OWNER: ${{ github.repository_owner }}
+  REPO_URL: https://github.com/${{ github.repository }}.git
+  JX_KUBERNETES: true
+  SOURCE_DIR: "${{ github.workspace }}/source"
+  OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  REGISTRIES: "us-docker.pkg.dev"
+  REPOSITORY: "prodoscore-artifactory"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          # check-latest: true
+
+      - name: Install dependencies
+        id: installation
+        run: npm ci
+
+      - name: Check Lints 
+        id: run_eslint
+        run: |
+          npm run lint
+        continue-on-error: true
+      
+      - name: Run Unit Tests 
+        id: run_jest
+        run: |
+          npm run test
+        continue-on-error: true
+
+      - name: Audit Check
+        id: run_audit
+        run: |
+          npm run audit
+        continue-on-error: true
+
+      - name: Update Pull Request
+        uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.pullrequest_remote_work_flow_secret }}
+          script: |
+            const output = `### Pipeline Results 🤖\n
+            #### Lint Results 📝\`${{ steps.run_eslint.outcome }}\`
+            #### Unit Testing Results 📝\`${{ steps.run_jest.outcome }}\`
+            #### Audit Checking Results 📝\`${{ steps.run_audit.outcome }}\`
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+
