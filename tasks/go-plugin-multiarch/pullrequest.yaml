@@ -34,20 +34,20 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: golang:1.19.3@sha256:7ffa70183b7596e6bc1b78c132dbba9a6e05a26cd30eaa9832fecad64b83f029
+        - image: golang:1.22.3@sha256:f43c6f049f04cbbaeb28f0aad3eea15274a7d0a7899a617d0037aec48d7ab010
           name: build-make-linux
           resources: {}
           script: |
             #!/bin/bash
             source .jx/variables.sh
             make linux
-        - image: golangci/golangci-lint:v1.50.1-alpine@sha256:a392d4e44049a444a927878792dae9534075ec57880e0657647ce818bd8278c2
+        - image: golangci/golangci-lint:v1.58.2-alpine@sha256:511101feba931bd578164b77714d1cee015d8980e0d40033c378b6626193e4ab
           name: make-lint
           resources: {}
           script: |
             #!/bin/sh
             golangci-lint run
-        - image: golang:1.19.3@sha256:7ffa70183b7596e6bc1b78c132dbba9a6e05a26cd30eaa9832fecad64b83f029
+        - image: golang:1.22.3@sha256:f43c6f049f04cbbaeb28f0aad3eea15274a7d0a7899a617d0037aec48d7ab010
           name: build-make-test
           resources: {}
           script: |
