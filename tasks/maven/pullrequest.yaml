@@ -34,7 +34,7 @@ spec:
             name: maven-settings
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.145
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.146
           name: jx-variables
           resources:
             # set requests for the pod here
