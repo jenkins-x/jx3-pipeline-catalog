@@ -12,13 +12,7 @@ spec:
   steps:
   - image: maven:3.9-eclipse-temurin-11
     name: integration-test
-    resources:
-      limits:
-        cpu: 2300m
-        memory: 8000Mi
-      requests:
-        cpu: 1500m
-        memory: 5500Mi
+    resources: {}
     onError: continue
     envFrom:
     - secretRef:
