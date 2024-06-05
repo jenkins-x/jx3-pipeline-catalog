@@ -6,16 +6,16 @@ metadata:
 spec:
   stepTemplate:
     name: ""
-    resources:
-      limits: {}
-      requests:
-        cpu: 1500m
-        memory: 5500Mi
+    resources: {}
     workingDir: /workspace/source
   steps:
   - image: maven:3.9-eclipse-temurin-11
     name: integration-test
-    resources: {}
+    resources:   
+      limits: {}
+      requests:
+        cpu: 1500m
+        memory: 5500Mi
     onError: continue
     envFrom:
     - secretRef:
