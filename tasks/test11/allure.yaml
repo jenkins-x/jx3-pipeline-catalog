@@ -7,7 +7,12 @@ spec:
   stepTemplate:
     name: ""
     resources:
-      limits: {}
+      limits:
+        cpu: 2300m
+        memory: 8000Mi
+      requests:
+        cpu: 1500m
+        memory: 5500Mi
     workingDir: /workspace/source
   steps:
   - image: maven:3.9-eclipse-temurin-11
