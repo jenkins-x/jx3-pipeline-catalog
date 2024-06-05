@@ -7,9 +7,7 @@ spec:
   stepTemplate:
     name: ""
     resources:
-      limits:
-        cpu: 2300m
-        memory: 8000Mi
+      limits: {}
       requests:
         cpu: 1500m
         memory: 5500Mi
