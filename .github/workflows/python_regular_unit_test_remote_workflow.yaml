@@ -7,7 +7,7 @@ on:
         required: true
       repository:
         type: string
-        required: true
+        required: false
       enable:
         type: string
         required: true   
