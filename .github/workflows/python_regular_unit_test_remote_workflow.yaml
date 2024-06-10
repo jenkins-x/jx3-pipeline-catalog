@@ -1,0 +1,73 @@
+name: python_regular_unit_test_remote_workflow
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        type: string
+        required: true
+      repository:
+        type: string
+        required: true
+      enable:
+        type: string
+        required: true   
+
+env:
+  REPOSITORY: ${{ inputs.repository }}    
+
+jobs:
+
+    code_validation:
+      name: Linting and Unit Testing
+      runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        id-token: write
+        pull-requests: write
+
+      if: ${{ inputs.enable == 'true' }}
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+  
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            #python-version: '3.x'
+            python-version: ${{ github.event.inputs.node-version }}
+  
+        - name: Install dependencies
+          id: install
+          run: |
+            pip install pipenv
+            pipenv install gunicorn wheel --skip-lock
+            pipenv sync --dev
+  
+        - name: Run Unit Tests
+          id: unit_test
+          run: |
+            pipenv run pytest
+          continue-on-error: true
+  
+        - name: Check Lints
+          id: lint_check
+          run: |
+            pipenv run flake8
+          continue-on-error: true
+  
+        - name: Update Pull Request
+          uses: actions/github-script@v6
+          if: github.event_name == 'pull_request'
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const output = `### Pipeline Results 🤖\n
+              #### Lint Results 📝\`${{ steps.lint_check.outcome }}\`
+              #### Unit Testing Results 📝\`${{ steps.unit_test.outcome }}\`
+              *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
