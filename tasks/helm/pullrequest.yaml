@@ -23,7 +23,7 @@ spec:
             limits: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.146
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.147
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -34,7 +34,7 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.146
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.147
           name: build-helm-build
           resources: {}
           script: |
