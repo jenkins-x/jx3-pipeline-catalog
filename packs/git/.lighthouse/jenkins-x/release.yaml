@@ -35,7 +35,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.147
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.148
           name: jx-variables
           resources:
             # override requests for the pod here
