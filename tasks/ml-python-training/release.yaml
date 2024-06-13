@@ -40,7 +40,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.148
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.149
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -76,7 +76,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-boot:3.10.148
+          image: ghcr.io/jenkins-x/jx-boot:3.10.149
           name: build-export-model
           resources: {}
           script: |+

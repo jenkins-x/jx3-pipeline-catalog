@@ -25,7 +25,7 @@ spec:
             limits: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.148
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.149
           name: jx-variables
           resources:
             # set requests for the pod here
