@@ -53,6 +53,7 @@ spec:
       # https://github.com/seahen/maven-s3-wagon
 
       ./gradlew test
+      sleep 600
   - image: public.ecr.aws/bitnami/aws-cli:2
     securityContext:
       runAsUser: 0
