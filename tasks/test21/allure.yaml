@@ -40,8 +40,8 @@ spec:
       STORAGE=s3://${BUCKET}${SITEPATH}
       SITE_HOST=${BUCKET}
       SITE=https://${SITE_HOST}${SITEPATH}/${SUBPATH}/index.html
-      TEST_RESULT_DIR=accountsit/target/allure-results
-      REPORT_DIR=accountsit/target/site/allure
+      TEST_RESULT_DIR=allure-results
+      REPORT_DIR=site/allure
       end
       . .jx/variables.sh
       # FIXME: The whole project needs to be built since the workspace of this task doesn't have the snapshot jars from
@@ -53,7 +53,6 @@ spec:
       # https://github.com/seahen/maven-s3-wagon
 
       ./gradlew test
-      sleep 600
   - image: public.ecr.aws/bitnami/aws-cli:2
     securityContext:
       runAsUser: 0
