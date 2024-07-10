@@ -44,7 +44,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.153
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.154
           name: jx-variables
           resources: {}
           script: |
@@ -58,7 +58,7 @@ spec:
             terraform init
             terraform version
             terraform validate
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.153
+        - image: ghcr.io/jenkins-x/jx-boot:3.10.154
           name: changelog
           resources: {}
           script: |
