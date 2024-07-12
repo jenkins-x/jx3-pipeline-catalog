@@ -34,19 +34,19 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables
             jx gitops pr variables
-        - image: node:14-slim
+        - image: node:20-slim
           name: build-npm-install
           resources: {}
           script: |
             #!/bin/sh
             npm install
-        - image: node:14-slim
+        - image: node:20-slim
           name: build-npm-test
           resources: {}
           script: |
             #!/bin/sh
             CI=true DISPLAY=:99 npm test
-        - image: node:14-slim
+        - image: node:20-slim
           name: build-ui-build
           resources: {}
           script: |
