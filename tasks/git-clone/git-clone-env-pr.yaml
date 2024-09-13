@@ -29,11 +29,18 @@ spec:
       git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
       git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}
       git config --global credential.helper store
-      git clone $REPO_URL $SUBDIR
-      cd $SUBDIR
-      git fetch origin $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
-      git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
-      git reset --hard $PULL_PULL_SHA
+      if [ "$PULL_OPTIMISED" = "true" ]; then
+        echo "Optimizing git clone for PR: git clone --depth=1 --branch $PULL_PULL_REF $REPO_URL $SUBDIR"
+        git clone --depth=1 --branch $PULL_PULL_REF $REPO_URL $SUBDIR
+        cd $SUBDIR
+        git reset --hard $PULL_PULL_SHA
+      else
+        git clone $REPO_URL $SUBDIR
+        cd $SUBDIR
+        git fetch origin $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+        git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
+        git reset --hard $PULL_PULL_SHA
+      fi
       echo "checked out revision: $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
     workingDir: /workspace
   - envFrom:
