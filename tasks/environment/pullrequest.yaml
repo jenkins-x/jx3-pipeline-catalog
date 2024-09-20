@@ -25,13 +25,14 @@ spec:
         steps:
         - args:
           - pr
+          - --profile
           command:
-          - make
+          - apk add remake --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing && remake
           envFrom:
           - secretRef:
               name: jx-boot-job-env-vars
               optional: true
-          image: ghcr.io/jenkins-x/jx-boot:3.10.155
+          image: ghcr.io/jenkins-x/jx-boot:3.10.154
           name: make-pr
           resources:
             requests:
