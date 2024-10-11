@@ -45,7 +45,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.22.3@sha256:f43c6f049f04cbbaeb28f0aad3eea15274a7d0a7899a617d0037aec48d7ab010
+        - image: golang:1.23.2-alpine3.19:f6392ffebb028fed5ffe743ddb9716e38402c978779edd66474bb5d05f5e65e4
           name: release-binary
           resources: {}
           script: |
