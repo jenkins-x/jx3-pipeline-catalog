@@ -40,7 +40,7 @@ spec:
           script: |
             #!/bin/sh
             make linux
-        - image: golangci/golangci-lint:v1.58.2-alpine@sha256:511101feba931bd578164b77714d1cee015d8980e0d40033c378b6626193e4ab
+        - image: golangci/golangci-lint:v1.61.0-alpine@sha256:61e2d68adc792393fcb600340fe5c28059638d813869d5b4c9502392a2fb4c96
           name: make-lint
           resources: {}
           script: |
