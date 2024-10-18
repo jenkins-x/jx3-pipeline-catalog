@@ -76,7 +76,7 @@ spec:
           - pr
           - --add-changelog
           - ../changelog.md
-          image: ghcr.io/jenkins-x/jx-updatebot:0.4.25
+          image: ghcr.io/jenkins-x/jx-updatebot:0.4.27
           name: promote
           resources: {}
   podTemplate: {}
