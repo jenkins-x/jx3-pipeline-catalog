@@ -25,6 +25,7 @@ spec:
     resources: {}
     script: |
       #!/bin/sh
+      set -ex
       export SUBDIR="source"
       echo "git cloning url: $REPO_URL version $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
       git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
@@ -46,6 +47,7 @@ spec:
     resources: {}
     script: |
       #!/usr/bin/env sh
+      set -ex
       jx gitops git merge
     workingDir: /workspace/source
   workspaces:
