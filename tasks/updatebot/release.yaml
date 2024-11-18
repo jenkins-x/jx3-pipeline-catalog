@@ -24,7 +24,7 @@ spec:
         - command:
           - jx-updatebot
           - pr
-          image: ghcr.io/jenkins-x/jx-updatebot:0.4.27
+          image: mqubeosscluster.azurecr.io/spring-financial-group/jx-updatebot:0.0.1
           name: promote-release
           resources: {}
   serviceAccountName: tekton-bot
