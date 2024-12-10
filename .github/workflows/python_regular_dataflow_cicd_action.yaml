@@ -102,7 +102,12 @@ jobs:
                     echo "Repository Name: $REPO_NAME"
                     #Doker build
                     docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$REPOSITORY:$GIT_SHORT_HASH" .
-                    docker image ls | grep -ai $REGISTRIES > dockertags.txt
+                    docker image ls | grep -ai $REPOSITORY
+                    docker image ls | grep -ai $REPOSITORY > dockertags.txt
+                    
+                    echo "##### Docker build details" >> comment.txt
+                    echo "IMAGE | TAG | SIZE" >> comment.txt
+                    echo "------ | ------ | ------ " >> comment.txt
                     # Read input from dockertags.txt
                     while IFS= read -r line; do
                             # Use '/' as the delimiter and print the text after the 4th '/'
