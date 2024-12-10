@@ -101,9 +101,9 @@ jobs:
                     GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     echo "Repository Name: $REPO_NAME"
                     #Doker build
-                    docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$REPOSITORY:$GIT_SHORT_HASH" .
-                    docker image ls | grep -ai $REPOSITORY
-                    docker image ls | grep -ai $REPOSITORY > dockertags.txt
+                    docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$REPO_NAME:$GIT_SHORT_HASH" .
+                    docker image ls | grep -ai $REPO_NAME
+                    docker image ls | grep -ai $REPO_NAME > dockertags.txt
                     
                     echo "##### Docker build details" >> comment.txt
                     echo "IMAGE | TAG | SIZE" >> comment.txt
