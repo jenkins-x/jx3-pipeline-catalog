@@ -100,7 +100,8 @@ jobs:
                     REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
                     GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     echo "Repository Name: $REPO_NAME"
-
+                    #Doker build
+                    docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$REPOSITORY:$GIT_SHORT_HASH" .
 
 
                     #ROOT_DIR="$(pwd)"
