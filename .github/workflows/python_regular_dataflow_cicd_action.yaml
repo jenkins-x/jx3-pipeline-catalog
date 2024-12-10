@@ -97,8 +97,10 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
+                    REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
                     GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
-                    echo "Full Repository: ${{ github.repository }}"
+                    echo "Repository Name: $REPO_NAME"
+
 
 
                     #ROOT_DIR="$(pwd)"
