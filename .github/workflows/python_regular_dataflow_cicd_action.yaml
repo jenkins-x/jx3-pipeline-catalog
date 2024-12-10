@@ -98,7 +98,7 @@ jobs:
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
                     GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
-                    echo "REPOSITORY: $REPOSITORY"
+                    echo "Full Repository: ${{ github.repository }}"
 
 
                     #ROOT_DIR="$(pwd)"
@@ -106,7 +106,7 @@ jobs:
                     #CHARTS_DIR="${ROOT_DIR}/charts"
 
                     # Find all subdirectories under the charts directory
-                    SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+                    #SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
 
                     # # Package each subdirectory as a Helm chart
                     # for SUBDIR in ${SUBDIRS}; do
