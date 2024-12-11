@@ -100,7 +100,7 @@ jobs:
                     REPOSITORY="${{env.REPOSITORY}}"
                     REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
                     GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
-                    echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
+                    echo "git_short_hash=${GIT_SHORT_HASH}" >> "$GITHUB_OUTPUT"
                     echo "Repository Name: $REPO_NAME"
                     #Doker build
                     docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$REPO_NAME:$GIT_SHORT_HASH" .
@@ -151,7 +151,7 @@ jobs:
       - name: Flex_Template_Build
         id: flex_template_build
         run: |
-              gcloud dataflow flex-template build gs://clusters-df-dw-user-data/template_file_gcs_path/df-dw-user-data-template:${{ steps.docker_build.outputs.image_tag }}.json --image "us-docker.pkg.dev/prodoscore-artifactory/images/df-dw-user-data:${{ steps.docker_build.outputs.image_tag }}" --sdk-language "PYTHON" --metadata-file "metadata.json"
+              gcloud dataflow flex-template build gs://clusters-df-dw-user-data/template_file_gcs_path/df-dw-user-data-template:${{ steps.docker_build.outputs.git_short_hash }}.json --image "us-docker.pkg.dev/prodoscore-artifactory/images/df-dw-user-data:${{ steps.docker_build.outputs.git_short_hash }}" --sdk-language "PYTHON" --metadata-file "metadata.json"
 
 
       - name: Pull Request data
