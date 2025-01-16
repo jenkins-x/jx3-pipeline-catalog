@@ -23,6 +23,10 @@ spec:
       labels:
         draft: {{ default "draft-app" .Values.draft }}
         app: {{ template "fullname" . }}
+        service.istio.io/canonical-name: "{{ .Values.service.istioCanonicalName | default (template "fullname" .) }}"
+        service.istio.io/canonical-revision: "{{ .Values.service.istioCanonicalRevision | default .Chart.Version }}"
+        app.kubernetes.io/name: "{{ .Values.app.kubernetesName | default (template "fullname" .) }}"
+        app.kubernetes.io/version: "{{ .Values.app.kubernetesVersion | default .Chart.Version }}"
 {{- if .Values.podsLabels }}
 {{ toYaml .Values.podsLabels | indent 6 }}
 {{- end }}
