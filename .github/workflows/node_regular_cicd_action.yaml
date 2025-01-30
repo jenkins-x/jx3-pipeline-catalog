@@ -238,7 +238,61 @@ jobs:
         with:
           filePath:  comment.txt
           pr_number: ${{ steps.pr_data.outputs.pr_number }}
+      - name: Repo Scanner
+        id: repo-scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          output: trivy-results.txt
+      - name: Comment Scan Results
+        uses: actions/github-script@v7
+        if: github.event.issue.pull_request
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const filePath = 'trivy-results.txt';
 
+            if (!context.payload.issue.pull_request) {
+              console.log("Not a pull request comment. Skipping...");
+              return;
+            }
+
+            const prNumber = context.payload.issue.number; // Extract PR number from issue_comment event
+
+            if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
+              const results = fs.readFileSync(filePath, 'utf8');
+              const truncatedResults = results.length > 65000 ? results.substring(0, 65000) + '\n\n**Output truncated...**' : results;
+              
+              const commentBody = `### 🔍 Security Scan Results  
+              
+              <details>
+              <summary>Click to expand scan details</summary>
+
+              \`\`\`
+              ${truncatedResults}
+              \`\`\`
+
+              </details>
+
+              ⚠️ Please review the security issues before merging!`;
+
+              github.rest.issues.createComment({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: commentBody
+              });
+            } else {
+              github.rest.issues.createComment({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: "✅ No CRITICAL or HIGH vulnerabilities found in the scan! 🎉"
+              });
+            }
 
 
 
