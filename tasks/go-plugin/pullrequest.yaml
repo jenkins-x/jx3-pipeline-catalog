@@ -28,7 +28,7 @@ spec:
           resources:
             # set requests for the pod here
             requests:
-              cpu: 400m
+              cpu: 1400m
               memory: 600Mi
           script: |
             #!/usr/bin/env sh
