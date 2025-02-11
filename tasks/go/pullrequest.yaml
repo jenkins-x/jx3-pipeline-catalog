@@ -47,7 +47,7 @@ spec:
           script: |
             #!/bin/sh
             golangci-lint run
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.11
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.13
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.9.1-debug
