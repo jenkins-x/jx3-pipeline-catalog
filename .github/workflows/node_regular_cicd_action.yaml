@@ -99,11 +99,13 @@ jobs:
 
                     echo "PR id: ${{env.PR_ID}}"
                     echo "Commit ID: ${{env.COMMIT_ID}}"
-                    
+
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
+
                     GIT_SHORT_HASH="${{ github.event.pull_request.number }}-${{ github.run_number }}-SNAPSHOT"
                     # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
+                    
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
                     CHARTS_DIR="${ROOT_DIR}/charts"
