@@ -97,6 +97,10 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
+                    COMMIT_ID=$(( $(git rev-list --count origin/main..HEAD) - 1 ))
+                    echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_ENV
+                    echo "TAG: ${{ github.event.pull_request.number }}-$COMMIT_ID"
+                    
                     GIT_SHORT_HASH="${{ github.event.pull_request.number }}-${{ env.COMMIT_ID }}-SNAPSHOT"
                     # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
