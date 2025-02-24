@@ -97,7 +97,7 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
-                    GIT_SHORT_HASH="${{ github.event.pull_request.number }}-${{ github.run_number }}-SNAPSHOT"
+                    GIT_SHORT_HASH="${{ github.event.pull_request.number }}-${{ env.COMMIT_ID }}-SNAPSHOT"
                     # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
@@ -163,7 +163,7 @@ jobs:
         run: |
               #!/bin/bash
               helm version
-              GIT_SHORT_HASH=${{ github.event.pull_request.number }}-${{ github.run_number }}-SNAPSHOT
+              GIT_SHORT_HASH=${{ github.event.pull_request.number }}-${{ env.COMMIT_ID }}-SNAPSHOT
               OCI_REGISTRY="${{env.OCI_REGISTRY}}"
               REGISTRIES="${{env.REGISTRIES}}"
               REPOSITORY="${{env.REPOSITORY}}"
