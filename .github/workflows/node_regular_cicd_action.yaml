@@ -97,8 +97,10 @@ jobs:
                     # ls -ltrh
                     # git branch
 
-                    echo "PR id: ${{env.PR_ID}}"
+                    echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
                     echo "Commit ID: ${{env.COMMIT_ID}}"
+                    IMAGE_TAG="${{ env.PR_NUMBER }}-${{ env.COMMIT_ID }}-SNAPSHOT"
+                    echo "Tagging Image: $IMAGE_TAG"
 
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
