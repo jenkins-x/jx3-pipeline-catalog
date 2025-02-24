@@ -49,8 +49,7 @@ env:
   OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
   REGISTRIES: "us-docker.pkg.dev"
   REPOSITORY: "prodoscore-artifactory"
-  PR_ID: ${{ github.event.pull_request.number }}
-  COMMIT_ID: $(( $(git rev-list --count origin/main..HEAD) - 1 ))
+
 
 jobs:
   build_job:
@@ -99,7 +98,7 @@ jobs:
 
                     echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
                     echo "Commit ID: ${{env.COMMIT_ID}}"
-                    IMAGE_TAG="${{ env.PR_NUMBER }}-${{ env.COMMIT_ID }}-SNAPSHOT"
+                    IMAGE_TAG="$PR_NUMBER-${{ env.COMMIT_ID }}-SNAPSHOT"
                     echo "Tagging Image: $IMAGE_TAG"
 
                     REGISTRIES="${{env.REGISTRIES}}"
