@@ -46,7 +46,7 @@ env:
   REPO_URL: https://github.com/${{ github.repository }}.git
   JX_KUBERNETES: true
   SOURCE_DIR: "${{ github.workspace }}/source"
-  OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-dev/"
   REGISTRIES: "us-docker.pkg.dev"
   REPOSITORY: "prodoscore-artifactory"
 
@@ -112,7 +112,7 @@ jobs:
 
                         echo "SHA: $GIT_SHORT_HASH"
                         echo "Building Docker image ..."
-                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .
+                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images-dev/$IMAGE_NAME:$GIT_SHORT_HASH" .
 
                         echo "*************************************************************"
 
@@ -185,7 +185,7 @@ jobs:
                   echo "Packaging Helm chart in ${SUBDIR}"
                   
                   #Sed image.repository
-                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
+                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images-dev/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
                   #Sed image.tag
                   sed -i "s|tag: .*|tag: ${GIT_SHORT_HASH}|" "${SUBDIR}/values.yaml"
                   ##### 
@@ -200,7 +200,7 @@ jobs:
               done
               
               # # Index the charts
-              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/ "
+              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-dev/ "
               ls -ltrh charts 
               echo "Helm charts packaged/indexed/push successfully!"  
       # # - uses: actions/github-script@v7
