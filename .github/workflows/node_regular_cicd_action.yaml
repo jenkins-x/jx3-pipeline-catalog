@@ -91,25 +91,26 @@ jobs:
       - name: PR number and commit number
         id: pr_commit
         run: |
-          COMMIT_ID=$(( $(git rev-list --count origin/main..HEAD) - 1 ))
-          echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_ENV
-          echo "TAG: ${{ github.event.pull_request.number }}-$COMMIT_ID"
+          echo "PR NO:- ${{ github.event.inputs.pr_number }}"
+          # COMMIT_ID=$(( $(git rev-list --count origin/main..HEAD) - 1 ))
+          # echo "COMMIT_ID=$COMMIT_ID" >> $GITHUB_ENV
+          # echo "TAG: ${{ github.event.pull_request.number }}-$COMMIT_ID"
           
-      - name: Update Pull Request
-        uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-              const output = `### Pipeline Results 🤖\n
-              #### Docker Tag: ${{ github.event.pull_request.number }}-${{ env.COMMIT_ID }}-SNAPSHOT\n`
+      # - name: Update Pull Request
+      #   uses: actions/github-script@v6
+      #   if: github.event_name == 'pull_request'
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #         const output = `### Pipeline Results 🤖\n
+      #         #### Docker Tag: ${{ github.event.pull_request.number }}-${{ env.COMMIT_ID }}-SNAPSHOT\n`
 
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: output
-              })
+      #         github.rest.issues.createComment({
+      #           issue_number: context.issue.number,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           body: output
+      #         })
 
       # - name: Docker_Build        
       #   run: |-
