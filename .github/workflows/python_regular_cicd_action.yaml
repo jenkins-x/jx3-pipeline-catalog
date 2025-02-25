@@ -88,6 +88,12 @@ jobs:
         run: |-
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
+      
+      - name: Get_PR_Number
+        run: |
+          pr_number='${{ github.event.issue.number }}'
+          echo "pr_number=${pr_number}" >> $GITHUB_ENV
+          echo "pr_number: ${pr_number}"
 
       - name: Docker_Build        
         run: |-
@@ -97,7 +103,8 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
-                    GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
+                    GIT_SHORT_HASH="0.0.0-PR-${pr_number}-$(git rev-parse --short HEAD)"
+                    # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
                     CHARTS_DIR="${ROOT_DIR}/charts"
@@ -162,7 +169,7 @@ jobs:
         run: |
               #!/bin/bash
               helm version
-              GIT_SHORT_HASH=0.0.0-$(git rev-parse --short HEAD)
+              GIT_SHORT_HASH=0.0.0-PR-${pr_number}-$(git rev-parse --short HEAD)
               OCI_REGISTRY="${{env.OCI_REGISTRY}}"
               REGISTRIES="${{env.REGISTRIES}}"
               REPOSITORY="${{env.REPOSITORY}}"
