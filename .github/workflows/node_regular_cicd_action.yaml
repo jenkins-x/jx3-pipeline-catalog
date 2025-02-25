@@ -93,6 +93,9 @@ jobs:
           pr_number='${{ github.event.issue.number }}'
           echo "pr_number=${pr_number}" >> $GITHUB_ENV
           echo "pr_number is = ${pr_number}"
+          commit_number=$(git rev-list --count origin/main..HEAD)
+          echo "commit_number=${commit_number}" >> $GITHUB_ENV
+          echo "commit_number is = ${commit_number}"
 
       # - name: Docker_Build        
       #   run: |-
