@@ -38,7 +38,7 @@ spec:
     resources: {}
     script: |
       trivy image --skip-update --input /workspace/source/image.tar > /workspace/source/scanresults.txt
-  - image: ghcr.io/jenkins-x/jx-boot:3.10.158
+  - image: ghcr.io/jenkins-x/jx-boot:3.11.52
     name: analyze
     resources: {}
     script: |
@@ -56,7 +56,7 @@ spec:
       else
         echo "No vulnerabilities found."
       fi
-  - image: gcr.io/go-containerregistry/crane/debug:59b5c06eb64f0b6500bd94d71b473adf6079e444
+  - image: gcr.io/go-containerregistry/crane/debug:c195f151efe3369874c72662cd69ad43ee485128
     name: push-container
     resources: {}
     script: |

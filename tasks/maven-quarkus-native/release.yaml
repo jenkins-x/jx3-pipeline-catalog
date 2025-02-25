@@ -45,13 +45,13 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.7.4
+          image: ghcr.io/jenkins-x/jx-release-version:2.7.10
           name: next-version
           resources: {}
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.158
+        - image: ghcr.io/jenkins-x/jx-boot:3.11.52
           name: jx-variables
           resources:
             # set requests for the pod here
@@ -85,7 +85,7 @@ spec:
             mvn versions:set -DnewVersion=$VERSION
 
             mvn --no-transfer-progress deploy -Pnative
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.11
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.13
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.9.1-debug
@@ -96,7 +96,7 @@ spec:
             source .jx/variables.sh
             cp /tekton/creds/.docker/config.json /kaniko/.docker/config.json
             /kaniko/executor $KANIKO_FLAGS --context=/workspace/source --dockerfile=${DOCKERFILE_PATH:-Dockerfile} --destination=$PUSH_CONTAINER_REGISTRY/$DOCKER_REGISTRY_ORG/$APP_NAME:$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.158
+        - image: ghcr.io/jenkins-x/jx-boot:3.11.52
           name: promote-changelog
           resources: {}
           script: |
@@ -117,14 +117,14 @@ spec:
             git commit -a -m "chore: release $VERSION" --allow-empty
             git tag -fa v$VERSION -m "Release version $VERSION"
             git push --force origin v$VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.10.158
+        - image: ghcr.io/jenkins-x/jx-boot:3.11.52
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.6.10
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.6.11
           name: promote-jx-promote
           resources: {}
           script: |
