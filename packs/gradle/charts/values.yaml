@@ -76,7 +76,7 @@ resources:
   requests:
     cpu: 200m
     memory: 128Mi
-probePath: /
+probePath: /actuator/health
 livenessProbe:
   initialDelaySeconds: 60
   periodSeconds: 10
@@ -94,13 +94,14 @@ readinessProbe:
 
 # custom ingress annotations on this service
 ingress:
+  enabled: false
   annotations: {}
   # defaults to nginx if no other ingress class annotation specified
   classAnnotation: ""
   # Add labels to the ingress
   labels: {}
   # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
-  host: ""
+  host: null
 
   # ingress path type
   pathType: ImplementationSpecific
@@ -124,7 +125,7 @@ jxRequirements:
     apiVersion: "networking.k8s.io/v1"
 
     # the domain for hosts
-    domain: ""
+    domain: null
     externalDNS: false
     namespaceSubDomain: -jx.
     serviceType: ""

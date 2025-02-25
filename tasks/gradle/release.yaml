@@ -50,7 +50,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: gradle:jdk11-openj9
+        - image: gradle:jdk21
           name: build-gradle-build
           resources: {}
           script: |

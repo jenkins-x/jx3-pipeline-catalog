@@ -29,8 +29,12 @@ spec:
             requests:
               cpu: 400m
               memory: 512Mi
-        - name: build-gradle-build
-          resources: {}
+        - image: gradle:jdk21
+          name: build-gradle-build
+          resources: { }
+          script: |
+            #!/bin/sh
+            gradle clean build
         - name: check-registry
           resources: {}
         - name: build-container-build
