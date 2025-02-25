@@ -68,8 +68,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           #ref: ${{ github.event.client_payload.ref }}
-           ref: refs/pull/${{ github.event.issue.number }}/head
-           fetch-depth: 0     
+           ref: refs/pull/${{ github.event.issue.number }}/head  
 
 
       - id: 'Auth'
@@ -93,9 +92,6 @@ jobs:
           pr_number='${{ github.event.issue.number }}'
           echo "pr_number=${pr_number}" >> $GITHUB_ENV
           echo "pr_number: ${pr_number}"
-          commit_number=$(git rev-list --count origin/main..HEAD)
-          echo "commit_number=${commit_number}" >> $GITHUB_ENV
-          echo "commit_number: ${commit_number}"
 
       - name: Docker_Build        
         run: |-
@@ -105,7 +101,7 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
-                    GIT_SHORT_HASH="${pr_number}-${commit_number}-SNAPSHOT"
+                    GIT_SHORT_HASH="PR-${pr_number}-$(git rev-parse --short HEAD)"
                     # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
@@ -171,7 +167,7 @@ jobs:
         run: |
               #!/bin/bash
               helm version
-              GIT_SHORT_HASH=${pr_number}-${commit_number}-SNAPSHOT
+              GIT_SHORT_HASH=${pr_number}-$(git rev-parse --short HEAD)
               OCI_REGISTRY="${{env.OCI_REGISTRY}}"
               REGISTRIES="${{env.REGISTRIES}}"
               REPOSITORY="${{env.REPOSITORY}}"
