@@ -154,7 +154,7 @@ jobs:
       - name: Flex_Template_Build
         id: flex_template_build
         run: |
-              #gcloud dataflow flex-template build gs://clusters-df-dw-user-data/template_file_gcs_path/df-dw-user-data-template:${{ steps.docker_build.outputs.git_short_hash }}.json --image "us-docker.pkg.dev/prodoscore-artifactory/images/df-dw-user-data:${{ steps.docker_build.outputs.git_short_hash }}" --sdk-language "PYTHON" --metadata-file "metadata.json"
+              #gcloud dataflow flex-template build gs://clusters-df-dw-collab/template_file_gcs_path/df-dw-collab-template:${{ steps.docker_build.outputs.git_short_hash }}.json --image "us-docker.pkg.dev/prodoscore-artifactory/images/df-dw-collab:${{ steps.docker_build.outputs.git_short_hash }}" --sdk-language "PYTHON" --metadata-file "metadata.json"
               gcloud dataflow flex-template build ${{ inputs.flex-template_path }}:${{ steps.docker_build.outputs.git_short_hash }}.json --image "us-docker.pkg.dev/prodoscore-artifactory/images/$REPO_NAME:${{ steps.docker_build.outputs.git_short_hash }}" --sdk-language "PYTHON" --metadata-file "metadata.json"                                    
                                                   
 
