@@ -57,6 +57,10 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Calculate Next Version
+      if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
+          (contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
       id: next_version
       run: |
         VERSION="${{ env.CURRENT_VERSION }}"
@@ -76,7 +80,10 @@ jobs:
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
     - name: Create GitHub Release
-      if: env.RELEASE_TYPE != 'invalid'
+      if: github.event.issue.pull_request && env.RELEASE_TYPE != 'invalid' && startsWith(github.event.comment.body, '/build ') &&
+          (contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
       run: gh release create ${{ env.NEW_VERSION }} --generate-notes
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
