@@ -51,8 +51,28 @@ env:
   REPOSITORY: "prodoscore-artifactory"
 
 jobs:
+  process-comment:
+    runs-on: ubuntu-latest
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/')
+    
+    steps:
+      - name: Extract Command from Comment
+        id: extract_command
+        run: |
+          COMMENT="${{ github.event.comment.body }}"
+          COMMAND=$(echo "$COMMENT" | awk '{print $1}')
+          ARGUMENT=$(echo "$COMMENT" | awk '{print $2}')
+
+          echo "COMMAND=$COMMAND" >> $GITHUB_ENV
+          echo "ARGUMENT=$ARGUMENT" >> $GITHUB_ENV
+
   build_job:
     runs-on: ubuntu-latest
+    needs: process-comment
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
+        !(contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
     outputs:
       image_name: "${{ steps.docker_push.outputs.image_name }}"
       image_tag: "${{ steps.docker_push.outputs.image_tag }}"
