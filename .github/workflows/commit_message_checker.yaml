@@ -42,7 +42,6 @@ jobs:
         if [[ "$RELEASE_TYPE" != "major" && "$RELEASE_TYPE" != "minor" && "$RELEASE_TYPE" != "patch" ]]; then
           echo "Invalid release command!"
           echo "RELEASE_TYPE=invalid" >> $GITHUB_ENV
-          exit 1
         fi
           
         echo "Release type: $RELEASE_TYPE"
