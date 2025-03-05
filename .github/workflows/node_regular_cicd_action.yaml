@@ -47,6 +47,7 @@ env:
   JX_KUBERNETES: true
   SOURCE_DIR: "${{ github.workspace }}/source"
   OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  OCI_REGISTRY_PROD: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-prod/"
   REGISTRIES: "us-docker.pkg.dev"
   REPOSITORY: "prodoscore-artifactory"
 
@@ -422,7 +423,7 @@ jobs:
 
                         echo "SHA: $GIT_SHORT_HASH"
                         echo "Building Docker image ..."
-                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .
+                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$GIT_SHORT_HASH" .
 
                         echo "*************************************************************"
 
@@ -474,7 +475,7 @@ jobs:
               #!/bin/bash
               helm version
               GIT_SHORT_HASH=${{ env.NEW_VERSION }}-$(git rev-parse --short HEAD)
-              OCI_REGISTRY="${{env.OCI_REGISTRY}}"
+              OCI_REGISTRY_PROD="${{env.OCI_REGISTRY_PROD}}"
               REGISTRIES="${{env.REGISTRIES}}"
               REPOSITORY="${{env.REPOSITORY}}"
 
@@ -501,8 +502,8 @@ jobs:
                   ##### 
                   helm package "${SUBDIR}" --version "${GIT_SHORT_HASH}" -d "${CHARTS_DIR}"   
                   # Index the charts
-                  helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY}"
-                  helm push "${SUBDIR}-${GIT_SHORT_HASH}.tgz"  "${OCI_REGISTRY}"
+                  helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY_PROD}"
+                  helm push "${SUBDIR}-${GIT_SHORT_HASH}.tgz"  "${OCI_REGISTRY_PROD}"
 
                 else
                   echo "Skipping ${SUBDIR} as it does not contain a valid Helm chart"
@@ -510,7 +511,7 @@ jobs:
               done
               
               # # Index the charts
-              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/ "
+              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-prod/ "
               ls -ltrh charts 
               echo "Helm charts packaged/indexed/push successfully!"  
       # # - uses: actions/github-script@v7
