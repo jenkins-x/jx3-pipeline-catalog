@@ -454,6 +454,7 @@ jobs:
               helm version
               GIT_SHORT_HASH=${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)
 
+              echo "GIT_SHORT_HASH is =${GIT_SHORT_HASH}"
 
               OCI_REGISTRY_PROD="${{env.OCI_REGISTRY_PROD}}"
               REGISTRIES="${{env.REGISTRIES}}"
