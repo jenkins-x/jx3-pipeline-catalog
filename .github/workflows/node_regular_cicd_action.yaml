@@ -477,7 +477,7 @@ jobs:
                   echo "Packaging Helm chart in ${SUBDIR}"
                   
                   #Sed image.repository
-                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
+                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images-prod/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
                   #Sed image.tag
                   sed -i "s|tag: .*|tag: ${GIT_SHORT_HASH}|" "${SUBDIR}/values.yaml"
                   ##### 
