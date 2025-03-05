@@ -453,6 +453,9 @@ jobs:
               #!/bin/bash
               helm version
               GIT_SHORT_HASH=${{ env.NEW_VERSION }}-$(git rev-parse --short HEAD)
+
+              echo "GIT_SHORT_HASH=${GIT_SHORT_HASH}"
+
               OCI_REGISTRY_PROD="${{env.OCI_REGISTRY_PROD}}"
               REGISTRIES="${{env.REGISTRIES}}"
               REPOSITORY="${{env.REPOSITORY}}"
@@ -480,6 +483,9 @@ jobs:
                   ##### 
                   helm package "${SUBDIR}" --version "${GIT_SHORT_HASH}" -d "${CHARTS_DIR}"   
                   # Index the charts
+
+                  echo "Start Packaging..."
+
                   helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY_PROD}"
                   helm push "${SUBDIR}-${GIT_SHORT_HASH}.tgz"  "${OCI_REGISTRY_PROD}"
 
