@@ -386,7 +386,7 @@ jobs:
                     git branch
                     REGISTRIES="${{env.REGISTRIES}}"
                     REPOSITORY="${{env.REPOSITORY}}"
-                    GIT_SHORT_HASH="${{ env.NEW_VERSION }}-$(git rev-parse --short HEAD)"
+                    GIT_SHORT_HASH="${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)"
                     # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
                     ROOT_DIR="$(pwd)"
                     # Define the charts directory
