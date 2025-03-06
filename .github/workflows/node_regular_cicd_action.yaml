@@ -535,3 +535,15 @@ jobs:
           filePath:  comment.txt
           pr_number: ${{ steps.pr_data.outputs.pr_number }}
       
+      - name: Copy Artifacts to dev registry
+        run: |
+          REGISTRIES="${{env.REGISTRIES}}"
+          REPOSITORY="${{env.REPOSITORY}}"
+          GIT_SHORT_HASH="${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)"
+          curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+          tar -zxvf go-containerregistry.tar.gz
+          chmod +x gcrane
+          sudo mv gcrane /usr/local/bin/
+          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/$IMAGE_NAME:$GIT_SHORT_HASH
+          
