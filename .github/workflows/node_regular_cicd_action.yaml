@@ -522,6 +522,6 @@ jobs:
           tar -zxvf go-containerregistry.tar.gz
           chmod +x gcrane
           sudo mv gcrane /usr/local/bin/
-          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
-          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/$IMAGE_NAME:$GIT_SHORT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH
           
