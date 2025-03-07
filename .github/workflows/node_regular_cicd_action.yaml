@@ -517,11 +517,12 @@ jobs:
         run: |
           REGISTRIES="${{env.REGISTRIES}}"
           REPOSITORY="${{env.REPOSITORY}}"
+          IMAGE=$(docker image ls --format "{{.Repository}}" | awk -F'/' '{print $NF}' | awk -F':' '{print $1}' | sort -u)
           GIT_SHORT_HASH="${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)"
           curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
           tar -zxvf go-containerregistry.tar.gz
           chmod +x gcrane
           sudo mv gcrane /usr/local/bin/
-          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH
-          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/${{ steps.docker_push.outputs.image_name }}:$GIT_SHORT_HASH
-          
+          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/$IMAGE:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE:$GIT_SHORT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/$IMAGE:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/$IMAGE:$GIT_SHORT_HASH
+               
