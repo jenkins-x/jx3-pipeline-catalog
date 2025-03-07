@@ -26,9 +26,9 @@ on:
     #     required: true
     outputs:
       image_name:
-        value: ${{ jobs.build_job.outputs.image_name }}
+        value: ${{ jobs.pr_pipeline.outputs.image_name }}
       image_tag: 
-        value: ${{ jobs.build_job.outputs.image_tag }}
+        value: ${{ jobs.pr_pipeline.outputs.image_tag }}
 
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
