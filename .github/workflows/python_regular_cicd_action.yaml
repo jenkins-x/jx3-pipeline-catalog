@@ -26,9 +26,9 @@ on:
     #     required: true
     outputs:
       image_name:
-        value: ${{ jobs.build_job.outputs.image_name }}
+        value: ${{ jobs.pr_pipeline.outputs.image_name }}
       image_tag: 
-        value: ${{ jobs.build_job.outputs.image_tag }}
+        value: ${{ jobs.pr_pipeline.outputs.image_tag }}
 
 env:
   GIT_AUTHOR_NAME: ${{ inputs.BOT_USER }}
@@ -47,6 +47,7 @@ env:
   JX_KUBERNETES: true
   SOURCE_DIR: "${{ github.workspace }}/source"
   OCI_REGISTRY: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts/"
+  OCI_REGISTRY_PROD: "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-prod/"
   REGISTRIES: "us-docker.pkg.dev"
   REPOSITORY: "prodoscore-artifactory"
 
@@ -66,7 +67,7 @@ jobs:
           echo "COMMAND=$COMMAND" >> $GITHUB_ENV
           echo "ARGUMENT=$ARGUMENT" >> $GITHUB_ENV
 
-  build_job:
+  pr_pipeline:
     runs-on: ubuntu-latest
     needs: process-comment
     if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
@@ -298,7 +299,211 @@ jobs:
               });
             }
 
+  release_pipeline:
+    runs-on: ubuntu-latest
+    needs: process-comment
+    if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
+        (contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
+    outputs:
+      image_name: "${{ steps.docker_push.outputs.image_name }}"
+      image_tag: "${{ steps.docker_push.outputs.image_tag }}"
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: sh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          #ref: ${{ github.event.client_payload.ref }}
+           ref: refs/pull/${{ github.event.issue.number }}/head  
 
+      - id: 'Auth'
+        name: 'Authenticate_to_Google_Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+
+      - name: 'Set_Up_Cloud_SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: Get Current Git Release
+        id: get_version
+        run: |
+          CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
+          CURRENT_VERSION="${CURRENT_VERSION#v}"  # Remove 'v' prefix if present
+          echo "Current version: $CURRENT_VERSION"
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker_Auth
+        run: |-
+              #!/bin/bash
+              gcloud auth configure-docker us-docker.pkg.dev
+
+      - name: Get_PR_Number
+        run: |
+          pr_number='${{ github.event.issue.number }}'
+          echo "pr_number=${pr_number}" >> $GITHUB_ENV
+          echo "pr_number: ${pr_number}"
+
+      - name: Docker_Build        
+        run: |-
+                    #!/bin/bash
+                    pwd
+                    ls -ltrh
+                    git branch
+                    REGISTRIES="${{env.REGISTRIES}}"
+                    REPOSITORY="${{env.REPOSITORY}}"
+                    GIT_SHORT_HASH="${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)"
+                    # GIT_SHORT_HASH="0.0.0-$(git rev-parse --short HEAD)"
+                    ROOT_DIR="$(pwd)"
+                    # Define the charts directory
+                    CHARTS_DIR="${ROOT_DIR}/charts"
+
+                    # Find all subdirectories under the charts directory
+                    SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+
+                    # Package each subdirectory as a Helm chart
+                    for SUBDIR in ${SUBDIRS}; do
+                        IMAGE_NAME=${SUBDIR##*/}
+
+                        echo "SHA: $GIT_SHORT_HASH"
+                        echo "Building Docker image ..."
+                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$GIT_SHORT_HASH" .
+
+                        echo "*************************************************************"
+
+                        docker image ls | grep -ai $REGISTRIES
+                        docker image ls | grep -ai $REGISTRIES > dockertags.txt
+
+                        # Read input from dockertags.txt
+                        echo "##### Docker build details" >> comment.txt
+                        echo "IMAGE | TAG | SIZE" >> comment.txt
+                        echo "------ | ------ | ------ " >> comment.txt
+
+                        while IFS= read -r line; do
+                            # Use '/' as the delimiter and print the text after the 4th '/'
+                            OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
+                            IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
+                            TAG=$(echo "$OUTPUT" | awk '{print $2}')
+                            SIZE=$(echo "$OUTPUT" | awk '{print $7}')
+                            # Print the result
+                            echo "$IMAGE | $TAG | $SIZE" >> comment.txt
+                        done < dockertags.txt
+                    done
+      - name: Docker_Push
+        id: docker_push
+        run: |
+            #!/bin/bash
+
+            # Set the desired registry
+            REGISTRY="us-docker.pkg.dev"
+
+            # Get the list of images and iterate through them
+            docker image ls | grep -ai $REGISTRY | while read -r line; do
+                # Extract image name, tag, and ID
+                image_name=$(echo $line | awk '{print $1}')
+                image_tag=$(echo $line | awk '{print $2}')
+                image_id=$(echo $line | awk '{print $3}')
+
+                # Push the image to the specified registry
+                echo "Docker Push $image_name"
+                docker tag $image_id $image_name:$image_tag
+                docker push $image_name:$image_tag
+                #echo "image_name=world" >> "$GITHUB_OUTPUT"
+                # Output the image name and tag
+                echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
+                echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
+                
+            done
+      - name: Helm_Package_And_push
+        run: |
+              #!/bin/bash
+              helm version
+              GIT_SHORT_HASH=${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)
+
+              echo "GIT_SHORT_HASH is =${GIT_SHORT_HASH}"
+
+              OCI_REGISTRY_PROD="${{env.OCI_REGISTRY_PROD}}"
+              REGISTRIES="${{env.REGISTRIES}}"
+              REPOSITORY="${{env.REPOSITORY}}"
+
+              ROOT_DIR="$(pwd)"
+
+              # Define the charts directory
+              CHARTS_DIR="${ROOT_DIR}/charts"
+              
+              # Find all subdirectories under the charts directory
+              SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
+              
+              # Package each subdirectory as a Helm chart
+              for SUBDIR in ${SUBDIRS}; do
+              IMAGE_NAME=${SUBDIR##*/}
+
+
+                if [ -f "${SUBDIR}/Chart.yaml" ]; then
+                  echo "Packaging Helm chart in ${SUBDIR}"
+                  
+                  #Sed image.repository
+                  sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images-prod/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
+                  #Sed image.tag
+                  sed -i "s|tag: .*|tag: ${GIT_SHORT_HASH}|" "${SUBDIR}/values.yaml"
+                  ##### 
+                  helm package "${SUBDIR}" --version "${GIT_SHORT_HASH}" -d "${CHARTS_DIR}"   
+                  # Index the charts
+
+                  echo "Start Packaging..."
+
+                  helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY_PROD}"
+                  helm push "${SUBDIR}-${GIT_SHORT_HASH}.tgz"  "${OCI_REGISTRY_PROD}"
+
+                else
+                  echo "Skipping ${SUBDIR} as it does not contain a valid Helm chart"
+                fi
+              done
+              
+              # # Index the charts
+              # helm repo index "${CHARTS_DIR}" --url "oci://us-docker.pkg.dev/prodoscore-artifactory/charts-prod/ "
+              ls -ltrh charts 
+              echo "Helm charts packaged/indexed/push successfully!"  
+
+
+      - name: Pull Request data
+        id: pr_data
+        run: |
+          pr_number='${{ github.event.issue.number }}'
+          echo "pr_number=${pr_number}" >> $GITHUB_ENV
+          cat comment.txt
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        id: hello
+        with:
+          filePath:  comment.txt
+          pr_number: ${{ steps.pr_data.outputs.pr_number }}
+      
+      - name: Copy Artifacts to dev registry
+        run: |
+          REGISTRIES="${{env.REGISTRIES}}"
+          REPOSITORY="${{env.REPOSITORY}}"
+          IMAGE=$(docker image ls --format "{{.Repository}}" | awk -F'/' '{print $NF}' | awk -F':' '{print $1}' | sort -u)
+          GIT_SHORT_HASH="${{ env.CURRENT_VERSION }}-$(git rev-parse --short HEAD)"
+          curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+          tar -zxvf go-containerregistry.tar.gz
+          chmod +x gcrane
+          sudo mv gcrane /usr/local/bin/
+          gcrane cp $REGISTRIES/$REPOSITORY/images-prod/$IMAGE:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE:$GIT_SHORT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts-prod/$IMAGE:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/charts/$IMAGE:$GIT_SHORT_HASH
+               
 
 
 
