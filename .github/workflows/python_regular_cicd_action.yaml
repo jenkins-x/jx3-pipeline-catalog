@@ -372,8 +372,8 @@ jobs:
             IMAGE_NAME=${SUBDIR##*/}
             echo "Image name is ${IMAGE_NAME}"
 
-            IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(IMAGE)'"
-            echo "Last Dev Image is ${IMAGE}"
+            IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images/$IMAGE_NAME --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(IMAGE)'"
+            echo "Last Dev Image is $IMAGE"
           done
       
           
