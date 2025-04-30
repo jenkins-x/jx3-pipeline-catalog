@@ -356,7 +356,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker_Auth
+      - name: Docker Auth
         run: |-
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
@@ -368,11 +368,11 @@ jobs:
           ROOT_DIR="$(pwd)"
           CHARTS_DIR="${ROOT_DIR}/charts"
           SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
-          IMAGE_NAME=${SUBDIR##*/}
+          for SUBDIR in ${SUBDIRS}; do
+            IMAGE_NAME=${SUBDIR##*/}
+            echo "Image name is ${IMAGE_NAME}"
 
-          echo "Image name is ${IMAGE_NAME}"
-
-          IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images"
+          # IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images"
           
 
       # - name: Get_PR_Number
