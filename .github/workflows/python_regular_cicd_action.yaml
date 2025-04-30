@@ -361,7 +361,7 @@ jobs:
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
 
-      - name: Tag image to Git Release
+      - name: Tag Dev Image to Git Release
         run: |-
           #!/bin/bash
 
@@ -371,7 +371,7 @@ jobs:
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
             echo "Image name is ${IMAGE_NAME}"
-
+          done
           # IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images"
           
 
