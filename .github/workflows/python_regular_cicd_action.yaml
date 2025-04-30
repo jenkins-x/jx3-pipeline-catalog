@@ -335,13 +335,13 @@ jobs:
            ref: refs/pull/${{ github.event.issue.number }}/head  
 
       - id: 'Auth'
-        name: 'Authenticate_to_Google_Cloud'
+        name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: ${{ inputs.workload_identity_provider }}
           service_account: ${{ inputs.service_account }}
 
-      - name: 'Set_Up_Cloud_SDK'
+      - name: 'Setup Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
           version: '>= 363.0.0'
@@ -371,8 +371,11 @@ jobs:
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
             echo "Image name is ${IMAGE_NAME}"
+
+            IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(IMAGE)'"
+            echo "Last Dev Image is ${IMAGE}"
           done
-          # IMAGE="gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images"
+      
           
 
       # - name: Get_PR_Number
