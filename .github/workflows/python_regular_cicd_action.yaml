@@ -436,8 +436,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          OLD_TAG="$(gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images/$IMAGE_NAME --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(TAGS)')" >> $GITHUB_ENV
-          echo "### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```\nNote: This image was created using" \```$OLD_TAG\``` > comment.txt 
+          echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
           gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           
 
