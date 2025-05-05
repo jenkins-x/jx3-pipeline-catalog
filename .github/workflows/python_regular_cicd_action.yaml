@@ -379,6 +379,7 @@ jobs:
             IMAGE="$(gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images/$IMAGE_NAME --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(IMAGE)')"
             TAG="$(gcloud artifacts docker images list ${{env.REGISTRIES}}/${{env.REPOSITORY}}/images/$IMAGE_NAME --include-tags --sort-by=~CREATE_TIME --limit=1 --format='value(TAGS)')"
             
+            # Print metadata
             echo "Last Dev Image is $IMAGE"
             echo "Last Dev Image Tag is $TAG"
             echo "Git Release is $CURRENT_VERSION"
@@ -388,7 +389,8 @@ jobs:
             docker tag $IMAGE:$TAG $IMAGE:$CURRENT_VERSION-$GIT_HASH
 
             # Comment on the PR
-            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Tagged $TAG to $CURRENT_VERSION-$GIT_HASH"
+            echo "### Release Details\nConverted Dev Image: \```$TAG\```\nProduction Release Tag": \```$CURRENT_VERSION-$GIT_HASH\``` > comment.txt
+            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           done
       
           
