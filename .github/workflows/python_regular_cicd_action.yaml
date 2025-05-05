@@ -352,7 +352,9 @@ jobs:
           CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
           CURRENT_VERSION="${CURRENT_VERSION#v}"  # Remove 'v' prefix if present
           echo "Current version: $CURRENT_VERSION"
+
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -378,6 +380,10 @@ jobs:
             echo "Last Dev Image is $IMAGE"
             echo "Last Dev Image Tag is $TAG"
             echo "Git Release is $CURRENT_VERSION"
+            echo "Git Hash is $GIT_HASH"
+
+            # Comment on the PR
+            gh pr comment --body "Tagged $IMAGE:$TAG to $IMAGE:$CURRENT_VERSION-$GIT_HASH"
           done
       
           
