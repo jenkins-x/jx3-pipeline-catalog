@@ -377,6 +377,7 @@ jobs:
             
             echo "Last Dev Image is $IMAGE"
             echo "Last Dev Image Tag is $TAG"
+            echo "Git Release is $CURRENT_VERSION"
           done
       
           
