@@ -364,6 +364,8 @@ jobs:
               gcloud auth configure-docker us-docker.pkg.dev
 
       - name: Tag Dev Image to Git Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
           #!/bin/bash
 
