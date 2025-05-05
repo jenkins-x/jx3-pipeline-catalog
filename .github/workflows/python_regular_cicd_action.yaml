@@ -393,7 +393,7 @@ jobs:
             docker push $IMAGE:$CURRENT_VERSION-$GIT_HASH
 
             # Comment on the PR
-            echo "### Release Details\nConverted Dev Image: \```$TAG\```\nProduction Release Tag": \```$CURRENT_VERSION-$GIT_HASH\``` > comment.txt
+            echo "### Release Details\nProduction Tag: \```$CURRENT_VERSION-$GIT_HASH\```\nNote: This image was created by retagging" \```$TAG\``` > comment.txt 
             gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           done
       
