@@ -385,7 +385,7 @@ jobs:
             echo "Git Hash is $GIT_HASH"
 
             # Comment on the PR
-            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Tagged $IMAGE:$TAG to $IMAGE:$CURRENT_VERSION-$GIT_HASH"
+            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "Tagged $TAG to $CURRENT_VERSION-$GIT_HASH"
           done
       
           
