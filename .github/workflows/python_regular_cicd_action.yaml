@@ -436,7 +436,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "### Release Details\nProduction Tag: \```$CURRENT_VERSION-$GIT_HASH\```\nNote: This image was created by retagging" \```$TAG\``` > comment.txt 
+          echo "### Release Tag\n \```$CURRENT_VERSION-$GIT_HASH\```\nNote: This image was created using" \```$TAG\``` > comment.txt 
           gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           
 
