@@ -386,7 +386,11 @@ jobs:
             echo "Git Hash is $GIT_HASH"
 
             echo "Tagging image $TAG to $CURRENT_VERSION-$GIT_HASH"
+            docker pull $IMAGE:$TAG
             docker tag $IMAGE:$TAG $IMAGE:$CURRENT_VERSION-$GIT_HASH
+
+            echo "Pushing image $IMAGE:$CURRENT_VERSION-$GIT_HASH"
+            docker push $IMAGE:$CURRENT_VERSION-$GIT_HASH
 
             # Comment on the PR
             echo "### Release Details\nConverted Dev Image: \```$TAG\```\nProduction Release Tag": \```$CURRENT_VERSION-$GIT_HASH\``` > comment.txt
