@@ -440,6 +440,24 @@ jobs:
           gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           
 
+      - name: Copy Artifacts to dev registry
+        run: |
+          REGISTRIES="${{env.REGISTRIES}}"
+          REPOSITORY="${{env.REPOSITORY}}"
+          DOCKER_IMAGE=$(docker image ls --format "{{.Repository}}" | awk -F'/' '{print $NF}' | awk -F':' '{print $1}' | sort -u)
+
+          curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+          tar -zxvf go-containerregistry.tar.gz
+          chmod +x gcrane
+          sudo mv gcrane /usr/local/bin/
+
+          gcrane cp $IMAGE:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE:$CURRENT_VERSION-$GIT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts/$IMAGE:$CURRENT_VERSION-$GIT_HASH
+
+          gcrane cp $REGISTRIES/$REPOSITORY/images/$DOCKER_IMAGE:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$DOCKER_IMAGE:$CURRENT_VERSION-$GIT_HASH
+          gcrane cp $REGISTRIES/$REPOSITORY/charts/$DOCKER_IMAGE:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/charts-prod/$DOCKER_IMAGE:$CURRENT_VERSION-$GIT_HASH
+
+
 
       # - name: Get_PR_Number
       #   run: |
