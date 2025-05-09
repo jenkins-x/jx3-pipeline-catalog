@@ -371,6 +371,7 @@ jobs:
 
           REGISTRIES="${{env.REGISTRIES}}"
           REPOSITORY="${{env.REPOSITORY}}"
+          pr_number='${{ github.event.issue.number }}'
           GIT_SHORT_HASH="0.0.0-PR-${pr_number}-$(git rev-parse --short HEAD)"
           ROOT_DIR="$(pwd)"
           CHARTS_DIR="${ROOT_DIR}/charts"
