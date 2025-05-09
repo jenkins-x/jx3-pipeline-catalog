@@ -393,6 +393,9 @@ jobs:
 
             echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
             gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+
+            echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
+            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
           done
       
       # - name: Tag Dev Chart to Prod Release - Helm
