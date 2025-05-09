@@ -380,9 +380,14 @@ jobs:
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
             docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
-            echo "Listing Images ..."
+
+            echo -e "\n\nListing Images ...\n"
             docker image ls
+            
             docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+            echo -e "\n\nListing Images after tagging ...\n"
+            docker image ls
+
             docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
           done
       
