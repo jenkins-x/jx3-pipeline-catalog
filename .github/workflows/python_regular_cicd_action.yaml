@@ -363,7 +363,7 @@ jobs:
               #!/bin/bash
               gcloud auth configure-docker us-docker.pkg.dev
 
-      - name: Tag Dev Image to Prod Release - Docker
+      - name: Tag Dev Image to GitHub Release and upload Prod Artifact Registry - Docker
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
@@ -381,14 +381,18 @@ jobs:
             IMAGE_NAME=${SUBDIR##*/}
             docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
 
-            echo -e "\n\nListing Images ...\n"
+            echo "\n\nListing Images ...\n"
             docker image ls
             
             docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-            echo -e "\n\nListing Images after tagging ...\n"
+            echo "\n\nListing Images After Tagging ...\n"
             docker image ls
 
+            echo "\n\nPush Production Image to Artifact Registry ...\n"
             docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+
+            echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
+            gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
           done
       
       # - name: Tag Dev Chart to Prod Release - Helm
