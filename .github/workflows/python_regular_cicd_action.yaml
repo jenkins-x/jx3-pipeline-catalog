@@ -392,6 +392,10 @@ jobs:
             docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
 
             echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
+            curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+            tar -zxvf go-containerregistry.tar.gz
+            chmod +x gcrane
+            sudo mv gcrane /usr/local/bin/
             gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
 
             echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
