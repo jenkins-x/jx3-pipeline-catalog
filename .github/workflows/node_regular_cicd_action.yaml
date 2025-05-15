@@ -375,6 +375,7 @@ jobs:
           CURRENT_VERSION="${CURRENT_VERSION#v}"  # Remove 'v' prefix if present
           echo "Current version: $CURRENT_VERSION"
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
