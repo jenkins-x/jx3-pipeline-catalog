@@ -398,6 +398,11 @@ jobs:
           CHARTS_DIR="${ROOT_DIR}/charts"
           SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
 
+          # get github version
+          CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
+          echo "Current version: $CURRENT_VERSION"
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
             if docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH; then
@@ -421,7 +426,7 @@ jobs:
               echo "\n\nImage $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH not found. Skipping tagging and pushing...\n"
               echo "### No releases will be created.\n Before creating a GitHub Release, create an image for lower environment and make sure your image is QA tested." > comment.txt 
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
-              gh release delete $CURRENT_VERSION --repo ${{ github.repository }} --yes
+              gh release delete $CURRENT_VERSION --yes
               exit 1
             fi
           done
