@@ -400,27 +400,29 @@ jobs:
 
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
-            docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
-
-            echo "\n\nListing Images ...\n"
-            docker image ls
-            
-            docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-            echo "\n\nListing Images After Tagging ...\n"
-            docker image ls
-
-            echo "\n\nPush Production Image to Artifact Registry ...\n"
-            docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-
-            echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
-            curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
-            tar -zxvf go-containerregistry.tar.gz
-            chmod +x gcrane
-            sudo mv gcrane /usr/local/bin/
-            gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-
-            echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
-            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+            if docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH; then
+              echo "\n\nListing Images ...\n"
+              docker image ls
+              
+              docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              echo "\n\nListing Images After Tagging ...\n"
+              docker image ls
+              echo "\n\nPush Production Image to Artifact Registry ...\n"
+              docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
+              curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+              tar -zxvf go-containerregistry.tar.gz
+              chmod +x gcrane
+              sudo mv gcrane /usr/local/bin/
+              gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+            else
+              echo "#### No releases will be created.\n Before creating a GitHub Release, create an image for lower environment and make sure your image is QA tested." > comment.txt 
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+              gh release delete $CURRENT_VERSION --repo ${{ github.repository }} --yes
+              exit 1
+            fi
           done
 
       - name: Tag Dev Image to GitHub Release and upload Prod Artifact Registry - Helm
