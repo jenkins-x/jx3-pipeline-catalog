@@ -418,6 +418,7 @@ jobs:
               echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
             else
+              echo "\n\nImage $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH not found. Skipping tagging and pushing...\n"
               echo "### No releases will be created.\n Before creating a GitHub Release, create an image for lower environment and make sure your image is QA tested." > comment.txt 
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
               gh release delete $CURRENT_VERSION --repo ${{ github.repository }} --yes
