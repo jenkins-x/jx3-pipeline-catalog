@@ -403,7 +403,7 @@ jobs:
 
             echo "Checking if image exists in Artifact Registry..."
 
-            if docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH; then
+            if docker pull "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH"; then
               echo "\n\nListing Images ...\n"
               docker image ls
               
