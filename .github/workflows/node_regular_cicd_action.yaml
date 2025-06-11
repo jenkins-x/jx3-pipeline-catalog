@@ -432,27 +432,31 @@ jobs:
               # Create GitHub Release
               gh release create ${{ env.NEW_VERSION }} --generate-notes
 
+              # Remove V prefix from NEW_VERSION
+              NEXT_VERSION="${NEW_VERSION#v}"
+              echo "Next version: $NEXT_VERSION"
+              echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
 
               # Start tagging and pushing the image
 
               echo "\n\nListing Images ...\n"
               docker image ls   
 
-              docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH      
+              docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH      
               echo "\n\nListing Images After Tagging ...\n"
               docker image ls
 
               echo "\n\nPush Production Image to Artifact Registry ...\n"
-              docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH
 
               echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
               curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
               tar -zxvf go-containerregistry.tar.gz
               chmod +x gcrane
               sudo mv gcrane /usr/local/bin/
-              gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH
               
-              echo "#### 🔖 Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
+              echo "#### 🔖 Release Tag: \```$NEXT_VERSION-$GIT_HASH\```" > comment.txt 
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
 
             else
@@ -492,15 +496,15 @@ jobs:
               #Sed image.repository
               sed -i "s|repository: .*|repository: ${REGISTRIES}/${REPOSITORY}/images/${IMAGE_NAME}|" "${SUBDIR}/values.yaml"
               #Sed image.tag
-              sed -i "s|tag: .*|tag: $CURRENT_VERSION-$GIT_HASH|" "${SUBDIR}/values.yaml"
+              sed -i "s|tag: .*|tag: $NEXT_VERSION-$GIT_HASH|" "${SUBDIR}/values.yaml"
               ##### 
-              helm package "${SUBDIR}" --version "$CURRENT_VERSION-$GIT_HASH" -d "${CHARTS_DIR}"   
+              helm package "${SUBDIR}" --version "$NEXT_VERSION-$GIT_HASH" -d "${CHARTS_DIR}"   
               # Index the charts
               helm repo index "${CHARTS_DIR}" --url "${OCI_REGISTRY}"
-              helm push "${SUBDIR}-$CURRENT_VERSION-$GIT_HASH.tgz"  "${OCI_REGISTRY}"
+              helm push "${SUBDIR}-$NEXT_VERSION-$GIT_HASH.tgz"  "${OCI_REGISTRY}"
 
               echo "\n\Copy Production Helm chart to Artifact Registry charts-prod repo...\n"
-              gcrane cp $REGISTRIES/$REPOSITORY/charts/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/charts-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              gcrane cp $REGISTRIES/$REPOSITORY/charts/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/charts-prod/$IMAGE_NAME:$NEXT_VERSION-$GIT_HASH
 
             else
               echo "Skipping ${SUBDIR} as it does not contain a valid Helm chart"
