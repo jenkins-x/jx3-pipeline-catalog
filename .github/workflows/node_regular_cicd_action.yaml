@@ -398,7 +398,7 @@ jobs:
           CHARTS_DIR="${ROOT_DIR}/charts"
           SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
 
-          # get github version
+          # Get github release
           CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
           echo "Current version: $CURRENT_VERSION"
           CURRENT_VERSION="${CURRENT_VERSION#v}"  # Remove 'v' prefix if present
@@ -437,7 +437,7 @@ jobs:
             fi
           done
 
-      - name: Tag Dev Image to GitHub Release and upload Prod Artifact Registry - Helm
+      - name: Tag Dev Helm chart to GitHub Release and upload Prod Artifact Registry - Helm
         run: |
           #!/bin/bash
           OCI_REGISTRY="${{env.OCI_REGISTRY}}"
