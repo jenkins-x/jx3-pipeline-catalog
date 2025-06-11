@@ -431,7 +431,7 @@ jobs:
               echo "### ❗No releases will be created.\n Before creating a GitHub Release, create an Image for lower environment and make sure your Image is QA tested." > comment.txt 
               
               gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
-              gh release delete $CURRENT_VERSION --yes
+              gh release delete v$CURRENT_VERSION --yes
               
               exit 1
             fi
