@@ -398,32 +398,46 @@ jobs:
           CHARTS_DIR="${ROOT_DIR}/charts"
           SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
 
+          # Get github release
+          CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
+          echo "Current version: $CURRENT_VERSION"
+          CURRENT_VERSION="${CURRENT_VERSION#v}"  # Remove 'v' prefix if present
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
           for SUBDIR in ${SUBDIRS}; do
             IMAGE_NAME=${SUBDIR##*/}
-            docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH
-
-            echo "\n\nListing Images ...\n"
-            docker image ls
-            
-            docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-            echo "\n\nListing Images After Tagging ...\n"
-            docker image ls
-
-            echo "\n\nPush Production Image to Artifact Registry ...\n"
-            docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-
-            echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
-            curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
-            tar -zxvf go-containerregistry.tar.gz
-            chmod +x gcrane
-            sudo mv gcrane /usr/local/bin/
-            gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
-
-            echo "#### Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
-            gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+            if docker pull $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH; then
+              echo "\n\nListing Images ...\n"
+              docker image ls
+              
+              docker tag $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              
+              echo "\n\nListing Images After Tagging ...\n"
+              docker image ls
+              echo "\n\nPush Production Image to Artifact Registry ...\n"
+              docker push $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              
+              echo "\n\Copy Production Image to Artifact Registry images-prod repo...\n"
+              curl -L https://github.com/google/go-containerregistry/releases/latest/download/go-containerregistry_Linux_x86_64.tar.gz -o go-containerregistry.tar.gz
+              tar -zxvf go-containerregistry.tar.gz
+              chmod +x gcrane
+              sudo mv gcrane /usr/local/bin/
+              gcrane cp $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH $REGISTRIES/$REPOSITORY/images-prod/$IMAGE_NAME:$CURRENT_VERSION-$GIT_HASH
+              
+              echo "#### 🚀 Release Tag: \```$CURRENT_VERSION-$GIT_HASH\```" > comment.txt 
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+            else
+              echo "\n\nImage $REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH not found. Skipping tagging and pushing...\n"
+              echo "### ❗No releases will be created.\n Before creating a GitHub Release, create an Image for lower environment and make sure your Image is QA tested." > comment.txt 
+              
+              gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file comment.txt
+              gh release delete v$CURRENT_VERSION --yes
+              
+              exit 1
+            fi
           done
 
-      - name: Tag Dev Image to GitHub Release and upload Prod Artifact Registry - Helm
+      - name: Tag Dev Helm chart to GitHub Release and upload Prod Artifact Registry - Helm
         run: |
           #!/bin/bash
           OCI_REGISTRY="${{env.OCI_REGISTRY}}"
