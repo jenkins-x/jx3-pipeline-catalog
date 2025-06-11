@@ -49,7 +49,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: golang:1.23.2@sha256:a7f2fc9834049c1f5df787690026a53738e55fc097cd8a4a93faa3e06c67ee32
+        - image: golang:1.24.4@sha256:d1db785fb37feb87d9140d78ed4fb7c75ee787360366a9c5efe39c7a841a0277
           name: release-binary
           resources: {}
           script: |
@@ -100,7 +100,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-goreleaser-image:1.0.0@sha256:35070795367fea9a789c1c3a138b5e32262e4253d38e47406ba9ab7833ff15b2
+          image: ghcr.io/jenkins-x/jx-goreleaser-image:1.0.2@sha256:7632b381687494e910e06a88b3801e39c1f17fbb44402db3cef45b2b342204e1
           name: upload-binaries
           resources: {}
           script: |

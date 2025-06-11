@@ -56,7 +56,7 @@ spec:
               secretKeyRef:
                 key: password
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-goreleaser-image:1.0.0@sha256:35070795367fea9a789c1c3a138b5e32262e4253d38e47406ba9ab7833ff15b2
+          image: ghcr.io/jenkins-x/jx-goreleaser-image:1.0.2@sha256:7632b381687494e910e06a88b3801e39c1f17fbb44402db3cef45b2b342204e1
           name: upload-binaries
           resources: {}
           script: |
