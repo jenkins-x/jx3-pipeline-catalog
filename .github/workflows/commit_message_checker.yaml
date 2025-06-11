@@ -47,46 +47,46 @@ jobs:
         echo "Release type: $RELEASE_TYPE"
         echo "RELEASE_TYPE=$RELEASE_TYPE" >> $GITHUB_ENV
     
-    # - name: Get Current Version
-    #   id: get_version
-    #   run: |
-    #     CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
-    #     echo "Current version: $CURRENT_VERSION"
-    #     echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-    #   env:
-    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get Current Version
+      id: get_version
+      run: |
+        CURRENT_VERSION=$(gh release view --json tagName --jq '.tagName' || echo "v0.0.0")
+        echo "Current version: $CURRENT_VERSION"
+        echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    # - name: Calculate Next Version
-    #   if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
-    #       (contains(github.event.comment.body, '/build major') || 
-    #       contains(github.event.comment.body, '/build minor') || 
-    #       contains(github.event.comment.body, '/build patch'))
-    #   id: next_version
-    #   run: |
-    #     VERSION="${{ env.CURRENT_VERSION }}"
-    #     VERSION="${VERSION#v}"  # Remove 'v' prefix if present
+    - name: Calculate Next Version
+      if: github.event.issue.pull_request && startsWith(github.event.comment.body, '/build ') &&
+          (contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
+      id: next_version
+      run: |
+        VERSION="${{ env.CURRENT_VERSION }}"
+        VERSION="${VERSION#v}"  # Remove 'v' prefix if present
           
-    #     IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           
-    #     case "${{ env.RELEASE_TYPE }}" in
-    #       major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
-    #       minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
-    #       patch) PATCH=$((PATCH + 1)) ;;
-    #       *) echo "Invalid release type"; exit 1 ;;
-    #     esac
+        case "${{ env.RELEASE_TYPE }}" in
+          major) MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0 ;;
+          minor) MINOR=$((MINOR + 1)); PATCH=0 ;;
+          patch) PATCH=$((PATCH + 1)) ;;
+          *) echo "Invalid release type"; exit 1 ;;
+        esac
           
-    #     NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
-    #     echo "Next version: $NEW_VERSION"
-    #     echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+        echo "Next version: $NEW_VERSION"
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-    # - name: Create GitHub Release
-    #   if: github.event.issue.pull_request && env.RELEASE_TYPE != 'invalid' && startsWith(github.event.comment.body, '/build ') &&
-    #       (contains(github.event.comment.body, '/build major') || 
-    #       contains(github.event.comment.body, '/build minor') || 
-    #       contains(github.event.comment.body, '/build patch'))
-    #   run: gh release create ${{ env.NEW_VERSION }} --generate-notes
-    #   env:
-    #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub Release
+      if: github.event.issue.pull_request && env.RELEASE_TYPE != 'invalid' && startsWith(github.event.comment.body, '/build ') &&
+          (contains(github.event.comment.body, '/build major') || 
+          contains(github.event.comment.body, '/build minor') || 
+          contains(github.event.comment.body, '/build patch'))
+      run: gh release create ${{ env.NEW_VERSION }} --generate-notes
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Print build_env
       run: echo "build_env=${{ steps.check.outputs.build_env }}"
