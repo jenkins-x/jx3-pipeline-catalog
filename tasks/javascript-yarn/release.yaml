@@ -55,13 +55,13 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx gitops variables
-        - image: node:20-slim
+        - image: node:22-slim
           name: build-yarn-install
           resources: {}
           script: |
             #!/bin/sh
             yarn install
-        - image: node:20-slim
+        - image: node:22-slim
           name: build-yarn-test
           resources: {}
           script: |
