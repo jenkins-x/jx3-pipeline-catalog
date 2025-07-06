@@ -26,12 +26,11 @@ spec:
       #!/bin/sh
       export SUBDIR="source"
       echo "git cloning url: $REPO_URL version $PULL_BASE_REF@$PULL_BASE_SHA to dir: $SUBDIR"
-      git config --global --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
-      git config --global --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}
-      git config --global credential.helper store
       git clone $REPO_URL $SUBDIR
       cd $SUBDIR
       git reset --hard $PULL_BASE_SHA
+      git config --add user.name ${GIT_AUTHOR_NAME:-jenkins-x-bot}
+      git config --add user.email ${GIT_AUTHOR_EMAIL:-jenkins-x@googlegroups.com}
       echo "checked out revision: $PULL_BASE_REF@$PULL_BASE_SHA to dir: $SUBDIR"
 
     workingDir: /workspace
