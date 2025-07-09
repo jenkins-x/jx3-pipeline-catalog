@@ -45,7 +45,7 @@ spec:
             # set requests for the pod here
             requests:
               cpu: 1400m
-              memory: 1600Mi
+              memory: 3600Mi
           script: |
             #!/usr/bin/env sh
             jx gitops variables
