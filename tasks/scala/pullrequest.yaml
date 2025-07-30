@@ -48,7 +48,7 @@ spec:
           script: |
             #!/bin/sh
             sbt clean compile assembly
-        - image: ghcr.io/jenkins-x/jx-registry:0.1.15
+        - image: ghcr.io/jenkins-x/jx-registry:0.1.17
           name: check-registry
           resources: {}
         - image: gcr.io/kaniko-project/executor:v1.9.1-debug
