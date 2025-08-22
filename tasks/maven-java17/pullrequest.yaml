@@ -38,7 +38,7 @@ spec:
               memory: 512Mi
           script: |
             #!/usr/bin/env sh
-            jx gitops variables
+            jx gitops variables --commit=false
             jx gitops pr variables
         - image: maven:3.8.2-openjdk-17
           name: build-set-version
