@@ -20,6 +20,8 @@ spec:
     envFrom:
     - secretRef:
         name: sales-credentials
+    - secretRef:
+        name: test-properties
     env:
     - name: _JAVA_OPTIONS
       value: -XX:+UnlockExperimentalVMOptions -XX:+UseContainerSupport
