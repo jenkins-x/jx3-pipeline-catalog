@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk-alpine
+FROM eclipse-temurin:8-alpine
 ENV PORT 8080
 EXPOSE 8080
 COPY target/*.war /opt/app.war
