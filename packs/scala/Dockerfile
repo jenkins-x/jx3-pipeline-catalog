@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM eclipse-temurin:8-alpine
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 COPY target/scala-*/*.jar /opt/app/app.jar

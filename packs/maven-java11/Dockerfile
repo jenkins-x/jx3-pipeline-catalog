@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:11-alpine
 ENV PORT 8080
 ENV CLASSPATH /opt/lib
 EXPOSE 8080
