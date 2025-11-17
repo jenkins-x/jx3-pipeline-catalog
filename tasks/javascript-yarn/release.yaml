@@ -39,7 +39,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.7.10
+          image: ghcr.io/jenkins-x/jx-release-version:2.8.0
           name: next-version
           resources: {}
           script: |
