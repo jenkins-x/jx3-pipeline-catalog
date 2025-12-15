@@ -133,15 +133,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER=$PULL_NUMBER
+          LOG_FILE=make.log
 
           echo "Commenting failure on PR #$PR_NUMBER"
 
-          gh pr comment "$PR_NUMBER" \
-            --body "**❌ GitHub Action Failed**
+          # Read last 20 lines containing 'ERROR', fallback to last 20 lines if none
+          if grep -q 'ERROR' "$LOG_FILE"; then
+            LOG_SNIPPET=$(sed -n '/ERROR/,$p' "$LOG_FILE" | tail -n 20)
+          else
+            LOG_SNIPPET=$(tail -n 20 "$LOG_FILE")
+          fi
 
-          \`\`\`
-          $(sed -n '/ERROR/,$p' ./source/make.log | tail -n 20)
-          \`\`\`
+          # Use printf to preserve newlines safely
+          COMMENT_BODY=$(printf "**❌ GitHub Action Failed**\n\n\`\`\`\n%s\n\`\`\`\n\nPlease check the workflow logs for full details." "$LOG_SNIPPET")
 
-          Please check the workflow logs for full details."
+          gh pr comment "$PR_NUMBER" --body "$COMMENT_BODY"
 
