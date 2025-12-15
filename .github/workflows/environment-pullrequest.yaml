@@ -112,6 +112,7 @@ jobs:
       - name: make-pr
         if: github.event_name == 'pull_request'
         working-directory: "${{ github.workspace }}/source"
+        shell: bash
         run: |
           set -o pipefail
           make pr 2>&1 | tee make.log
