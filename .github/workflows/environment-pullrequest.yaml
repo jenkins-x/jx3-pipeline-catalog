@@ -115,28 +115,51 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          make pr 2>&1 | tee make.log
+          PR_NUMBER=$PULL_NUMBER
+          LOG_FILE=make.log
+
+          # Run Makefile and capture output
+          make pr 2>&1 | tee "$LOG_FILE"
+          STATUS=$?
+
+          # Comment on PR if it failed
+          if [ $STATUS -ne 0 ]; then
+            echo "Commenting failure on PR #$PR_NUMBER"
+            gh pr comment "$PR_NUMBER" \
+              --body "**❌ GitHub Action Failed**
+          \`\`\`
+          $(tail -n 20 "$LOG_FILE")
+          \`\`\`
+
+          Please check the workflow logs for full details."
+              fi
+
+              # Always delete the log
+              rm -f "$LOG_FILE"
+
+              # Exit with Makefile status so workflow fails properly
+              exit $STATUS
         env:
           HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
           GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
-      - name: Comment failure on PR
-        if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_NUMBER=$PULL_NUMBER
+      # - name: Comment failure on PR
+      #   if: failure()
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     PR_NUMBER=$PULL_NUMBER
 
-          echo "Commenting failure on PR #$PR_NUMBER"
+      #     echo "Commenting failure on PR #$PR_NUMBER"
 
-          gh pr comment "$PR_NUMBER" \
-            --body "**❌ GitHub Action Failed**
+      #     gh pr comment "$PR_NUMBER" \
+      #       --body "**❌ GitHub Action Failed**
 
-          \`\`\`
-          $(sed -n '/ERROR/,$p' ./make.log | tail -n 20)
-          \`\`\`
+      #     \`\`\`
+      #     $(sed -n '/ERROR/,$p' ./make.log | tail -n 20)
+      #     \`\`\`
 
-          Please check the workflow logs for full details."
+      #     Please check the workflow logs for full details."
 
-      - run: rm -rf make.log
+      # - run: rm -rf make.log
