@@ -120,7 +120,11 @@ jobs:
           HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
           GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-
+      - name: Upload log as artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: make-log
+          path: ./source/make.log
       - name: Comment failure on PR
         if: failure()
         env:
@@ -134,9 +138,8 @@ jobs:
             --body "**❌ GitHub Action Failed**
 
           \`\`\`
-          $(sed -n '/ERROR/,$p' make.log | tail -n 20)
+          $(sed -n '/ERROR/,$p' ./source/make.log | tail -n 20)
           \`\`\`
 
           Please check the workflow logs for full details."
 
-      - run: rm -rf make.log
