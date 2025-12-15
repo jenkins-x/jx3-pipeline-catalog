@@ -111,7 +111,7 @@ jobs:
             ${{ runner.os }}-helmfile-
       - name: make-pr
         if: github.event_name == 'pull_request'
-        continue-on-error: true
+        # continue-on-error: true
         working-directory: "${{ github.workspace }}/source"
         shell: bash
         run: |
@@ -122,6 +122,7 @@ jobs:
           GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
       - name: Upload log as artifact
+        if: failure()
         uses: actions/upload-artifact@v6
         with:
           name: make-log
