@@ -127,6 +127,7 @@ jobs:
           path: ./source/make.log
       - name: Comment failure on PR
         if: failure()
+        working-directory: "${{ github.workspace }}/source"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
