@@ -112,8 +112,28 @@ jobs:
       - name: make-pr
         if: github.event_name == 'pull_request'
         working-directory: "${{ github.workspace }}/source"
-        run: make pr
+        run: |
+          set -o pipefail
+          make pr 2>&1 | tee make.log
         env:
           HELMFILE_CACHE_HOME: "${{ github.workspace }}/.cache"
           GITHUB_ACTOR: ${{ inputs.BOT_USER }}
           GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+
+      - name: Comment failure on PR
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(jq -r '.pull_request.number' "$GITHUB_EVENT_PATH")
+
+          echo "Commenting failure on PR #$PR_NUMBER"
+
+          gh pr comment "$PR_NUMBER" \
+            --body "**❌ GitHub Action Failed**
+
+          \`\`\`
+          $(sed -n '/ERROR/,$p' make.log | tail -n 20)
+          \`\`\`
+
+          Please check the workflow logs for full details."
