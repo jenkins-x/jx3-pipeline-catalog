@@ -134,7 +134,7 @@ jobs:
             --body "**❌ GitHub Action Failed**
 
           \`\`\`
-          $(sed -n '/ERROR/,$p' make.log | tail -n 20)
+          $(sed -n '/ERROR/,$p' ./make.log | tail -n 20)
           \`\`\`
 
           Please check the workflow logs for full details."
