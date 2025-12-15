@@ -138,3 +138,5 @@ jobs:
           \`\`\`
 
           Please check the workflow logs for full details."
+
+      - run: rm -rf make.log
