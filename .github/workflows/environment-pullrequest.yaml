@@ -75,7 +75,8 @@ jobs:
         working-directory: "${{ github.workspace }}/source"
         run: |
           counter=0
-
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions Bot"
           BASE_BRANCH=$(git remote show origin | sed -n 's/.*HEAD branch: //p')
 
           if [ -z "$BASE_BRANCH" ]; then
