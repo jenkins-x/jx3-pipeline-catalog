@@ -71,7 +71,7 @@ jobs:
           git checkout $(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER
           git reset --hard $PULL_PULL_SHA
           echo "checked out revision: $PULL_PULL_REF:$(echo $JOB_NAME | tr '[:lower:]' '[:upper:]')-$PULL_NUMBER@$PULL_PULL_SHA to dir: $SUBDIR"
-      - name: git-merge
+      - name: git-rebase
         working-directory: "${{ github.workspace }}/source"
         run: |
           counter=0
