@@ -75,27 +75,34 @@ jobs:
         working-directory: "${{ github.workspace }}/source"
         run: |
           counter=0
-          BASE_BRANCH=origin/main
+
+          BASE_BRANCH=$(git remote show origin | sed -n 's/.*HEAD branch: //p')
+
+          if [ -z "$BASE_BRANCH" ]; then
+            echo "Could not determine base branch"
+            exit 1
+          fi
+
+          git fetch origin "$BASE_BRANCH"
 
           until [ "$counter" -eq 3 ]; do
-            echo "Attempt $((counter+1)) to rebase onto $BASE_BRANCH"
+            echo "Attempt $((counter+1)) to rebase onto origin/$BASE_BRANCH"
 
-            if git rebase "$BASE_BRANCH" -Xtheirs; then
+            if git rebase "origin/$BASE_BRANCH" -Xtheirs; then
               exit 0
             fi
 
             counter=$((counter+1))
 
-            echo "Rebase failed, aborting"
             git rebase --abort || true
 
             if git log -1 --pretty=%B | grep -iq regenerate; then
-              echo "Dropping last regenerate commit"
               git reset --hard HEAD~1
             fi
           done
 
           exit 1
+
 
           # counter=0
           # until [ "$counter" -eq 3 ]; do
@@ -108,7 +115,7 @@ jobs:
           #   fi
           # done
           # exit 1
-          
+
       - id: "auth"
         name: "Authenticate to Google Cloud"
         uses: "google-github-actions/auth@v1"
