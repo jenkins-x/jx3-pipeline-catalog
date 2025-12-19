@@ -118,12 +118,12 @@ jobs:
           cluster_name: ${{ inputs.cluster_name }}
           location: ${{ inputs.cluster_location }}
           use_connect_gateway: "true"
-      - uses: "docker/login-action@v1"
+      - uses: "docker/login-action@v3"
         with:
           registry: "us-docker.pkg.dev" # or
           username: "oauth2accesstoken"
           password: "${{ steps.auth.outputs.access_token }}"
-      - uses: actions/cache@v3
+      - uses: actions/cache@v5
         with:
           path: "${{ github.workspace }}/.cache"
           key: ${{ runner.os }}-helmfile-${{ github.run_id }}
