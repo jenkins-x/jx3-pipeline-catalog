@@ -53,11 +53,12 @@ jobs:
           curl -L https://github.com/jenkins-x/jx/releases/download/v3.7.7/jx-linux-amd64.tar.gz | tar xzv
           chmod +x jx 
           mv jx /usr/local/bin
-      - uses: actions/setup-python@v6
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
           python-version: '3.10'
       - run: pip install pyyaml
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
         with:
           path: "${{ github.workspace }}/source"
       - run: |
