@@ -170,26 +170,27 @@ jobs:
         id: docker_push
         shell: bash
         run: |
-          #!/bin/bash
           set -euo pipefail
-          
-          REGISTRY="us-docker.pkg.dev"
-          
-          # Use pipe delimiter for reliable parsing
-          docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' | grep -F "$REGISTRY" | while IFS='|' read -r image_name image_tag image_id; do
-              # Skip if any field is empty or <none>
-              if [[ -z "$image_name" || "$image_name" == "<none>" || -z "$image_tag" || "$image_tag" == "<none>" ]]; then
-                  continue
-              fi
-          
-              echo "--Docker Push ${image_name}:${image_tag}--"
-              docker push "${image_name}:${image_tag}"
-              
-              # Output the image name and tag
-              echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
-              echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
-          done
       
+          REGISTRY="us-docker.pkg.dev"
+      
+          # Use a delimiter for stable parsing
+          docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' \
+            | grep -F "$REGISTRY" \
+            | while IFS='|' read -r image_name image_tag image_id; do
+      
+                # Skip invalid rows
+                if [[ -z "${image_name}" || "${image_name}" == "<none>" || -z "${image_tag}" || "${image_tag}" == "<none>" ]]; then
+                  continue
+                fi
+      
+                echo "--- Docker Push ${image_name}:${image_tag} ---"
+                docker push "${image_name}:${image_tag}"
+      
+                # Expose ONE value as job output (last pushed wins)
+                echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
+                echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
+              done
 
             
       - name: Helm_Package_And_push
