@@ -167,29 +167,29 @@ jobs:
                     done
       - name: Docker_Push
         id: docker_push
+        shell: bash
         run: |
-            #!/bin/bash
+          set -euo pipefail
 
-            # Set the desired registry
-            REGISTRY="us-docker.pkg.dev"
+          REGISTRY="us-docker.pkg.dev"
 
-            # Get the list of images and iterate through them
-            docker image ls | grep -ai $REGISTRY | while read -r line; do
-                # Extract image name, tag, and ID
-                image_name=$(echo $line | awk '{print $1}')
-                image_tag=$(echo $line | awk '{print $2}')
-                image_id=$(echo $line | awk '{print $3}')
+          # Script-safe output
+          docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' \
+            | grep -F "$REGISTRY" \
+            | while IFS='|' read -r image_name image_tag image_id; do
 
-                # Push the image to the specified registry
-                echo "Docker Push $image_name"
-                docker tag $image_id $image_name:$image_tag
-                docker push $image_name:$image_tag
-                #echo "image_name=world" >> "$GITHUB_OUTPUT"
-                # Output the image name and tag
+                # Skip invalid rows
+                if [[ -z "$image_name" || "$image_name" == "<none>" || -z "$image_tag" || "$image_tag" == "<none>" ]]; then
+                  continue
+                fi
+
+                echo "--- Docker Push ${image_name}:${image_tag} ---"
+                docker push "${image_name}:${image_tag}"
+
+                # last pushed wins if multiple images
                 echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
                 echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
-                
-            done
+              done
       - name: Helm_Package_And_push
         run: |
               #!/bin/bash
