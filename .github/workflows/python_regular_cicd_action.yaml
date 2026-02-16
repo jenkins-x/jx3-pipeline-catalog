@@ -170,29 +170,25 @@ jobs:
         id: docker_push
         shell: bash
         run: |
+          #!/bin/bash
           set -euo pipefail
-      
+          
           REGISTRY="us-docker.pkg.dev"
-          last_repo=""
-          last_tag=""
           
           # Use pipe delimiter for reliable parsing
-          while IFS='|' read -r repo tag id; do
-            if [[ -n "$repo" && "$repo" != "<none>" && -n "$tag" && "$tag" != "<none>" ]]; then
-              echo "Docker Push ${repo}:${tag}"
-              docker push "${repo}:${tag}"
-              last_repo="$repo"
-              last_tag="$tag"
-            fi
-          done < <(docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' | grep -F "$REGISTRY" || true)
-      
-          if [[ -z "$last_repo" ]]; then
-            echo "No images found for registry: $REGISTRY"
-            exit 1
-          fi
-      
-          echo "image_name=${last_repo}" >> "$GITHUB_OUTPUT"
-          echo "image_tag=${last_tag}" >> "$GITHUB_OUTPUT"
+          docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' | grep -F "$REGISTRY" | while IFS='|' read -r image_name image_tag image_id; do
+              # Skip if any field is empty or <none>
+              if [[ -z "$image_name" || "$image_name" == "<none>" || -z "$image_tag" || "$image_tag" == "<none>" ]]; then
+                  continue
+              fi
+          
+              echo "--Docker Push ${image_name}:${image_tag}--"
+              docker push "${image_name}:${image_tag}"
+              
+              # Output the image name and tag
+              echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
+              echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
+          done
       
 
             
