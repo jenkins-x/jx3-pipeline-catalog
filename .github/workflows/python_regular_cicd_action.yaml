@@ -166,31 +166,33 @@ jobs:
                             echo "$IMAGE | $TAG | $SIZE" >> comment.txt
                         done < dockertags.txt
                     done
+
       - name: Docker_Push
         id: docker_push
         shell: bash
         run: |
           set -euo pipefail
-      
+
           REGISTRY="us-docker.pkg.dev"
-      
-          # Use a delimiter for stable parsing
+
+          # Script-safe output
           docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' \
             | grep -F "$REGISTRY" \
             | while IFS='|' read -r image_name image_tag image_id; do
-      
+
                 # Skip invalid rows
-                if [[ -z "${image_name}" || "${image_name}" == "<none>" || -z "${image_tag}" || "${image_tag}" == "<none>" ]]; then
+                if [[ -z "$image_name" || "$image_name" == "<none>" || -z "$image_tag" || "$image_tag" == "<none>" ]]; then
                   continue
                 fi
-      
+
                 echo "--- Docker Push ${image_name}:${image_tag} ---"
                 docker push "${image_name}:${image_tag}"
-      
-                # Expose ONE value as job output (last pushed wins)
+
+                # last pushed wins if multiple images
                 echo "image_name=${image_name}" >> "$GITHUB_OUTPUT"
                 echo "image_tag=${image_tag}" >> "$GITHUB_OUTPUT"
               done
+
 
             
       - name: Helm_Package_And_push
