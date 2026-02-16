@@ -173,31 +173,24 @@ jobs:
           set -euo pipefail
       
           REGISTRY="us-docker.pkg.dev"
-          # Only list images from that registry in a parse-safe way
-          mapfile -t IMAGES < <(docker images --format '{{.Repository}} {{.Tag}} {{.ID}}' | grep -F "$REGISTRY" || true)
+          last_repo=""
+          last_tag=""
+          
+          # Use pipe delimiter for reliable parsing
+          while IFS='|' read -r repo tag id; do
+            if [[ -n "$repo" && "$repo" != "<none>" && -n "$tag" && "$tag" != "<none>" ]]; then
+              echo "Docker Push ${repo}:${tag}"
+              docker push "${repo}:${tag}"
+              last_repo="$repo"
+              last_tag="$tag"
+            fi
+          done < <(docker images --format '{{.Repository}}|{{.Tag}}|{{.ID}}' | grep -F "$REGISTRY" || true)
       
-          if [ "${#IMAGES[@]}" -eq 0 ]; then
+          if [[ -z "$last_repo" ]]; then
             echo "No images found for registry: $REGISTRY"
             exit 1
           fi
       
-          last_repo=""
-          last_tag=""
-      
-          for row in "${IMAGES[@]}"; do
-            repo="$(awk '{print $1}' <<<"$row")"
-            tag="$(awk '{print $2}' <<<"$row")"
-            id="$(awk '{print $3}' <<<"$row")"
-      
-            echo "Docker Push ${repo}:${tag}"
-            docker tag "$id" "${repo}:${tag}"
-            docker push "${repo}:${tag}"
-      
-            last_repo="$repo"
-            last_tag="$tag"
-          done
-      
-    
           echo "image_name=${last_repo}" >> "$GITHUB_OUTPUT"
           echo "image_tag=${last_tag}" >> "$GITHUB_OUTPUT"
       
