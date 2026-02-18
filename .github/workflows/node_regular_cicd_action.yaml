@@ -147,21 +147,23 @@ jobs:
 
                         echo "*************************************************************"
 
-                        docker image ls | grep -ai $REGISTRIES
-                        docker image ls | grep -ai $REGISTRIES > dockertags.txt
+                        # List images for this registry (for debug)
+                        docker images | grep -ai "$REGISTRIES" || true
+
+                        # Capture image details in a machine‑readable format
+                        docker images --format '{{.Repository}}:{{.Tag}}|{{.Tag}}|{{.Size}}' \
+                          | grep -F "$REGISTRIES" > dockertags.txt
 
                         # Read input from dockertags.txt
                         echo "##### Docker build details" >> comment.txt
                         echo "IMAGE | TAG | SIZE" >> comment.txt
                         echo "------ | ------ | ------ " >> comment.txt
 
-                        while IFS= read -r line; do
-                            # Use '/' as the delimiter and print the text after the 4th '/'
-                            OUTPUT=$(echo "$line" | awk -F'/' '{print $(NF-0)}')
-                            IMAGE=$(echo "$OUTPUT" | awk '{print $1}')
-                            TAG=$(echo "$OUTPUT" | awk '{print $2}')
-                            SIZE=$(echo "$OUTPUT" | awk '{print $7}')
-                            # Print the result
+                        while IFS='|' read -r IMAGE TAG SIZE; do
+                            # Skip invalid/empty rows
+                            if [[ -z "$IMAGE" || -z "$TAG" || -z "$SIZE" ]]; then
+                              continue
+                            fi
                             echo "$IMAGE | $TAG | $SIZE" >> comment.txt
                         done < dockertags.txt
                     done
