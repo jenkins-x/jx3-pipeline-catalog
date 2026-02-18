@@ -155,13 +155,18 @@ jobs:
 
                         echo "*************************************************************"
 
-                        # Get image size for this repository
-                        SIZE=$(docker images "$FULL_REPO" --format '{{.Size}}' | head -n 1 || true)
+                        # Get image size directly from the built image
+                        SIZE=$(docker inspect "$FULL_IMAGE" --format='{{.Size}}' 2>/dev/null || echo "")
+                        if [ -z "$SIZE" ]; then
+                          # Fallback: query by repository and tag
+                          SIZE=$(docker images --filter "reference=$FULL_IMAGE" --format '{{.Size}}' 2>/dev/null || echo "")
+                        fi
                         if [ -z "$SIZE" ]; then
                           SIZE="N/A"
                         fi
 
                         # Append a single row per image: IMAGE_NAME | TAG | SIZE
+                        echo "$IMAGE_NAME | $GIT_SHORT_HASH | $SIZE"
                         echo "$IMAGE_NAME | $GIT_SHORT_HASH | $SIZE" >> comment.txt
                     done
       - name: Docker_Push
