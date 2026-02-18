@@ -137,35 +137,32 @@ jobs:
                     # Find all subdirectories under the charts directory
                     SUBDIRS=$(find "${CHARTS_DIR}" -type d -mindepth 1 -maxdepth 1)
 
+                    # Initialise Docker build details table
+                    echo "##### Docker build details" > comment.txt
+                    echo "IMAGE | TAG | SIZE" >> comment.txt
+                    echo "------ | ------ | ------ " >> comment.txt
+
                     # Package each subdirectory as a Helm chart
                     for SUBDIR in ${SUBDIRS}; do
                         IMAGE_NAME=${SUBDIR##*/}
 
                         echo "SHA: $GIT_SHORT_HASH"
                         echo "Building Docker image ..."
-                        docker build -f "Dockerfile" -t "$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME:$GIT_SHORT_HASH" .
+                        FULL_REPO="$REGISTRIES/$REPOSITORY/images/$IMAGE_NAME"
+                        FULL_IMAGE="$FULL_REPO:$GIT_SHORT_HASH"
+
+                        docker build -f "Dockerfile" -t "$FULL_IMAGE" .
 
                         echo "*************************************************************"
 
-                        # List images for this registry (for debug)
-                        docker images | grep -ai "$REGISTRIES" || true
+                        # Get image size for this repository
+                        SIZE=$(docker images "$FULL_REPO" --format '{{.Size}}' | head -n 1 || true)
+                        if [ -z "$SIZE" ]; then
+                          SIZE="N/A"
+                        fi
 
-                        # Capture image details in a machine‑readable format
-                        docker images --format '{{.Repository}}:{{.Tag}}|{{.Tag}}|{{.Size}}' \
-                          | grep -F "$REGISTRIES" > dockertags.txt
-
-                        # Read input from dockertags.txt
-                        echo "##### Docker build details" >> comment.txt
-                        echo "IMAGE | TAG | SIZE" >> comment.txt
-                        echo "------ | ------ | ------ " >> comment.txt
-
-                        while IFS='|' read -r IMAGE TAG SIZE; do
-                            # Skip invalid/empty rows
-                            if [[ -z "$IMAGE" || -z "$TAG" || -z "$SIZE" ]]; then
-                              continue
-                            fi
-                            echo "$IMAGE | $TAG | $SIZE" >> comment.txt
-                        done < dockertags.txt
+                        # Append a single row per image: IMAGE_NAME | TAG | SIZE
+                        echo "$IMAGE_NAME | $GIT_SHORT_HASH | $SIZE" >> comment.txt
                     done
       - name: Docker_Push
         id: docker_push
