@@ -34,7 +34,7 @@ spec:
               secretKeyRef:
                 key: username
                 name: tekton-git
-          image: ghcr.io/jenkins-x/jx-release-version:2.8.0
+          image: ghcr.io/jenkins-x/jx-release-version:2.8.4
           name: next-version
           resources:
             # set requests for the pod here
@@ -44,7 +44,7 @@ spec:
           script: |
             #!/usr/bin/env sh
             jx-release-version --tag > VERSION
-        - image: ghcr.io/jenkins-x/jx-boot:3.16.55
+        - image: ghcr.io/jenkins-x/jx-boot:3.17.1
           name: jx-variables
           resources: {}
           script: |
@@ -56,7 +56,7 @@ spec:
           script: |
             #!/bin/sh
             make build
-        - image: ghcr.io/jenkins-x/jx-boot:3.16.55
+        - image: ghcr.io/jenkins-x/jx-boot:3.17.1
           name: release-chart
           resources: {}
           script: |
@@ -70,14 +70,14 @@ spec:
           script: |
             #!/bin/sh
             make release
-        - image: ghcr.io/jenkins-x/jx-boot:3.16.55
+        - image: ghcr.io/jenkins-x/jx-boot:3.17.1
           name: promote-helm-release
           resources: {}
           script: |
             #!/usr/bin/env sh
             source .jx/variables.sh
             jx gitops helm release
-        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.6.31
+        - image: ghcr.io/jenkins-x-plugins/jx-promote:0.6.39
           name: promote-jx-promote
           resources: {}
           script: |

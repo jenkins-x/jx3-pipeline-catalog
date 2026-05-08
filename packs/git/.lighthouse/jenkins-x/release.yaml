@@ -18,7 +18,7 @@ spec:
             limits: {}
           workingDir: /workspace/source
         steps:
-        - image: ghcr.io/jenkins-x/jx-release-version:2.8.0
+        - image: ghcr.io/jenkins-x/jx-release-version:2.8.4
           name: next-version
           resources: {}
           script: |
@@ -35,7 +35,7 @@ spec:
               secretKeyRef:
                 name: tekton-git
                 key: username
-        - image: ghcr.io/jenkins-x/jx-boot:3.16.55
+        - image: ghcr.io/jenkins-x/jx-boot:3.17.1
           name: jx-variables
           resources:
             # override requests for the pod here
