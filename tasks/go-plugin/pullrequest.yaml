@@ -34,7 +34,7 @@ spec:
             #!/usr/bin/env sh
             jx gitops variables --commit=false
             jx gitops pr variables
-        - image: golang:1.24.4@sha256:d1db785fb37feb87d9140d78ed4fb7c75ee787360366a9c5efe39c7a841a0277
+        - image: golang:1.26.3@sha256:2981696eed011d747340d7252620932677929cce7d2d539602f56a8d7e9b660b
           name: build-make-linux
           resources: {}
           script: |
@@ -46,7 +46,7 @@ spec:
           script: |
             #!/bin/sh
             golangci-lint run
-        - image: golang:1.24.4@sha256:d1db785fb37feb87d9140d78ed4fb7c75ee787360366a9c5efe39c7a841a0277
+        - image: golang:1.26.3@sha256:2981696eed011d747340d7252620932677929cce7d2d539602f56a8d7e9b660b
           name: build-make-test
           resources: {}
           script: |
