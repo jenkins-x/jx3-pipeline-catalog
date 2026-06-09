@@ -41,7 +41,7 @@ spec:
             #!/bin/bash
             source .jx/variables.sh
             make linux
-        - image: golangci/golangci-lint:v1.64.8-alpine@sha256:ae6460f78db54f22838d2a8aee0f2eaa4f785d5a01f638600072b60848f8deb4
+        - image: golangci/golangci-lint:v2.12.2-alpine@sha256:91b27804074a0bacea298707f016911e60cf0cdbc6c7bf5ccacb5f0606d18d60
           name: make-lint
           resources: {}
           script: |
