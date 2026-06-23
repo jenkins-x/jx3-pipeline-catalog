@@ -40,6 +40,8 @@ spec:
 
             git clone https://github.com/jenkins-x/$REPO_NAME new-main
             cd new-main
+            git config user.name jenkins-x-bot-test
+            git config user.email "jenkins-x@googlegroups.com"                        
             sed -i -e "s|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@.*|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@$PULL_BASE_SHA|" environment/.lighthouse/jenkins-x/pullrequest.yaml
 
             git add * || true
