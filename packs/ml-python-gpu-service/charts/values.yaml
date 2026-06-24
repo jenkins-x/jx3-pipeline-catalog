@@ -141,6 +141,8 @@ jxRequirements:
 
     apiVersion: "networking.k8s.io/v1"
 
+    kind: ""
+
     # the domain for hosts
     domain: ""
     externalDNS: false

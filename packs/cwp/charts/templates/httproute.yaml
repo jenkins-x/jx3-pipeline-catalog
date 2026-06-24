@@ -20,7 +20,7 @@ spec:
   parentRefs:
 {{- if .Values.httpRoute.parentRefs }}
 {{ toYaml .Values.httpRoute.parentRefs | indent 2 }}
-{{- else }}
+{{- else if eq .Values.jxRequirements.ingress.kind "httproute" }}
   - name: envoy-gateway
     namespace: envoy-gateway-system
     sectionName: http
@@ -29,6 +29,7 @@ spec:
     namespace: envoy-gateway-system
     sectionName: https
 {{- end }}
+{{- else }} []
 {{- end }}
 {{- if not (eq "NodePort" .Values.jxRequirements.ingress.serviceType) }}
   hostnames:
