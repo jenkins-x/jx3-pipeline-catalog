@@ -1,4 +1,4 @@
-{{- if and (or .Values.ingress.host .Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
+{{- if and (or .Values.ingress.host .Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) (not .Values.httpRoute.enabled) }}
 {{- $host := (.Values.ingress.host | default (printf "%s%s%s" .Values.service.name .Values.jxRequirements.ingress.namespaceSubDomain .Values.jxRequirements.ingress.domain)) | quote }}
 {{- $annotations := dict }}
 {{- $_ := merge $annotations .Values.ingress.annotations .Values.jxRequirements.ingress.annotations  }}

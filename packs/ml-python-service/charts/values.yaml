@@ -104,6 +104,22 @@ ingress:
   # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
   host: ""
 
+httpRoute:
+  enabled: false
+  # Add annotations to the route (merged with jxRequirements.ingress.annotations)
+  annotations: {}
+  # Add labels to the route
+  labels: {}
+  # list of resources to attach the route to (usually a Gateway)
+  # defaults to the platform Gateway (envoy-gateway) when left empty
+  # https://gateway-api.sigs.k8s.io/reference/api-spec/1.5/spec/#httproutespec
+  parentRefs: []
+  # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
+  hostnames: []
+  # path prefix to match for the generated rule (overridden by the lighthouse webhook
+  # path "/<namespace>/hook" when jxRequirements.ingress.serviceType == NodePort)
+  path: /
+
 serviceAccount:
   enabled: true
   name: ""
