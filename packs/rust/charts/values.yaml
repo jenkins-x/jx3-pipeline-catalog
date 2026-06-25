@@ -112,13 +112,15 @@ httpRoute:
   # Add labels to the route
   labels: {}
   # list of resources to attach the route to (usually a Gateway)
-  # defaults to the platform Gateway (envoy-gateway) when left empty
+  # when left empty, defaults to the platform Gateway (envoy-gateway) only when
+  # jxRequirements.ingress.kind == "httproute"; otherwise no parentRefs are set
   # https://gateway-api.sigs.k8s.io/reference/api-spec/1.5/spec/#httproutespec
   parentRefs: []
   # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
   hostnames: []
-  # path prefix to match for the generated rule (overridden by the lighthouse webhook
-  # path "/<namespace>/hook" when jxRequirements.ingress.serviceType == NodePort)
+  # path prefix to match for the generated rule. When
+  # jxRequirements.ingress.serviceType == NodePort this is overridden by the
+  # lighthouse webhook path "/<namespace>/hook".
   path: /
 
 serviceAccount:
