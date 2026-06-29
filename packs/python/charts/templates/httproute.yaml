@@ -29,7 +29,8 @@ spec:
     namespace: envoy-gateway-system
     sectionName: https
 {{- end }}
-{{- else }} []
+{{- else }}
+{{- fail "httpRoute.enabled is true but no parentRefs could be determined: set .Values.httpRoute.parentRefs explicitly, or set .Values.jxRequirements.ingress.kind to \"httproute\" to use the default envoy-gateway parentRefs." }}
 {{- end }}
 {{- if not (eq "NodePort" .Values.jxRequirements.ingress.serviceType) }}
   hostnames:
