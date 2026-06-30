@@ -104,6 +104,24 @@ ingress:
   # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
   host: ""
 
+httpRoute:
+  enabled: false
+  # Add annotations to the route (merged with jxRequirements.ingress.annotations)
+  annotations: {}
+  # Add labels to the route
+  labels: {}
+  # list of resources to attach the route to (usually a Gateway)
+  # defaults to the platform Gateway (envoy-gateway) when jxRequirements.ingress.kind == "httproute";
+  # otherwise, fails if parentRefs are not set
+  # https://gateway-api.sigs.k8s.io/reference/api-spec/1.5/spec/#httproutespec
+  parentRefs: []
+  # defaults to .service.name + jxRequirements.ingress.namespaceSubDomain + jxRequirements.ingress.domain
+  hostnames: []
+  # path prefix to match for the generated rule. When
+  # jxRequirements.ingress.serviceType == NodePort this is overridden by the
+  # lighthouse webhook path "/<namespace>/hook".
+  path: /
+
 serviceAccount:
   enabled: true
   name: ""
@@ -122,6 +140,8 @@ jxRequirements:
 
     # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
     apiVersion: "extensions/v1beta1"
+
+    kind: ""
 
     # the domain for hosts
     domain: ""
