@@ -3,20 +3,16 @@
 # Declare variables to be passed into your templates.
 looker:
   deployWebhookUrl: ""
-
 image:
   repository: curlimages/curl
   tag: 7.77.0
   pullPolicy: IfNotPresent
-
 # optional list of image pull secrets to use to pull images
 jx:
   # optional image pull secrets
   imagePullSecrets: []
-
   # whether to create a Release CRD when installing charts with Release CRDs included
   releaseCRD: true
-
 # Canary deployments
 # If enabled, Istio and Flagger need to be installed in the cluster
 canary:
@@ -39,7 +35,6 @@ canary:
   labels: {}
   # Add labels to the canary gateway
   gatewayLabels: {}
-
 resources:
   limits:
     cpu: 400m
@@ -47,7 +42,6 @@ resources:
   requests:
     cpu: 100m
     memory: 128Mi
-
 # values we use from the `jx-requirements.yml` file if we are using helmfile and helm 3
 jxRequirements:
   ingress:
@@ -56,7 +50,6 @@ jxRequirements:
     #  kubernetes.io/ingress.class: nginx
 
     apiVersion: "networking.k8s.io/v1"
-
     # the domain for hosts
     domain: ""
     externalDNS: false
