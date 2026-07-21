@@ -29,4 +29,3 @@ spec:
         - curl
         - -L
         - {{ .Values.looker.deployWebhookUrl }}
-

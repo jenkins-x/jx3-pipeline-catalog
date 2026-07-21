@@ -8,12 +8,12 @@ upstream:
     repo: https://github.com/jenkins-x/jx3-pipeline-catalog
     directory: /helm/charts
     ref: master
-  updateStrategy: resource-merge
+  updateStrategy: force-delete-replace
 upstreamLock:
   type: git
   git:
     repo: https://github.com/jenkins-x/jx3-pipeline-catalog
     directory: /helm/charts
     ref: master
-    commit: b52b35506a05e046d54615c3ade97f3aef8bfb08
+    commit: b95321b897a5428b6276ec2075fedc687195b0f3
 pipeline: {}
