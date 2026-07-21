@@ -1,0 +1,52 @@
+{{- if and (eq .Values.jxRequirements.ingress.kind "httproute") (or .Values.httpRoute.hostnames .Values.jxRequirements.ingress.domain) (not .Values.knativeDeploy) }}
+{{- $annotations := dict }}
+{{- $_ := merge $annotations .Values.httpRoute.annotations .Values.jxRequirements.ingress.annotations }}
+{{- if and (hasKey .Values.jxRequirements.ingress "serviceType") (.Values.jxRequirements.ingress.serviceType) (eq .Values.jxRequirements.ingress.serviceType "NodePort") (not (hasKey $annotations "jenkins.io/host")) }}
+{{- $_ := set $annotations "jenkins.io/host" .Values.jxRequirements.ingress.domain }}
+{{- end }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+{{- if $annotations }}
+  annotations:
+{{ toYaml $annotations | indent 4 }}
+{{- end }}
+  name: {{ .Values.service.name }}
+{{- if .Values.httpRoute.labels }}
+  labels:
+{{ toYaml .Values.httpRoute.labels | indent 4 }}
+{{- end }}
+spec:
+  parentRefs:
+{{- if .Values.httpRoute.parentRefs }}
+{{ toYaml .Values.httpRoute.parentRefs | indent 2 }}
+{{- end }}
+  - name: envoy-gateway
+    namespace: envoy-gateway-system
+    sectionName: http
+{{- if .Values.jxRequirements.ingress.tls.enabled }}
+  - name: envoy-gateway
+    namespace: envoy-gateway-system
+    sectionName: https
+{{- end }}
+{{- if not (eq "NodePort" .Values.jxRequirements.ingress.serviceType) }}
+  hostnames:
+{{- if .Values.httpRoute.hostnames }}
+{{ toYaml .Values.httpRoute.hostnames | indent 2 }}
+{{- else }}
+  - {{ printf "%s%s%s" .Values.service.name .Values.jxRequirements.ingress.namespaceSubDomain .Values.jxRequirements.ingress.domain | quote }}
+{{- end }}
+{{- end }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+{{- if eq "NodePort" .Values.jxRequirements.ingress.serviceType }}
+        value: "/{{ .Release.Namespace }}/hook"
+{{- else }}
+        value: {{ .Values.httpRoute.path | default "/" }}
+{{- end }}
+    backendRefs:
+    - name: {{ .Values.service.name }}
+      port: {{ .Values.service.externalPort }}
+{{- end }}
