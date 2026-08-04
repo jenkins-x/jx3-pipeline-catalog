@@ -31,22 +31,6 @@ spec:
               memory: 600Mi
         - name: promote-changelog
           resources: {}
-        - image: ghcr.io/jenkins-x/jx-boot:3.17.76
-          name: promote-pullrequest
-          resources: {}
-          script: |
-            #!/usr/bin/env sh
-            source .jx/variables.sh
-
-            git clone https://github.com/jenkins-x/$REPO_NAME new-main
-            cd new-main
-            git config user.name jenkins-x-bot-test
-            git config user.email "jenkins-x@googlegroups.com"                        
-            sed -i -e "s|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@.*|uses:jenkins-x/jx3-pipeline-catalog/tasks/go/release.yaml@$PULL_BASE_SHA|" environment/.lighthouse/jenkins-x/pullrequest.yaml
-
-            git add * || true
-            git commit -a -m "chore: upgrade environment pull request to $PULL_BASE_SHA" --allow-empty
-            git push
   podTemplate: {}
   serviceAccountName: tekton-bot
   timeout: 12h0m0s

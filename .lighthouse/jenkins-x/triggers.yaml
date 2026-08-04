@@ -55,7 +55,6 @@ spec:
   - name: release
     context: "release"
     source: "release.yaml"
-    ignore_changes: '^\.lighthouse/jenkins-x/pullrequest\.yaml$'
     branches:
     - ^main$
     - ^master$
